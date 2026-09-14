@@ -1,0 +1,1138 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Import Students{% endblock %}
+
+{% block content %}
+
+<section class="import-page">
+
+    <!-- ================================================= -->
+    <!-- HEADER -->
+    <!-- ================================================= -->
+
+    <div class="import-header">
+
+        <div>
+
+            <div class="import-eyebrow">
+                <span></span>
+                STUDENT ACCESS PROVISIONING
+            </div>
+
+            <h1>
+                Import
+                <span>Students</span>
+            </h1>
+
+            <p>
+                Authorize students in bulk using your official
+                college roster.
+            </p>
+
+        </div>
+
+        <a
+            href="{{ url_for('admin.students') }}"
+            class="back-link"
+        >
+            ← Student Registry
+        </a>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- MAIN GRID -->
+    <!-- ================================================= -->
+
+    <div class="import-grid">
+
+        <!-- ============================================= -->
+        <!-- UPLOAD CARD -->
+        <!-- ============================================= -->
+
+        <div class="upload-card">
+
+            <div class="card-grid"></div>
+
+            <div class="upload-card-header">
+
+                <div>
+
+                    <span class="system-label">
+                        DATA INGESTION
+                    </span>
+
+                    <h2>
+                        Upload College Roster
+                    </h2>
+
+                </div>
+
+                <div class="upload-status">
+                    READY
+                </div>
+
+            </div>
+
+
+            <!-- ========================================= -->
+            <!-- DROP ZONE -->
+            <!-- ========================================= -->
+
+            <form
+                method="POST"
+                action="{{ url_for('admin.upload_students') }}"
+                enctype="multipart/form-data"
+                id="studentUploadForm"
+            >
+
+                <label
+                    for="studentFile"
+                    class="drop-zone"
+                    id="dropZone"
+                >
+
+                    <input
+                        type="file"
+                        id="studentFile"
+                        name="student_file"
+                        accept=".csv,.xlsx,.pdf"
+                        hidden
+                        required
+                    >
+
+                    <div class="upload-orbit">
+
+                        <div class="orbit orbit-a"></div>
+                        <div class="orbit orbit-b"></div>
+
+                        <div class="upload-core">
+                            ↑
+                        </div>
+
+                    </div>
+
+                    <div class="drop-title">
+                        Drop roster here
+                    </div>
+
+                    <div class="drop-subtitle">
+                        or click to browse files
+                    </div>
+
+                    <div
+                        class="selected-file"
+                        id="selectedFile"
+                    >
+                        No file selected
+                    </div>
+
+                </label>
+
+
+                <!-- ===================================== -->
+                <!-- ACTION -->
+                <!-- ===================================== -->
+
+                <button
+                    type="submit"
+                    class="process-btn"
+                    id="processBtn"
+                >
+
+                    <span class="process-icon">
+                        →
+                    </span>
+
+                    <span>
+                        Process & Import
+                    </span>
+
+                    <span class="process-arrow">
+                        ↗
+                    </span>
+
+                </button>
+
+            </form>
+
+        </div>
+
+
+        <!-- ============================================= -->
+        <!-- FORMAT CARD -->
+        <!-- ============================================= -->
+
+        <div class="format-card">
+
+            <div class="format-card-top">
+
+                <span class="system-label">
+                    IMPORT PROTOCOL
+                </span>
+
+                <span class="format-count">
+                    03 FORMATS
+                </span>
+
+            </div>
+
+
+            <div class="format-item">
+
+                <div class="format-icon">
+                    CSV
+                </div>
+
+                <div>
+
+                    <strong>
+                        CSV Spreadsheet
+                    </strong>
+
+                    <p>
+                        Best for simple college rosters.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="format-item">
+
+                <div class="format-icon">
+                    XLS
+                </div>
+
+                <div>
+
+                    <strong>
+                        Excel XLSX
+                    </strong>
+
+                    <p>
+                        Use .xlsx format for Excel files.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="format-item">
+
+                <div class="format-icon">
+                    PDF
+                </div>
+
+                <div>
+
+                    <strong>
+                        PDF Roster
+                    </strong>
+
+                    <p>
+                        Text-based PDF documents supported.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- REQUIRED FORMAT -->
+    <!-- ================================================= -->
+
+    <div class="protocol-panel">
+
+        <div class="protocol-title">
+
+            <div class="protocol-number">
+                01
+            </div>
+
+            <div>
+                <strong>
+                    Required File Structure
+                </strong>
+
+                <span>
+                    The system reads the Roll Number / Student ID column.
+                </span>
+            </div>
+
+        </div>
+
+
+        <div class="data-preview">
+
+            <div class="data-header">
+                <span>Name</span>
+                <span>Roll Number</span>
+                <span>Email</span>
+                <span>Phone</span>
+            </div>
+
+
+            <div class="data-row">
+
+                <span>
+                    Anurag Yadav
+                </span>
+
+                <span class="primary-column">
+                    24AI001
+                </span>
+
+                <span>
+                    anurag@example.com
+                </span>
+
+                <span>
+                    9876543210
+                </span>
+
+            </div>
+
+
+            <div class="data-row">
+
+                <span>
+                    Student Name
+                </span>
+
+                <span class="primary-column">
+                    24AI002
+                </span>
+
+                <span>
+                    student@example.com
+                </span>
+
+                <span>
+                    9876543211
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="protocol-note">
+
+            <span>✓</span>
+
+            <p>
+                <strong>Important:</strong>
+                <b>Roll Number</b> or
+                <b>Student ID</b> is the mandatory column.
+                Name, Email and Phone can be present in the file,
+                but the current authorization registry uses the
+                Roll Number / Student ID as the unique identity.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- SECURITY / FLOW -->
+    <!-- ================================================= -->
+
+    <div class="flow-strip">
+
+        <div class="flow-step">
+
+            <span>01</span>
+
+            <div>
+                <strong>Upload</strong>
+                <small>Official roster</small>
+            </div>
+
+        </div>
+
+
+        <div class="flow-line"></div>
+
+
+        <div class="flow-step">
+
+            <span>02</span>
+
+            <div>
+                <strong>Validate</strong>
+                <small>IDs & duplicates</small>
+            </div>
+
+        </div>
+
+
+        <div class="flow-line"></div>
+
+
+        <div class="flow-step">
+
+            <span>03</span>
+
+            <div>
+                <strong>Authorize</strong>
+                <small>Registry update</small>
+            </div>
+
+        </div>
+
+
+        <div class="flow-line"></div>
+
+
+        <div class="flow-step">
+
+            <span>04</span>
+
+            <div>
+                <strong>Dashboard</strong>
+                <small>Import complete</small>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ===================================================== -->
+<!-- STYLES -->
+<!-- ===================================================== -->
+
+<style>
+
+.import-page {
+    animation: importEnter .55s cubic-bezier(.2,.8,.2,1);
+}
+
+@keyframes importEnter {
+
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+}
+
+.import-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 25px;
+    margin-bottom: 25px;
+}
+
+.import-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: .16em;
+    opacity: .55;
+}
+
+.import-eyebrow span {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #20b486;
+    box-shadow: 0 0 0 5px rgba(32,180,134,.10);
+    animation: importPulse 1.8s infinite;
+}
+
+@keyframes importPulse {
+
+    50% {
+        transform: scale(.65);
+        opacity: .5;
+    }
+
+}
+
+.import-header h1 {
+    margin: 9px 0 0;
+    font-size: clamp(32px,4vw,48px);
+    line-height: 1;
+    letter-spacing: -.045em;
+}
+
+.import-header h1 span {
+    opacity: .4;
+}
+
+.import-header p {
+    margin: 12px 0 0;
+    opacity: .6;
+}
+
+.back-link {
+    text-decoration: none;
+    color: inherit;
+    font-size: 12px;
+    font-weight: 800;
+    padding: 10px 14px;
+    border: 1px solid rgba(17,24,39,.09);
+    border-radius: 10px;
+    background: white;
+    transition: .2s ease;
+}
+
+.back-link:hover {
+    transform: translateX(-3px);
+}
+
+
+/* =======================================================
+   MAIN GRID
+======================================================= */
+
+.import-grid {
+    display: grid;
+    grid-template-columns: 1.45fr .75fr;
+    gap: 18px;
+}
+
+
+/* =======================================================
+   UPLOAD CARD
+======================================================= */
+
+.upload-card {
+    position: relative;
+    overflow: hidden;
+    min-height: 430px;
+    padding: 25px;
+    border-radius: 22px;
+    border: 1px solid rgba(17,24,39,.08);
+    background: #111827;
+    color: white;
+    box-shadow: 0 25px 60px rgba(17,24,39,.15);
+}
+
+.card-grid {
+    position: absolute;
+    inset: 0;
+    opacity: .09;
+    background-image:
+        linear-gradient(
+            rgba(255,255,255,.25) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(255,255,255,.25) 1px,
+            transparent 1px
+        );
+    background-size: 35px 35px;
+    mask-image: linear-gradient(
+        to bottom,
+        black,
+        transparent
+    );
+}
+
+.upload-card-header {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.system-label {
+    display: block;
+    font-size: 9px;
+    letter-spacing: .16em;
+    font-weight: 900;
+    opacity: .48;
+}
+
+.upload-card h2 {
+    margin: 8px 0 0;
+    font-size: 23px;
+    letter-spacing: -.025em;
+}
+
+.upload-status {
+    padding: 6px 9px;
+    border-radius: 999px;
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: .1em;
+    background: rgba(255,255,255,.09);
+    border: 1px solid rgba(255,255,255,.12);
+}
+
+
+/* =======================================================
+   DROP ZONE
+======================================================= */
+
+.drop-zone {
+    position: relative;
+    z-index: 2;
+    min-height: 255px;
+    margin-top: 25px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 1px dashed rgba(255,255,255,.22);
+    border-radius: 18px;
+    cursor: pointer;
+    background: rgba(255,255,255,.035);
+    transition:
+        border-color .25s ease,
+        background .25s ease,
+        transform .25s ease;
+}
+
+.drop-zone:hover,
+.drop-zone.drag-active {
+    border-color: rgba(255,255,255,.55);
+    background: rgba(255,255,255,.07);
+    transform: translateY(-2px);
+}
+
+
+/* =======================================================
+   ORBIT
+======================================================= */
+
+.upload-orbit {
+    position: relative;
+    width: 85px;
+    height: 85px;
+    margin-bottom: 18px;
+}
+
+.upload-core {
+    position: absolute;
+    inset: 22px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: white;
+    color: #111827;
+    font-size: 23px;
+    font-weight: 900;
+    box-shadow: 0 0 35px rgba(255,255,255,.15);
+}
+
+.orbit {
+    position: absolute;
+    inset: 0;
+    border: 1px solid rgba(255,255,255,.18);
+    border-radius: 50%;
+}
+
+.orbit-a {
+    animation: orbitA 6s linear infinite;
+}
+
+.orbit-b {
+    inset: 9px;
+    animation: orbitB 4s linear infinite reverse;
+}
+
+@keyframes orbitA {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes orbitB {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.drop-title {
+    font-size: 18px;
+    font-weight: 850;
+}
+
+.drop-subtitle {
+    margin-top: 5px;
+    font-size: 12px;
+    opacity: .48;
+}
+
+.selected-file {
+    margin-top: 13px;
+    max-width: 80%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 10px;
+    opacity: .4;
+}
+
+
+/* =======================================================
+   PROCESS BUTTON
+======================================================= */
+
+.process-btn {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 15px;
+    padding: 14px 16px;
+    border: 0;
+    border-radius: 13px;
+    background: white;
+    color: #111827;
+    font: inherit;
+    font-weight: 900;
+    cursor: pointer;
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease;
+}
+
+.process-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 35px rgba(0,0,0,.2);
+}
+
+.process-icon {
+    font-size: 20px;
+}
+
+.process-arrow {
+    margin-left: auto;
+    font-size: 18px;
+}
+
+
+/* =======================================================
+   FORMAT CARD
+======================================================= */
+
+.format-card {
+    padding: 22px;
+    border-radius: 22px;
+    border: 1px solid rgba(17,24,39,.08);
+    background: white;
+    box-shadow: 0 18px 50px rgba(17,24,39,.06);
+}
+
+.format-card-top {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 17px;
+}
+
+.format-count {
+    font-size: 9px;
+    font-weight: 900;
+    opacity: .4;
+}
+
+.format-item {
+    display: flex;
+    gap: 13px;
+    padding: 16px 0;
+    border-top: 1px solid rgba(17,24,39,.07);
+}
+
+.format-icon {
+    width: 43px;
+    height: 43px;
+    flex: 0 0 43px;
+    display: grid;
+    place-items: center;
+    border-radius: 11px;
+    background: #f1f3f6;
+    font-size: 10px;
+    font-weight: 900;
+}
+
+.format-item strong {
+    display: block;
+    font-size: 13px;
+}
+
+.format-item p {
+    margin: 4px 0 0;
+    font-size: 11px;
+    opacity: .52;
+    line-height: 1.5;
+}
+
+
+/* =======================================================
+   PROTOCOL
+======================================================= */
+
+.protocol-panel {
+    margin-top: 18px;
+    padding: 21px;
+    border: 1px solid rgba(17,24,39,.08);
+    border-radius: 20px;
+    background: white;
+    box-shadow: 0 18px 50px rgba(17,24,39,.05);
+}
+
+.protocol-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 17px;
+}
+
+.protocol-number {
+    width: 35px;
+    height: 35px;
+    display: grid;
+    place-items: center;
+    border-radius: 10px;
+    background: #111827;
+    color: white;
+    font-size: 10px;
+    font-weight: 900;
+}
+
+.protocol-title strong {
+    display: block;
+}
+
+.protocol-title span {
+    display: block;
+    margin-top: 3px;
+    font-size: 11px;
+    opacity: .52;
+}
+
+.data-preview {
+    overflow: hidden;
+    border: 1px solid rgba(17,24,39,.08);
+    border-radius: 13px;
+}
+
+.data-header,
+.data-row {
+    display: grid;
+    grid-template-columns: 1.1fr .9fr 1.3fr .9fr;
+    gap: 10px;
+    padding: 12px 14px;
+}
+
+.data-header {
+    background: #f5f6f8;
+    font-size: 9px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    opacity: .5;
+}
+
+.data-row {
+    border-top: 1px solid rgba(17,24,39,.06);
+    font-size: 11px;
+}
+
+.primary-column {
+    font-weight: 900;
+}
+
+.protocol-note {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    padding: 12px;
+    border-radius: 12px;
+    background: #f6f8fa;
+}
+
+.protocol-note > span {
+    font-weight: 900;
+}
+
+.protocol-note p {
+    margin: 0;
+    font-size: 11px;
+    line-height: 1.55;
+    opacity: .62;
+}
+
+
+/* =======================================================
+   FLOW
+======================================================= */
+
+.flow-strip {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 18px;
+    padding: 15px 18px;
+    border: 1px solid rgba(17,24,39,.08);
+    border-radius: 17px;
+    background: rgba(255,255,255,.7);
+}
+
+.flow-step {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-width: 0;
+}
+
+.flow-step > span {
+    width: 27px;
+    height: 27px;
+    display: grid;
+    place-items: center;
+    border-radius: 8px;
+    background: #f0f2f5;
+    font-size: 9px;
+    font-weight: 900;
+}
+
+.flow-step strong {
+    display: block;
+    font-size: 10px;
+}
+
+.flow-step small {
+    display: block;
+    margin-top: 2px;
+    font-size: 9px;
+    opacity: .45;
+}
+
+.flow-line {
+    flex: 1;
+    height: 1px;
+    background: rgba(17,24,39,.1);
+}
+
+
+/* =======================================================
+   RESPONSIVE
+======================================================= */
+
+@media (max-width: 900px) {
+
+    .import-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .flow-strip {
+        overflow-x: auto;
+    }
+
+    .flow-step {
+        min-width: 130px;
+    }
+
+}
+
+@media (max-width: 650px) {
+
+    .import-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .data-preview {
+        overflow-x: auto;
+    }
+
+    .data-header,
+    .data-row {
+        min-width: 650px;
+    }
+
+    .flow-line {
+        min-width: 25px;
+    }
+
+}
+
+</style>
+
+
+<!-- ===================================================== -->
+<!-- FILE INTERACTION -->
+<!-- ===================================================== -->
+
+<script>
+
+const fileInput =
+    document.getElementById("studentFile");
+
+const dropZone =
+    document.getElementById("dropZone");
+
+const selectedFile =
+    document.getElementById("selectedFile");
+
+const form =
+    document.getElementById("studentUploadForm");
+
+const processBtn =
+    document.getElementById("processBtn");
+
+
+function showSelectedFile(file) {
+
+    if (!file) {
+
+        selectedFile.textContent =
+            "No file selected";
+
+        return;
+    }
+
+    selectedFile.textContent =
+        `${file.name} • ${(file.size / 1024).toFixed(1)} KB`;
+
+}
+
+
+fileInput.addEventListener(
+    "change",
+    () => {
+
+        showSelectedFile(
+            fileInput.files[0]
+        );
+
+    }
+);
+
+
+/* =======================================================
+   DRAG & DROP
+======================================================= */
+
+[
+    "dragenter",
+    "dragover"
+].forEach(eventName => {
+
+    dropZone.addEventListener(
+        eventName,
+        event => {
+
+            event.preventDefault();
+
+            dropZone.classList.add(
+                "drag-active"
+            );
+
+        }
+    );
+
+});
+
+
+[
+    "dragleave",
+    "drop"
+].forEach(eventName => {
+
+    dropZone.addEventListener(
+        eventName,
+        event => {
+
+            event.preventDefault();
+
+            dropZone.classList.remove(
+                "drag-active"
+            );
+
+        }
+    );
+
+});
+
+
+dropZone.addEventListener(
+    "drop",
+    event => {
+
+        const file =
+            event.dataTransfer.files[0];
+
+        if (!file) return;
+
+        const allowed = [
+            ".csv",
+            ".xlsx",
+            ".pdf"
+        ];
+
+        const extension =
+            "." +
+            file.name
+                .split(".")
+                .pop()
+                .toLowerCase();
+
+        if (!allowed.includes(extension)) {
+
+            alert(
+                "Only CSV, XLSX and PDF files are supported."
+            );
+
+            return;
+        }
+
+        fileInput.files =
+            event.dataTransfer.files;
+
+        showSelectedFile(file);
+
+    }
+);
+
+
+/* =======================================================
+   SUBMIT ANIMATION
+======================================================= */
+
+form.addEventListener(
+    "submit",
+    () => {
+
+        processBtn.disabled = true;
+
+        processBtn.innerHTML = `
+            <span class="process-icon">◌</span>
+            <span>Processing roster...</span>
+        `;
+
+    }
+);
+
+</script>
+
+{% endblock %}

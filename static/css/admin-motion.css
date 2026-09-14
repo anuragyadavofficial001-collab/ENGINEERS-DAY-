@@ -1,0 +1,452 @@
+
+/* =========================================================
+   ENGINEERS DAY — ADMIN MOTION SYSTEM v2
+   Drop-in visual layer. Keep admin.css; load this AFTER it.
+   ========================================================= */
+
+:root{
+  --ed-bg:#f5f7fb;
+  --ed-surface:rgba(255,255,255,.76);
+  --ed-surface-strong:rgba(255,255,255,.92);
+  --ed-ink:#101827;
+  --ed-muted:#667085;
+  --ed-line:rgba(15,23,42,.08);
+  --ed-blue:#2563eb;
+  --ed-cyan:#06b6d4;
+  --ed-violet:#7c3aed;
+  --ed-green:#16a34a;
+  --ed-red:#ef4444;
+  --ed-shadow:0 18px 55px rgba(15,23,42,.08);
+  --ed-radius:20px;
+  --ed-ease:cubic-bezier(.22,1,.36,1);
+}
+
+html{scroll-behavior:smooth}
+
+body{
+  background:
+    radial-gradient(circle at 12% 8%,rgba(37,99,235,.08),transparent 26rem),
+    radial-gradient(circle at 88% 16%,rgba(124,58,237,.07),transparent 25rem),
+    linear-gradient(135deg,#f8fafc 0%,#f2f5fa 48%,#f8fafc 100%);
+  color:var(--ed-ink);
+}
+
+/* Ambient engineering grid */
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:-1;
+  opacity:.34;
+  background-image:
+    linear-gradient(rgba(37,99,235,.035) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(37,99,235,.035) 1px,transparent 1px);
+  background-size:34px 34px;
+  mask-image:linear-gradient(to bottom,black,transparent 82%);
+}
+
+/* Page entrance */
+body.ed-page-ready .admin-content,
+body.ed-page-ready main,
+body.ed-page-ready .main-content,
+body.ed-page-ready .content{
+  animation:edPageIn .72s var(--ed-ease) both;
+}
+@keyframes edPageIn{
+  from{opacity:0;transform:translateY(14px) scale(.995)}
+  to{opacity:1;transform:none}
+}
+
+/* Sidebar — restrained glass */
+.sidebar,
+.admin-sidebar,
+aside{
+  backdrop-filter:blur(18px) saturate(135%);
+  -webkit-backdrop-filter:blur(18px) saturate(135%);
+  background:linear-gradient(180deg,rgba(255,255,255,.88),rgba(248,250,252,.76));
+  border-right:1px solid var(--ed-line);
+}
+
+.sidebar a,
+.admin-sidebar a,
+aside a{
+  position:relative;
+  transition:
+    transform .24s var(--ed-ease),
+    background .24s ease,
+    color .24s ease,
+    box-shadow .24s ease;
+}
+.sidebar a:hover,
+.admin-sidebar a:hover,
+aside a:hover{
+  transform:translateX(4px);
+  background:rgba(37,99,235,.065);
+}
+.sidebar a.active,
+.admin-sidebar a.active,
+aside a.active{
+  box-shadow:inset 3px 0 0 var(--ed-blue),0 8px 24px rgba(37,99,235,.08);
+}
+
+/* Main cards: depth + subtle 3D */
+.card,
+.panel,
+.stat-card,
+.dashboard-card,
+.content-card,
+.section-card,
+.info-card,
+.table-card,
+.form-card,
+.upload-card,
+.notification-card,
+.event-card{
+  position:relative;
+  isolation:isolate;
+  border:1px solid var(--ed-line);
+  background:var(--ed-surface);
+  box-shadow:var(--ed-shadow);
+  border-radius:var(--ed-radius);
+  backdrop-filter:blur(16px) saturate(120%);
+  -webkit-backdrop-filter:blur(16px) saturate(120%);
+  transition:
+    transform .42s var(--ed-ease),
+    box-shadow .42s var(--ed-ease),
+    border-color .3s ease;
+  animation:edCardIn .62s var(--ed-ease) both;
+}
+.card::after,
+.panel::after,
+.stat-card::after,
+.dashboard-card::after,
+.content-card::after,
+.section-card::after,
+.info-card::after,
+.table-card::after,
+.form-card::after,
+.upload-card::after,
+.notification-card::after,
+.event-card::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  pointer-events:none;
+  background:linear-gradient(125deg,rgba(255,255,255,.45),transparent 35%);
+  opacity:.6;
+  z-index:-1;
+}
+@keyframes edCardIn{
+  from{opacity:0;transform:translateY(18px) scale(.985)}
+  to{opacity:1;transform:none}
+}
+.card:hover,
+.panel:hover,
+.stat-card:hover,
+.dashboard-card:hover,
+.content-card:hover,
+.section-card:hover,
+.info-card:hover,
+.table-card:hover,
+.form-card:hover,
+.upload-card:hover,
+.notification-card:hover,
+.event-card:hover{
+  transform:translateY(-5px);
+  box-shadow:0 26px 70px rgba(15,23,42,.12);
+  border-color:rgba(37,99,235,.16);
+}
+
+/* Staggered children */
+.stat-card:nth-child(1), .card:nth-child(1){animation-delay:.04s}
+.stat-card:nth-child(2), .card:nth-child(2){animation-delay:.09s}
+.stat-card:nth-child(3), .card:nth-child(3){animation-delay:.14s}
+.stat-card:nth-child(4), .card:nth-child(4){animation-delay:.19s}
+.stat-card:nth-child(5), .card:nth-child(5){animation-delay:.24s}
+.stat-card:nth-child(6), .card:nth-child(6){animation-delay:.29s}
+
+/* Metric numbers */
+.stat-card .value,
+.stat-card .number,
+.metric-value,
+.kpi-value,
+.stat-value{
+  letter-spacing:-.045em;
+  font-variant-numeric:tabular-nums;
+  text-shadow:0 8px 28px rgba(37,99,235,.12);
+}
+
+/* Headers */
+.page-title,
+.page-header h1,
+.content-header h1,
+main h1{
+  letter-spacing:-.045em;
+}
+.page-subtitle,
+.page-header p,
+.content-header p{
+  color:var(--ed-muted);
+}
+
+/* Buttons: tactile, not gimmicky */
+button,
+.btn,
+a.btn,
+input[type="submit"],
+input[type="button"]{
+  position:relative;
+  overflow:hidden;
+  transition:
+    transform .22s var(--ed-ease),
+    box-shadow .22s var(--ed-ease),
+    filter .22s ease;
+}
+button::after,
+.btn::after,
+a.btn::after,
+input[type="submit"]::after{
+  content:"";
+  position:absolute;
+  width:80px;
+  height:80px;
+  left:var(--mx,50%);
+  top:var(--my,50%);
+  transform:translate(-50%,-50%) scale(0);
+  border-radius:50%;
+  background:rgba(255,255,255,.22);
+  pointer-events:none;
+  transition:transform .45s var(--ed-ease);
+}
+button:hover,
+.btn:hover,
+a.btn:hover,
+input[type="submit"]:hover{
+  transform:translateY(-2px);
+  box-shadow:0 12px 28px rgba(37,99,235,.18);
+}
+button:hover::after,
+.btn:hover::after,
+a.btn:hover::after,
+input[type="submit"]:hover::after{
+  transform:translate(-50%,-50%) scale(1.8);
+}
+
+/* Inputs */
+input,select,textarea{
+  transition:
+    border-color .22s ease,
+    box-shadow .22s ease,
+    transform .22s var(--ed-ease),
+    background .22s ease;
+}
+input:focus,select:focus,textarea:focus{
+  outline:none;
+  border-color:rgba(37,99,235,.5)!important;
+  box-shadow:0 0 0 4px rgba(37,99,235,.09),0 12px 30px rgba(37,99,235,.06);
+  transform:translateY(-1px);
+}
+
+/* Tables */
+.table-wrap,
+.table-container,
+.data-table-wrap{
+  overflow:auto;
+  border-radius:18px;
+}
+table{
+  border-collapse:separate;
+  border-spacing:0;
+}
+thead th{
+  position:sticky;
+  top:0;
+  z-index:2;
+  background:rgba(248,250,252,.92);
+  backdrop-filter:blur(12px);
+}
+tbody tr{
+  transition:
+    background .2s ease,
+    transform .22s var(--ed-ease),
+    box-shadow .22s ease;
+}
+tbody tr:hover{
+  background:rgba(37,99,235,.035);
+}
+
+/* Status badges */
+.badge,
+.status,
+.pill,
+.tag{
+  transition:transform .2s var(--ed-ease),box-shadow .2s ease;
+}
+.badge:hover,
+.status:hover,
+.pill:hover,
+.tag:hover{
+  transform:translateY(-1px) scale(1.025);
+  box-shadow:0 6px 18px rgba(15,23,42,.08);
+}
+
+/* Flash messages */
+.flash,
+.alert,
+.notice{
+  animation:edAlert .55s var(--ed-ease) both;
+}
+@keyframes edAlert{
+  from{opacity:0;transform:translateY(-10px);filter:blur(3px)}
+  to{opacity:1;transform:none;filter:none}
+}
+
+/* ---------------- PAGE-SPECIFIC MOTION ---------------- */
+
+/* Dashboard: telemetry sweep */
+body[data-ed-page="dashboard"] .stat-card::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  pointer-events:none;
+  background:linear-gradient(105deg,transparent 35%,rgba(37,99,235,.09),transparent 65%);
+  transform:translateX(-120%);
+  animation:edSweep 5.5s ease-in-out infinite;
+}
+@keyframes edSweep{
+  0%,55%{transform:translateX(-120%)}
+  75%,100%{transform:translateX(120%)}
+}
+
+/* Events: event cards get a perspective lift */
+body[data-ed-page="events"] .event-card,
+body[data-ed-page="event-edit"] .form-card{
+  transform-style:preserve-3d;
+  perspective:900px;
+}
+
+/* Registrations: table becomes an operations console */
+body[data-ed-page="registrations"] table tbody tr{
+  animation:edRowIn .45s var(--ed-ease) both;
+}
+@keyframes edRowIn{
+  from{opacity:0;transform:translateX(12px)}
+  to{opacity:1;transform:none}
+}
+
+/* Results: winner emphasis */
+body[data-ed-page="results"] .winner,
+body[data-ed-page="result-edit"] .winner,
+body[data-ed-page="results"] [class*="winner"]{
+  box-shadow:0 18px 55px rgba(124,58,237,.12);
+}
+
+/* Notifications: signal-feed pulse */
+body[data-ed-page="notifications"] .notification-card::before{
+  content:"";
+  position:absolute;
+  width:7px;height:7px;
+  border-radius:50%;
+  top:18px;right:18px;
+  background:var(--ed-cyan);
+  box-shadow:0 0 0 0 rgba(6,182,212,.35);
+  animation:edPulse 2.2s infinite;
+}
+@keyframes edPulse{
+  0%{box-shadow:0 0 0 0 rgba(6,182,212,.35)}
+  70%{box-shadow:0 0 0 10px rgba(6,182,212,0)}
+  100%{box-shadow:0 0 0 0 rgba(6,182,212,0)}
+}
+
+/* Student registry: scanning line */
+body[data-ed-page="students"] .table-card::before,
+body[data-ed-page="upload-students"] .upload-card::before{
+  content:"";
+  position:absolute;
+  left:0;right:0;top:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--ed-blue),transparent);
+  opacity:.5;
+  animation:edScan 4s linear infinite;
+}
+@keyframes edScan{
+  0%{transform:translateY(0);opacity:0}
+  10%{opacity:.7}
+  90%{opacity:.7}
+  100%{transform:translateY(520px);opacity:0}
+}
+
+/* Upload: drag-zone breathing state */
+body[data-ed-page="upload-students"] input[type="file"] + *,
+body[data-ed-page="upload-students"] .dropzone,
+body[data-ed-page="upload-students"] .upload-zone{
+  transition:transform .35s var(--ed-ease),box-shadow .35s ease,border-color .35s ease;
+}
+body[data-ed-page="upload-students"] .dropzone:hover,
+body[data-ed-page="upload-students"] .upload-zone:hover{
+  transform:translateY(-4px) scale(1.005);
+  box-shadow:0 25px 65px rgba(37,99,235,.12);
+  border-color:rgba(37,99,235,.35);
+}
+
+/* Settings: command-center sections */
+body[data-ed-page="settings"] .form-card,
+body[data-ed-page="settings"] .panel{
+  transition:transform .35s var(--ed-ease),box-shadow .35s var(--ed-ease);
+}
+
+/* Registration detail / result edit */
+body[data-ed-page="registration-details"] .form-card,
+body[data-ed-page="result-edit"] .form-card,
+body[data-ed-page="event-edit"] .form-card{
+  animation:edFocusIn .7s var(--ed-ease) both;
+}
+@keyframes edFocusIn{
+  from{opacity:0;transform:perspective(1000px) rotateX(2deg) translateY(18px)}
+  to{opacity:1;transform:none}
+}
+
+/* Page transition overlay */
+#ed-transition{
+  position:fixed;
+  inset:0;
+  z-index:99999;
+  pointer-events:none;
+  background:
+    radial-gradient(circle at 50% 50%,rgba(37,99,235,.13),transparent 20%),
+    #f7f9fc;
+  opacity:1;
+  animation:edTransitionOut .62s var(--ed-ease) .03s forwards;
+}
+@keyframes edTransitionOut{
+  to{opacity:0;visibility:hidden}
+}
+
+/* Loading shimmer utility */
+.ed-shimmer{
+  background:linear-gradient(100deg,rgba(148,163,184,.08) 20%,rgba(255,255,255,.7) 40%,rgba(148,163,184,.08) 60%);
+  background-size:200% 100%;
+  animation:edShimmer 1.4s linear infinite;
+}
+@keyframes edShimmer{to{background-position:-200% 0}}
+
+/* Respect accessibility */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.001ms!important;
+    animation-iteration-count:1!important;
+    scroll-behavior:auto!important;
+    transition-duration:.001ms!important;
+  }
+}
+
+/* Mobile */
+@media (max-width:900px){
+  body::before{background-size:26px 26px}
+  .card,.panel,.stat-card,.dashboard-card,.content-card,.section-card,
+  .info-card,.table-card,.form-card,.upload-card,.notification-card,.event-card{
+    border-radius:16px;
+  }
+}

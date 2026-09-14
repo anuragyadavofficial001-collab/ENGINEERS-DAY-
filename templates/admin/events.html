@@ -1,0 +1,124 @@
+{% extends "admin/base.html" %}
+
+{% block title %}
+Event Management
+{% endblock %}
+
+{% block content %}
+
+<div class="events-page">
+
+    <div class="page-header">
+        <div>
+            <div class="section-kicker">ADMIN / EVENT OPERATIONS</div>
+            <h1>Event Management</h1>
+            <p>Manage Engineers Day events, schedules, participation and event configuration.</p>
+        </div>
+
+        <div class="header-date">
+            <span class="date-label">TOTAL EVENTS</span>
+            <strong>{{ games|length }}</strong>
+        </div>
+    </div>
+
+
+    <div class="events-grid">
+
+        {% for game in games %}
+
+        <div class="event-card">
+
+            <div class="event-card-top">
+                <span class="event-number">
+                    {{ "%02d"|format(loop.index) }}
+                </span>
+
+                <span class="event-status">
+                    {{ game.status or "UPCOMING" }}
+                </span>
+            </div>
+
+
+            <div class="event-card-body">
+
+                <h2>{{ game.game_name }}</h2>
+
+                <p>
+                    {{ game.description or "No event description available." }}
+                </p>
+
+                <div class="event-meta">
+
+                    <div>
+                        <span>MODE</span>
+                        <strong>{{ game.registration_mode }}</strong>
+                    </div>
+
+                    <div>
+                        <span>TEAM SIZE</span>
+                        <strong>
+                            {% if game.registration_mode == "TEAM" %}
+                                {{ game.team_min_size }}–{{ game.team_max_size }}
+                            {% else %}
+                                Individual
+                            {% endif %}
+                        </strong>
+                    </div>
+
+                    <div>
+                        <span>DATE</span>
+                        <strong>{{ game.schedule_date or "Not set" }}</strong>
+                    </div>
+
+                    <div>
+                        <span>TIME</span>
+                        <strong>{{ game.schedule_time or "Not set" }}</strong>
+                    </div>
+
+                    <div>
+                        <span>VENUE</span>
+                        <strong>{{ game.venue or "Not set" }}</strong>
+                    </div>
+
+                    <div>
+                        <span>PRIZE</span>
+                        <strong>{{ game.prize_pool or "Not announced" }}</strong>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="event-card-footer">
+
+                <span>
+                    {% if game.registration_open %}
+                        Registration Open
+                    {% else %}
+                        Registration Closed
+                    {% endif %}
+                </span>
+
+                <a href="{{ url_for('admin.edit_event', game_id=game.id) }}">
+                    Edit Event →
+                </a>
+
+            </div>
+
+        </div>
+
+        {% else %}
+
+        <div class="empty-state">
+            <h2>No Events Found</h2>
+            <p>There are currently no events available in the database.</p>
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endblock %}

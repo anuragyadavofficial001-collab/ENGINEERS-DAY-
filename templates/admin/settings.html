@@ -1,0 +1,195 @@
+{% extends "admin/base.html" %}
+
+{% block title %}
+Settings
+{% endblock %}
+
+{% block content %}
+
+<div class="settings-page">
+
+    <div class="page-header">
+        <div>
+            <div class="section-kicker">SYSTEM / CONFIGURATION</div>
+
+            <h1>Settings</h1>
+
+            <p>
+                Manage administrative preferences and event portal configuration.
+            </p>
+        </div>
+
+        <div class="header-date">
+            <span class="date-label">SYSTEM</span>
+            <strong>CONFIG</strong>
+        </div>
+    </div>
+
+
+    <form method="POST" class="settings-form">
+
+        <!-- PORTAL -->
+
+        <section class="settings-section">
+
+            <div class="settings-heading">
+                <div>
+                    <span>01 / PORTAL</span>
+                    <h2>Portal Configuration</h2>
+                </div>
+
+                <b>GENERAL</b>
+            </div>
+
+            <div class="settings-grid">
+
+                <div class="settings-field full">
+                    <label for="portal_name">Portal Name</label>
+
+                    <input
+                        type="text"
+                        id="portal_name"
+                        name="portal_name"
+                        value="{{ settings.portal_name if settings else 'Engineers Day 2026' }}"
+                    >
+                </div>
+
+                <div class="settings-field">
+                    <label for="event_date">Event Date</label>
+
+                    <input
+                        type="date"
+                        id="event_date"
+                        name="event_date"
+                        value="{{ settings.event_date if settings else '2026-09-15' }}"
+                    >
+                </div>
+
+                <div class="settings-field">
+                    <label for="portal_status">Portal Status</label>
+
+                    <select id="portal_status" name="portal_status">
+                        <option value="ACTIVE">Active</option>
+                        <option value="MAINTENANCE">Maintenance</option>
+                    </select>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- REGISTRATION -->
+
+        <section class="settings-section">
+
+            <div class="settings-heading">
+                <div>
+                    <span>02 / ACCESS</span>
+                    <h2>Registration Control</h2>
+                </div>
+
+                <b>ACCESS</b>
+            </div>
+
+            <div class="settings-toggle-grid">
+
+                <label class="settings-toggle">
+
+                    <input
+                        type="checkbox"
+                        name="registration_enabled"
+                        value="1"
+                        checked
+                    >
+
+                    <span>
+                        <strong>Registration Engine</strong>
+                        <small>
+                            Allow students to register for available events.
+                        </small>
+                    </span>
+
+                </label>
+
+
+                <label class="settings-toggle">
+
+                    <input
+                        type="checkbox"
+                        name="student_login_enabled"
+                        value="1"
+                        checked
+                    >
+
+                    <span>
+                        <strong>Student Login</strong>
+                        <small>
+                            Allow students to access the event portal.
+                        </small>
+                    </span>
+
+                </label>
+
+            </div>
+
+        </section>
+
+
+        <!-- SYSTEM -->
+
+        <section class="settings-section">
+
+            <div class="settings-heading">
+                <div>
+                    <span>03 / SYSTEM</span>
+                    <h2>System Information</h2>
+                </div>
+
+                <b>STATUS</b>
+            </div>
+
+            <div class="system-info-grid">
+
+                <div>
+                    <span>DATABASE</span>
+                    <strong>MySQL</strong>
+                </div>
+
+                <div>
+                    <span>EVENT CATALOG</span>
+                    <strong>27 Events</strong>
+                </div>
+
+                <div>
+                    <span>AUTHENTICATION</span>
+                    <strong>OTP Based</strong>
+                </div>
+
+                <div>
+                    <span>PLATFORM</span>
+                    <strong>Operational</strong>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <div class="settings-actions">
+
+            <button
+                type="submit"
+                class="primary-action"
+            >
+                Save Settings
+                <span>→</span>
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

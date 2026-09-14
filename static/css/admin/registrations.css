@@ -1,0 +1,1679 @@
+/* =========================================================
+   ENGINEERS DAY ADMIN
+   REGISTRATIONS — GLASS OPERATIONS UI
+   ---------------------------------------------------------
+   Page-specific stylesheet
+   ========================================================= */
+
+
+/* =========================================================
+   PAGE ATMOSPHERE
+   ========================================================= */
+
+.admin-page {
+    position: relative;
+    isolation: isolate;
+    min-height: 100%;
+    padding-bottom: 42px;
+}
+
+
+/* Soft glass-light atmosphere */
+
+.admin-page::before,
+.admin-page::after {
+    content: "";
+    position: fixed;
+    z-index: -1;
+    pointer-events: none;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: .55;
+}
+
+.admin-page::before {
+    width: 420px;
+    height: 420px;
+    top: 13%;
+    right: -190px;
+    background: rgba(37, 99, 235, .075);
+}
+
+.admin-page::after {
+    width: 340px;
+    height: 340px;
+    left: 18%;
+    bottom: -180px;
+    background: rgba(6, 182, 212, .055);
+}
+
+
+/* =========================================================
+   PAGE HEADER
+   ========================================================= */
+
+.admin-page .page-header {
+    position: relative;
+
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+
+    gap: 24px;
+    margin-bottom: 22px;
+}
+
+
+.admin-page .page-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    margin-bottom: 8px;
+
+    color: #2563eb;
+
+    font-size: 9px;
+    font-weight: 850;
+
+    letter-spacing: .14em;
+    text-transform: uppercase;
+}
+
+
+.admin-page .page-eyebrow .eyebrow-dot {
+    width: 6px;
+    height: 6px;
+
+    border-radius: 50%;
+
+    background: #2563eb;
+
+    box-shadow:
+        0 0 0 4px rgba(37, 99, 235, .07),
+        0 0 14px rgba(37, 99, 235, .24);
+
+    animation:
+        registrationPulse
+        2.4s
+        ease-in-out
+        infinite;
+}
+
+
+.admin-page .page-title {
+    margin: 0;
+
+    color: #0f172a;
+
+    font-size: clamp(30px, 3vw, 42px);
+    font-weight: 850;
+
+    line-height: 1;
+    letter-spacing: -.045em;
+}
+
+
+.admin-page .page-subtitle {
+    max-width: 690px;
+
+    margin: 9px 0 0;
+
+    color: rgba(15, 23, 42, .52);
+
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+
+.admin-page .page-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+
+/* =========================================================
+   GLASS BUTTON SYSTEM
+   ========================================================= */
+
+.admin-page .admin-btn {
+    position: relative;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+
+    min-height: 40px;
+
+    padding: 10px 15px;
+
+    border-radius: 11px;
+
+    font-family: inherit;
+    font-size: 10px;
+    font-weight: 820;
+
+    text-decoration: none;
+
+    cursor: pointer;
+    overflow: hidden;
+
+    transform: translateZ(0);
+
+    transition:
+        transform .2s cubic-bezier(.16, 1, .3, 1),
+        background .22s ease,
+        border-color .22s ease,
+        box-shadow .22s ease,
+        color .22s ease,
+        filter .22s ease;
+}
+
+
+.admin-page .admin-btn::before {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    background:
+        linear-gradient(
+            115deg,
+            transparent 25%,
+            rgba(255,255,255,.20) 48%,
+            transparent 70%
+        );
+
+    transform:
+        translateX(-130%);
+
+    transition:
+        transform .55s cubic-bezier(.16, 1, .3, 1);
+
+    pointer-events: none;
+}
+
+
+.admin-page .admin-btn:hover::before {
+    transform:
+        translateX(130%);
+}
+
+
+.admin-page .admin-btn:active {
+    transform:
+        translateY(1px)
+        scale(.965);
+}
+
+
+.admin-page .admin-btn:focus-visible {
+    outline:
+        2px solid rgba(37,99,235,.62);
+
+    outline-offset: 3px;
+}
+
+
+/* Secondary */
+
+.admin-page .admin-btn-secondary {
+    color: #334155;
+
+    background:
+        rgba(255,255,255,.62);
+
+    border:
+        1px solid rgba(148,163,184,.19);
+
+    box-shadow:
+        0 7px 18px rgba(15,23,42,.045),
+        inset 0 1px 0 rgba(255,255,255,.88);
+}
+
+
+.admin-page .admin-btn-secondary:hover {
+    color: #1d4ed8;
+
+    background:
+        rgba(239,246,255,.82);
+
+    border-color:
+        rgba(37,99,235,.18);
+
+    transform:
+        translateY(-2px);
+
+    box-shadow:
+        0 11px 24px rgba(15,23,42,.075),
+        inset 0 1px 0 rgba(255,255,255,.95);
+}
+
+
+/* Primary */
+
+.admin-page .admin-btn-primary {
+    color: #fff;
+
+    background:
+        linear-gradient(
+            135deg,
+            #2563eb,
+            #1d4ed8
+        );
+
+    border:
+        1px solid rgba(37,99,235,.35);
+
+    box-shadow:
+        0 8px 18px rgba(37,99,235,.19),
+        inset 0 1px 0 rgba(255,255,255,.20);
+}
+
+
+.admin-page .admin-btn-primary:hover {
+    filter: brightness(1.055);
+
+    transform:
+        translateY(-2px);
+
+    box-shadow:
+        0 12px 25px rgba(37,99,235,.25),
+        inset 0 1px 0 rgba(255,255,255,.22);
+}
+
+
+/* =========================================================
+   STAT GLASS CARDS
+   ========================================================= */
+
+.admin-page .admin-stat-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: 14px;
+
+    margin-bottom: 22px;
+}
+
+
+.admin-page .admin-stat-card {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+
+    gap: 13px;
+
+    min-height: 105px;
+
+    padding: 17px;
+
+    overflow: hidden;
+
+    border-radius: 18px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.72),
+            rgba(255,255,255,.39)
+        );
+
+    border:
+        1px solid rgba(255,255,255,.72);
+
+    box-shadow:
+        0 12px 30px rgba(15,23,42,.065),
+        0 2px 8px rgba(15,23,42,.025),
+        inset 0 1px 0 rgba(255,255,255,.90);
+
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+
+    transition:
+        transform .24s cubic-bezier(.16,1,.3,1),
+        box-shadow .24s ease,
+        border-color .24s ease;
+}
+
+
+.admin-page .admin-stat-card::before {
+    content: "";
+
+    position: absolute;
+
+    width: 130px;
+    height: 130px;
+
+    right: -62px;
+    top: -65px;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(37,99,235,.10),
+            transparent 68%
+        );
+
+    pointer-events: none;
+}
+
+
+.admin-page .admin-stat-card:hover {
+    transform:
+        translateY(-4px);
+
+    border-color:
+        rgba(37,99,235,.16);
+
+    box-shadow:
+        0 18px 38px rgba(15,23,42,.09),
+        0 4px 10px rgba(15,23,42,.03),
+        inset 0 1px 0 rgba(255,255,255,.96);
+}
+
+
+.admin-page .admin-stat-icon {
+    position: relative;
+    z-index: 1;
+
+    width: 40px;
+    height: 40px;
+    flex: 0 0 40px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 12px;
+
+    color: #2563eb;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(239,246,255,.92),
+            rgba(219,234,254,.55)
+        );
+
+    border:
+        1px solid rgba(37,99,235,.10);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.95);
+
+    font-size: 17px;
+    font-weight: 800;
+}
+
+
+.admin-page .admin-stat-content {
+    position: relative;
+    z-index: 1;
+
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+}
+
+
+.admin-page .admin-stat-label {
+    color: rgba(15,23,42,.43);
+
+    font-size: 8px;
+    font-weight: 850;
+
+    letter-spacing: .12em;
+}
+
+
+.admin-page .admin-stat-content strong {
+    margin-top: 2px;
+
+    color: #0f172a;
+
+    font-size: 25px;
+    font-weight: 850;
+
+    line-height: 1;
+
+    font-variant-numeric: tabular-nums;
+}
+
+
+.admin-page .admin-stat-content small {
+    margin-top: 5px;
+
+    color: rgba(15,23,42,.42);
+
+    font-size: 9px;
+}
+
+
+/* =========================================================
+   GLASS CARD FOUNDATION
+   ========================================================= */
+
+.admin-page .admin-card {
+    position: relative;
+
+    overflow: hidden;
+
+    margin-bottom: 20px;
+
+    border-radius: 20px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.72),
+            rgba(248,250,252,.48)
+        );
+
+    border:
+        1px solid rgba(255,255,255,.72);
+
+    box-shadow:
+        0 16px 40px rgba(15,23,42,.065),
+        0 3px 9px rgba(15,23,42,.025),
+        inset 0 1px 0 rgba(255,255,255,.92);
+
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+
+.admin-page .admin-card::before {
+    content: "";
+
+    position: absolute;
+
+    left: 8%;
+    right: 8%;
+    top: 0;
+
+    height: 1px;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(37,99,235,.22),
+            transparent
+        );
+}
+
+
+.admin-page .admin-card-header {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding: 19px 21px;
+
+    border-bottom:
+        1px solid rgba(148,163,184,.10);
+}
+
+
+.admin-page .admin-card-header h2 {
+    margin: 0;
+
+    color: #111827;
+
+    font-size: 15px;
+    font-weight: 820;
+
+    letter-spacing: -.018em;
+}
+
+
+.admin-page .admin-card-header p {
+    margin: 5px 0 0;
+
+    color: rgba(15,23,42,.44);
+
+    font-size: 10px;
+}
+
+
+/* =========================================================
+   FILTER / EXPLORER
+   ========================================================= */
+
+.admin-page .registration-filter-card {
+    margin-bottom: 20px;
+}
+
+
+.admin-page .admin-filter-form {
+    display: grid;
+
+    grid-template-columns:
+        minmax(220px, 1.55fr)
+        minmax(190px, 1fr)
+        minmax(165px, .8fr)
+        auto;
+
+    gap: 13px;
+
+    align-items: end;
+
+    padding: 19px 21px 21px;
+}
+
+
+.admin-page .admin-form-group {
+    display: flex;
+    flex-direction: column;
+
+    gap: 7px;
+
+    min-width: 0;
+}
+
+
+.admin-page .admin-form-group label {
+    color: rgba(15,23,42,.50);
+
+    font-size: 8px;
+    font-weight: 850;
+
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+
+
+/* =========================================================
+   GLASS INPUTS
+   ========================================================= */
+
+.admin-page .admin-input {
+    width: 100%;
+
+    min-height: 43px;
+
+    padding: 10px 13px;
+
+    border-radius: 11px;
+
+    color: #0f172a;
+
+    background:
+        rgba(255,255,255,.48);
+
+    border:
+        1px solid rgba(148,163,184,.17);
+
+    outline: none;
+
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 600;
+
+    box-shadow:
+        inset 0 1px 2px rgba(15,23,42,.018);
+
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+
+    transition:
+        background .22s ease,
+        border-color .22s ease,
+        box-shadow .25s ease,
+        transform .18s cubic-bezier(.16,1,.3,1);
+}
+
+
+.admin-page .admin-input::placeholder {
+    color: rgba(15,23,42,.31);
+}
+
+
+.admin-page .admin-input:hover {
+    background:
+        rgba(255,255,255,.68);
+
+    border-color:
+        rgba(100,116,139,.22);
+}
+
+
+.admin-page .admin-input:focus {
+    background:
+        rgba(255,255,255,.86);
+
+    border-color:
+        rgba(37,99,235,.42);
+
+    transform:
+        translateY(-1px);
+
+    box-shadow:
+        0 0 0 3px rgba(37,99,235,.065),
+        0 8px 20px rgba(15,23,42,.045);
+}
+
+
+/* Native select */
+
+.admin-page select.admin-input {
+    cursor: pointer;
+}
+
+
+.admin-page .admin-input option {
+    background: #ffffff;
+    color: #111827;
+}
+
+
+/* =========================================================
+   FILTER ACTIONS
+   ========================================================= */
+
+.admin-page .admin-filter-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+
+.admin-page .admin-filter-actions .admin-btn {
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   TABLE GLASS CONTAINER
+   ========================================================= */
+
+.admin-page .admin-table-wrapper {
+    width: 100%;
+
+    overflow-x: auto;
+
+    padding: 8px;
+
+    scrollbar-width: thin;
+
+    scrollbar-color:
+        rgba(100,116,139,.20)
+        transparent;
+}
+
+
+.admin-page .admin-table-wrapper::-webkit-scrollbar {
+    height: 7px;
+}
+
+
+.admin-page .admin-table-wrapper::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+
+.admin-page .admin-table-wrapper::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+
+    background:
+        rgba(100,116,139,.20);
+}
+
+
+.admin-page .admin-table {
+    width: 100%;
+    min-width: 1120px;
+
+    border-collapse: separate;
+    border-spacing: 0 5px;
+}
+
+
+/* =========================================================
+   TABLE HEADER
+   ========================================================= */
+
+.admin-page .admin-table thead th {
+    padding: 10px 13px;
+
+    color: rgba(15,23,42,.42);
+
+    text-align: left;
+
+    font-size: 8px;
+    font-weight: 850;
+
+    letter-spacing: .11em;
+    text-transform: uppercase;
+
+    white-space: nowrap;
+
+    border: 0;
+}
+
+
+/* =========================================================
+   TABLE ROWS — GLASS
+   ========================================================= */
+
+.admin-page .admin-table tbody tr {
+    position: relative;
+
+    animation:
+        registrationRowIn
+        .42s
+        cubic-bezier(.16,1,.3,1)
+        both;
+
+    transition:
+        transform .22s cubic-bezier(.16,1,.3,1);
+}
+
+
+.admin-page .admin-table tbody tr:nth-child(1) {
+    animation-delay: 40ms;
+}
+
+.admin-page .admin-table tbody tr:nth-child(2) {
+    animation-delay: 70ms;
+}
+
+.admin-page .admin-table tbody tr:nth-child(3) {
+    animation-delay: 100ms;
+}
+
+.admin-page .admin-table tbody tr:nth-child(4) {
+    animation-delay: 130ms;
+}
+
+.admin-page .admin-table tbody tr:nth-child(5) {
+    animation-delay: 160ms;
+}
+
+.admin-page .admin-table tbody tr:nth-child(n+6) {
+    animation-delay: 190ms;
+}
+
+
+.admin-page .admin-table tbody tr:hover {
+    transform:
+        translateX(3px);
+}
+
+
+/* Glass cells */
+
+.admin-page .admin-table tbody td {
+    padding: 13px;
+
+    color: #1e293b;
+
+    background:
+        rgba(255,255,255,.40);
+
+    border-top:
+        1px solid rgba(255,255,255,.58);
+
+    border-bottom:
+        1px solid rgba(148,163,184,.08);
+
+    vertical-align: middle;
+
+    transition:
+        background .2s ease,
+        border-color .2s ease,
+        box-shadow .2s ease;
+}
+
+
+.admin-page .admin-table tbody td:first-child {
+    border-left:
+        1px solid rgba(255,255,255,.58);
+
+    border-radius:
+        12px 0 0 12px;
+}
+
+
+.admin-page .admin-table tbody td:last-child {
+    border-right:
+        1px solid rgba(255,255,255,.58);
+
+    border-radius:
+        0 12px 12px 0;
+}
+
+
+.admin-page .admin-table tbody tr:hover td {
+    background:
+        rgba(239,246,255,.57);
+
+    border-top-color:
+        rgba(37,99,235,.09);
+
+    border-bottom-color:
+        rgba(37,99,235,.08);
+}
+
+
+/* =========================================================
+   TABLE INDEX
+   ========================================================= */
+
+.admin-page .table-index {
+    display: inline-grid;
+    place-items: center;
+
+    width: 26px;
+    height: 26px;
+
+    border-radius: 8px;
+
+    color: rgba(15,23,42,.45);
+
+    background:
+        rgba(255,255,255,.45);
+
+    border:
+        1px solid rgba(148,163,184,.10);
+
+    font-family:
+        ui-monospace,
+        SFMono-Regular,
+        Menlo,
+        Monaco,
+        Consolas,
+        monospace;
+
+    font-size: 9px;
+    font-weight: 700;
+
+    font-variant-numeric: tabular-nums;
+}
+
+
+/* =========================================================
+   STUDENT PROFILE
+   ========================================================= */
+
+.admin-page .student-table-profile {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    min-width: 205px;
+}
+
+
+.admin-page .student-avatar {
+    position: relative;
+
+    width: 36px;
+    height: 36px;
+    flex: 0 0 36px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 11px;
+
+    color: #1d4ed8;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(239,246,255,.90),
+            rgba(219,234,254,.56)
+        );
+
+    border:
+        1px solid rgba(37,99,235,.10);
+
+    box-shadow:
+        0 5px 12px rgba(37,99,235,.07),
+        inset 0 1px 0 rgba(255,255,255,.90);
+
+    font-size: 12px;
+    font-weight: 850;
+
+    transition:
+        transform .22s cubic-bezier(.16,1,.3,1),
+        box-shadow .22s ease;
+}
+
+
+.admin-page .admin-table tbody tr:hover .student-avatar {
+    transform:
+        translateY(-2px)
+        rotate(-2deg);
+
+    box-shadow:
+        0 8px 17px rgba(37,99,235,.11),
+        inset 0 1px 0 rgba(255,255,255,.96);
+}
+
+
+.admin-page .student-table-info,
+.admin-page .event-table-info,
+.admin-page .team-cell {
+    display: flex;
+    flex-direction: column;
+
+    gap: 3px;
+
+    min-width: 0;
+}
+
+
+.admin-page .student-table-info strong,
+.admin-page .event-table-info strong,
+.admin-page .team-cell strong {
+    overflow: hidden;
+
+    color: #172033;
+
+    font-size: 11px;
+    font-weight: 780;
+
+    line-height: 1.3;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+.admin-page .student-table-info span,
+.admin-page .event-table-info span,
+.admin-page .team-cell span {
+    overflow: hidden;
+
+    color: rgba(15,23,42,.43);
+
+    font-size: 9px;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   STUDENT ID
+   ========================================================= */
+
+.admin-page .mono-value {
+    display: inline-flex;
+    align-items: center;
+
+    min-height: 27px;
+
+    padding: 5px 8px;
+
+    border-radius: 7px;
+
+    color: #334155;
+
+    background:
+        rgba(241,245,249,.62);
+
+    border:
+        1px solid rgba(148,163,184,.10);
+
+    font-family:
+        ui-monospace,
+        SFMono-Regular,
+        Menlo,
+        Monaco,
+        Consolas,
+        monospace;
+
+    font-size: 9px;
+    font-weight: 700;
+
+    letter-spacing: .025em;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   EVENT CELL
+   ========================================================= */
+
+.admin-page .event-table-info strong {
+    max-width: 175px;
+}
+
+
+.admin-page .event-table-info span {
+    color: rgba(37,99,235,.62);
+    font-weight: 650;
+}
+
+
+/* =========================================================
+   TEAM / INDIVIDUAL BADGES
+   ========================================================= */
+
+.admin-page .mode-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 25px;
+
+    padding: 5px 9px;
+
+    border-radius: 8px;
+
+    font-size: 8px;
+    font-weight: 850;
+
+    letter-spacing: .09em;
+
+    white-space: nowrap;
+
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease;
+}
+
+
+.admin-page .admin-table tbody tr:hover .mode-badge {
+    transform:
+        translateY(-1px);
+}
+
+
+.admin-page .mode-team {
+    color: #6d28d9;
+
+    background:
+        rgba(139,92,246,.085);
+
+    border:
+        1px solid rgba(139,92,246,.12);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.55);
+}
+
+
+.admin-page .mode-individual {
+    color: #0369a1;
+
+    background:
+        rgba(14,165,233,.075);
+
+    border:
+        1px solid rgba(14,165,233,.11);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.55);
+}
+
+
+/* =========================================================
+   TEAM CELL
+   ========================================================= */
+
+.admin-page .team-cell strong {
+    color: #334155;
+}
+
+
+.admin-page .muted-value {
+    color: rgba(15,23,42,.38);
+
+    font-size: 9px;
+}
+
+
+/* =========================================================
+   STATUS SYSTEM
+   ========================================================= */
+
+.admin-page .status-badge {
+    position: relative;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    min-height: 27px;
+
+    padding: 5px 9px;
+
+    border-radius: 8px;
+
+    font-size: 8.5px;
+    font-weight: 800;
+
+    white-space: nowrap;
+
+    border: 1px solid transparent;
+
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease;
+}
+
+
+.admin-page .status-badge i {
+    width: 5px;
+    height: 5px;
+    flex: 0 0 5px;
+
+    display: block;
+
+    border-radius: 50%;
+
+    background: currentColor;
+
+    box-shadow:
+        0 0 0 3px currentColor;
+
+    opacity: .16;
+}
+
+
+.admin-page .status-badge i::after {
+    content: "";
+
+    display: block;
+
+    width: 5px;
+    height: 5px;
+
+    border-radius: 50%;
+
+    background: currentColor;
+
+    opacity: 1;
+
+    animation:
+        statusPulse
+        2s
+        ease-in-out
+        infinite;
+}
+
+
+.admin-page .status-approved {
+    color: #047857;
+
+    background:
+        rgba(16,185,129,.075);
+
+    border-color:
+        rgba(16,185,129,.13);
+}
+
+
+.admin-page .status-registered {
+    color: #b45309;
+
+    background:
+        rgba(245,158,11,.075);
+
+    border-color:
+        rgba(245,158,11,.14);
+}
+
+
+.admin-page .status-rejected {
+    color: #be123c;
+
+    background:
+        rgba(244,63,94,.07);
+
+    border-color:
+        rgba(244,63,94,.12);
+}
+
+
+.admin-page .status-cancelled {
+    color: #64748b;
+
+    background:
+        rgba(100,116,139,.075);
+
+    border-color:
+        rgba(100,116,139,.13);
+}
+
+
+.admin-page .admin-table tbody tr:hover .status-badge {
+    transform:
+        translateY(-1px);
+
+    box-shadow:
+        0 5px 12px rgba(15,23,42,.045);
+}
+
+
+/* =========================================================
+   DATE
+   ========================================================= */
+
+.admin-page .date-value {
+    display: inline-flex;
+    align-items: center;
+
+    min-height: 27px;
+
+    color: rgba(15,23,42,.52);
+
+    font-size: 9px;
+    font-weight: 650;
+
+    white-space: nowrap;
+
+    font-variant-numeric: tabular-nums;
+}
+
+
+/* =========================================================
+   VIEW ACTION
+   ========================================================= */
+
+.admin-page .table-action-btn {
+    position: relative;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+
+    min-height: 31px;
+
+    padding: 7px 10px;
+
+    border-radius: 8px;
+
+    color: #1d4ed8;
+
+    background:
+        rgba(239,246,255,.68);
+
+    border:
+        1px solid rgba(37,99,235,.13);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.78);
+
+    text-decoration: none;
+
+    font-size: 9px;
+    font-weight: 800;
+
+    white-space: nowrap;
+
+    transition:
+        transform .2s cubic-bezier(.16,1,.3,1),
+        background .2s ease,
+        border-color .2s ease,
+        box-shadow .2s ease;
+}
+
+
+.admin-page .table-action-btn span {
+    transition:
+        transform .2s ease;
+}
+
+
+.admin-page .table-action-btn:hover {
+    transform:
+        translateY(-2px);
+
+    color: #ffffff;
+
+    background:
+        linear-gradient(
+            135deg,
+            #2563eb,
+            #1d4ed8
+        );
+
+    border-color:
+        rgba(37,99,235,.30);
+
+    box-shadow:
+        0 7px 15px rgba(37,99,235,.18);
+}
+
+
+.admin-page .table-action-btn:hover span {
+    transform:
+        translateX(3px);
+}
+
+
+.admin-page .table-action-btn:active {
+    transform:
+        translateY(1px)
+        scale(.96);
+}
+
+
+/* =========================================================
+   EMPTY STATE
+   ========================================================= */
+
+.admin-page .admin-empty-state {
+    min-height: 300px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    padding: 42px 20px;
+
+    text-align: center;
+}
+
+
+.admin-page .empty-state-icon {
+    position: relative;
+
+    width: 64px;
+    height: 64px;
+
+    display: grid;
+    place-items: center;
+
+    margin-bottom: 16px;
+
+    border-radius: 19px;
+
+    color: #2563eb;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(239,246,255,.78),
+            rgba(255,255,255,.42)
+        );
+
+    border:
+        1px solid rgba(37,99,235,.12);
+
+    box-shadow:
+        0 10px 25px rgba(37,99,235,.075),
+        inset 0 1px 0 rgba(255,255,255,.9);
+
+    font-size: 24px;
+
+    animation:
+        emptyFloat
+        3.5s
+        ease-in-out
+        infinite;
+}
+
+
+.admin-page .admin-empty-state h3 {
+    margin: 0 0 7px;
+
+    color: #172033;
+
+    font-size: 17px;
+    font-weight: 820;
+
+    letter-spacing: -.02em;
+}
+
+
+.admin-page .admin-empty-state p {
+    max-width: 430px;
+
+    margin: 0 0 19px;
+
+    color: rgba(15,23,42,.45);
+
+    font-size: 10px;
+    line-height: 1.65;
+}
+
+
+/* =========================================================
+   CARD ENTRANCE
+   ========================================================= */
+
+.admin-page .admin-stat-card {
+    animation:
+        registrationCardIn
+        .5s
+        cubic-bezier(.16,1,.3,1)
+        both;
+}
+
+
+.admin-page .admin-stat-card:nth-child(1) {
+    animation-delay: 40ms;
+}
+
+.admin-page .admin-stat-card:nth-child(2) {
+    animation-delay: 80ms;
+}
+
+.admin-page .admin-stat-card:nth-child(3) {
+    animation-delay: 120ms;
+}
+
+.admin-page .admin-stat-card:nth-child(4) {
+    animation-delay: 160ms;
+}
+
+
+.admin-page .registration-filter-card {
+    animation:
+        registrationCardIn
+        .52s
+        cubic-bezier(.16,1,.3,1)
+        190ms
+        both;
+}
+
+
+/* =========================================================
+   KEYFRAMES
+   ========================================================= */
+
+@keyframes registrationCardIn {
+
+    from {
+        opacity: 0;
+
+        transform:
+            translateY(12px)
+            scale(.988);
+    }
+
+    to {
+        opacity: 1;
+
+        transform:
+            translateY(0)
+            scale(1);
+    }
+}
+
+
+@keyframes registrationRowIn {
+
+    from {
+        opacity: 0;
+
+        transform:
+            translateY(7px);
+    }
+
+    to {
+        opacity: 1;
+
+        transform:
+            translateY(0);
+    }
+}
+
+
+@keyframes registrationPulse {
+
+    0%,
+    100% {
+        opacity: .65;
+        transform: scale(.92);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.08);
+    }
+}
+
+
+@keyframes statusPulse {
+
+    0%,
+    100% {
+        transform: scale(.85);
+        opacity: .72;
+    }
+
+    50% {
+        transform: scale(1.15);
+        opacity: 1;
+    }
+}
+
+
+@keyframes emptyFloat {
+
+    0%,
+    100% {
+        transform:
+            translateY(0);
+    }
+
+    50% {
+        transform:
+            translateY(-5px);
+    }
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 1050px) {
+
+    .admin-page .admin-stat-grid {
+        grid-template-columns:
+            repeat(2, minmax(0,1fr));
+    }
+
+    .admin-page .admin-filter-form {
+        grid-template-columns:
+            repeat(2, minmax(0,1fr));
+    }
+
+    .admin-page .admin-filter-actions {
+        grid-column: 1 / -1;
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 680px) {
+
+    .admin-page .page-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .admin-page .page-header-actions {
+        width: 100%;
+    }
+
+    .admin-page .page-header-actions .admin-btn {
+        width: 100%;
+    }
+
+    .admin-page .page-title {
+        font-size: 31px;
+    }
+
+    .admin-page .admin-stat-grid {
+        grid-template-columns:
+            minmax(0,1fr);
+    }
+
+    .admin-page .admin-filter-form {
+        grid-template-columns:
+            minmax(0,1fr);
+
+        padding:
+            16px;
+    }
+
+    .admin-page .admin-filter-actions {
+        grid-column: auto;
+    }
+
+    .admin-page .admin-filter-actions .admin-btn {
+        flex: 1;
+    }
+
+    .admin-page .admin-card-header {
+        padding: 17px;
+    }
+
+    .admin-page .admin-table-wrapper {
+        padding: 5px;
+    }
+
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .admin-page .admin-stat-card,
+    .admin-page .registration-filter-card,
+    .admin-page .admin-table tbody tr,
+    .admin-page .empty-state-icon,
+    .admin-page .page-eyebrow .eyebrow-dot,
+    .admin-page .status-badge i::after {
+        animation: none !important;
+    }
+
+    .admin-page *,
+    .admin-page *::before,
+    .admin-page *::after {
+        transition-duration: .01ms !important;
+    }
+
+}

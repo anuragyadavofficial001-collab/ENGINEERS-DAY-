@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Engineers Day 2026 // SR Group of Institution</title>
+
+  <!-- Orbitron -->
+  <link
+    rel="stylesheet"
+    href="https://db.onlinewebfonts.com/c/b1314443e183d1cdd77049077c46facc?family=Orbitron-Medium"
+  />
+
+  <!-- Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Main landing stylesheet -->
+  <link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/landing.css') }}"
+  />
+</head>
+
+<body>
+
+  <main class="hero">
+
+    <!-- =====================================================
+         BACKGROUND
+         ===================================================== -->
+
+    <div
+      class="hero-base-img hero-image-animate"
+      style="
+        background-image:
+        url('https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260831_115955_2a9adb39-5e9b-4ced-96e2-6900eabe3de9.png&w=1920&q=85');
+      "
+      aria-hidden="true"
+    ></div>
+
+    <!-- Cursor reveal -->
+    <div
+      class="hero-reveal-img"
+      id="reveal-img"
+      style="
+        background-image:
+        url('https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260831_123709_183f0065-efb2-4bb2-a849-13aaa5af2f3f.png&w=1920&q=85');
+      "
+      aria-hidden="true"
+    ></div>
+
+    <!-- Dark cinematic overlay -->
+    <div class="cinematic-overlay" aria-hidden="true"></div>
+
+    <!-- Fine grain -->
+    <div class="grain-layer" aria-hidden="true"></div>
+
+
+    <!-- =====================================================
+         TOP NAVIGATION
+         ===================================================== -->
+
+    <header class="topbar">
+
+      <div class="brand">
+
+        <div class="brand-mark">
+          <span>SR</span>
+        </div>
+
+        <div class="brand-copy">
+          <strong>SR GROUP OF INSTITUTION</strong>
+          <small>Learn&nbsp; | &nbsp;Build&nbsp; | &nbsp;Innovate</small>
+        </div>
+
+      </div>
+
+
+      <div class="top-event">
+
+        <span class="script-text">
+          Engineers Build Tomorrow
+        </span>
+
+        <span class="separator">—</span>
+
+        <span>
+          Together We Create
+        </span>
+
+      </div>
+
+    </header>
+
+
+    <!-- =====================================================
+         MAIN UI
+         ===================================================== -->
+
+    <div class="hero-ui">
+
+
+      <!-- ===================================================
+           LEFT CONTENT
+           =================================================== -->
+
+      <section class="hero-left">
+
+        <div class="hero-copy">
+
+          <div class="eyebrow fade-up">
+            SR GROUP OF INSTITUTION
+            <span></span>
+            SPECIAL EVENT
+          </div>
+
+
+          <h1 class="words-pull-up">
+
+            <span>ENGINEERS DAY</span>
+
+            <span class="accent-line">
+              <em>2026</em>
+            </span>
+
+          </h1>
+
+
+          <p class="hero-description fade-up">
+
+            A celebration of engineering, innovation and
+            the minds shaping what comes next.
+
+          </p>
+
+
+          <div class="event-date fade-up">
+
+            <div class="date-number">
+              16
+            </div>
+
+            <div class="date-info">
+              <strong>SEPTEMBER</strong>
+              <span>2026</span>
+            </div>
+
+          </div>
+
+
+          <!-- =============================================
+               ACCESS BUTTONS
+               ============================================= -->
+
+          <div class="access-panel fade-up">
+
+            <div class="access-label">
+              <span class="status-dot"></span>
+              SELECT YOUR ACCESS
+            </div>
+
+
+            <div class="access-buttons">
+
+              <!-- STUDENT -->
+
+              <a
+                href="{{ url_for('auth.login') }}"
+                class="access-btn student-access"
+              >
+
+                <div class="access-icon">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M4 19.5V7.8C4 6.81 4.81 6 5.8 6H18.2C19.19 6 20 6.81 20 7.8V19.5"
+                      stroke="currentColor"
+                      stroke-width="1.4"
+                    />
+
+                    <path
+                      d="M3 19.5H21"
+                      stroke="currentColor"
+                      stroke-width="1.4"
+                      stroke-linecap="round"
+                    />
+
+                    <circle
+                      cx="12"
+                      cy="11"
+                      r="2.1"
+                      stroke="currentColor"
+                      stroke-width="1.3"
+                    />
+
+                    <path
+                      d="M8.7 16.3C9.4 14.9 10.5 14.2 12 14.2C13.5 14.2 14.6 14.9 15.3 16.3"
+                      stroke="currentColor"
+                      stroke-width="1.3"
+                      stroke-linecap="round"
+                    />
+                  </svg>
+                </div>
+
+
+                <div class="access-content">
+                  <strong>Student Access</strong>
+                  <span>Enroll & continue to portal</span>
+                </div>
+
+
+                <div class="access-arrow">
+                  →
+                </div>
+
+              </a>
+
+
+              <!-- ADMIN -->
+
+              <a
+                href="{{ url_for('admin.login') }}"
+                class="access-btn admin-access"
+              >
+
+                <div class="access-icon">
+
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+
+                    <rect
+                      x="5"
+                      y="4"
+                      width="14"
+                      height="16"
+                      rx="2"
+                      stroke="currentColor"
+                      stroke-width="1.4"
+                    />
+
+                    <path
+                      d="M8 8H16"
+                      stroke="currentColor"
+                      stroke-width="1.3"
+                      stroke-linecap="round"
+                    />
+
+                    <path
+                      d="M8 12H16"
+                      stroke="currentColor"
+                      stroke-width="1.3"
+                      stroke-linecap="round"
+                    />
+
+                    <path
+                      d="M8 16H13"
+                      stroke="currentColor"
+                      stroke-width="1.3"
+                      stroke-linecap="round"
+                    />
+
+                  </svg>
+
+                </div>
+
+
+                <div class="access-content">
+                  <strong>Admin Control</strong>
+                  <span>Event & registration management</span>
+                </div>
+
+
+                <div class="access-arrow">
+                  →
+                </div>
+
+              </a>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- =================================================
+             COLLEGE CARD
+             ================================================= -->
+
+        <article class="college-card fade-up">
+
+          <div class="college-symbol">
+
+            <div class="symbol-ring"></div>
+
+            <span>SR</span>
+
+          </div>
+
+
+          <div class="college-body">
+
+            <div class="mini-label">
+              PRESENTED BY
+            </div>
+
+            <h2>
+              SR GROUP OF INSTITUTION
+            </h2>
+
+            <p>
+              Empowering ideas. Building engineers.
+              Creating tomorrow.
+            </p>
+
+          </div>
+
+
+          <div class="college-corner">
+            <span>ED</span>
+            <small>26</small>
+          </div>
+
+        </article>
+
+      </section>
+
+
+
+      <!-- ===================================================
+           RIGHT SIDE / EVENT VISUAL
+           =================================================== -->
+
+      <section class="hero-visual">
+
+
+        <!-- Floating technical coordinates -->
+
+        <div class="coordinate coord-one">
+          26.8467° N
+        </div>
+
+        <div class="coordinate coord-two">
+          80.9462° E
+        </div>
+
+
+        <!-- Central typography -->
+
+        <div class="visual-title">
+
+          <span class="visual-word word-one">
+            ENGINEER
+          </span>
+
+          <span class="visual-word word-two">
+            THE
+          </span>
+
+          <span class="visual-word word-three">
+            FUTURE
+          </span>
+
+        </div>
+
+
+        <!-- Circular event HUD -->
+
+        <div class="event-orbit">
+
+          <div class="orbit-ring orbit-ring-one"></div>
+          <div class="orbit-ring orbit-ring-two"></div>
+          <div class="orbit-ring orbit-ring-three"></div>
+
+
+          <div class="orbit-core">
+
+            <span class="core-small">
+              SRGI
+            </span>
+
+            <strong>
+              ED
+            </strong>
+
+            <span class="core-year">
+              2026
+            </span>
+
+          </div>
+
+
+          <div class="orbit-marker marker-one">
+            <span></span>
+          </div>
+
+          <div class="orbit-marker marker-two">
+            <span></span>
+          </div>
+
+          <div class="orbit-marker marker-three">
+            <span></span>
+          </div>
+
+        </div>
+
+
+        <!-- Event information -->
+
+        <div class="visual-info">
+
+          <div class="info-line"></div>
+
+          <div>
+            <small>EVENT DATE</small>
+            <strong>16.09.2026</strong>
+          </div>
+
+          <div>
+            <small>LOCATION</small>
+            <strong>SR GROUP OF INSTITUTION</strong>
+          </div>
+
+        </div>
+
+
+        <!-- Decorative construction line -->
+
+        <div class="blueprint-line blueprint-one"></div>
+        <div class="blueprint-line blueprint-two"></div>
+
+
+      </section>
+
+
+      <!-- ===================================================
+           PAGE INDICATOR
+           =================================================== -->
+
+      <div class="hero-page fade-up">
+
+        <span>01</span>
+
+        <i></i>
+
+        <span>ENGINEERS DAY</span>
+
+      </div>
+
+
+      <!-- ===================================================
+           BOTTOM INFO
+           =================================================== -->
+
+      <section class="bottom-info fade-up">
+
+        <div class="bottom-item">
+
+          <span class="bottom-number">
+            16
+          </span>
+
+          <div>
+            <small>SEPTEMBER</small>
+            <strong>2026</strong>
+          </div>
+
+        </div>
+
+
+        <div class="bottom-divider"></div>
+
+
+        <div class="bottom-item">
+
+          <span class="live-dot"></span>
+
+          <div>
+            <small>STATUS</small>
+            <strong>EVENT PORTAL ONLINE</strong>
+          </div>
+
+        </div>
+
+      </section>
+
+    </div>
+
+
+    <!-- =====================================================
+         FOOTER
+         ===================================================== -->
+
+    <footer class="site-footer">
+
+      <div class="footer-left">
+        Engineers Day 2026
+      </div>
+
+      <div class="footer-center">
+        SR Group of Institution
+      </div>
+
+      <div class="footer-right">
+        Created by <strong>Anurag Yadav</strong>
+      </div>
+
+    </footer>
+
+
+    <!-- Cursor -->
+    <div class="cursor-dot" id="cursor-dot"></div>
+    <div class="cursor-ring" id="cursor-ring"></div>
+
+  </main>
+
+
+  <!-- Main landing JS -->
+  <script
+    src="{{ url_for('static', filename='js/landing.js') }}"
+  ></script>
+
+</body>
+</html>

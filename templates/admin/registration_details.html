@@ -1,0 +1,1389 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Registration Details | Admin{% endblock %}
+
+{% block content %}
+
+<div class="admin-page">
+
+    <!-- =========================================================
+         PAGE HEADER
+    ========================================================== -->
+    <div class="page-header">
+
+        <div>
+
+            <div class="page-eyebrow">
+                <span class="eyebrow-dot"></span>
+                REGISTRATION INSPECTOR
+            </div>
+
+            <h1 class="page-title">
+                Registration Details
+            </h1>
+
+            <p class="page-subtitle">
+                Review complete registration, student and participation details.
+            </p>
+
+        </div>
+
+
+        <div class="page-header-actions">
+
+            <a
+                href="{{ url_for('admin.registrations') }}"
+                class="admin-btn admin-btn-secondary"
+            >
+                <span>←</span>
+                Back to Registrations
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         STATUS / ID STRIP
+    ========================================================== -->
+    <div class="registration-identity-strip">
+
+        <div class="identity-main">
+
+            <span class="identity-label">
+                REGISTRATION
+            </span>
+
+            <strong>
+                #{{ registration.id }}
+            </strong>
+
+        </div>
+
+
+        <div class="identity-divider"></div>
+
+
+        <div class="identity-main">
+
+            <span class="identity-label">
+                STATUS
+            </span>
+
+            {% if registration.status == 'APPROVED' %}
+
+                <span class="status-badge status-approved">
+                    <i></i>
+                    Approved
+                </span>
+
+            {% elif registration.status == 'REJECTED' %}
+
+                <span class="status-badge status-rejected">
+                    <i></i>
+                    Rejected
+                </span>
+
+            {% elif registration.status == 'CANCELLED' %}
+
+                <span class="status-badge status-cancelled">
+                    <i></i>
+                    Cancelled
+                </span>
+
+            {% else %}
+
+                <span class="status-badge status-registered">
+                    <i></i>
+                    Registered
+                </span>
+
+            {% endif %}
+
+        </div>
+
+
+        <div class="identity-divider"></div>
+
+
+        <div class="identity-main">
+
+            <span class="identity-label">
+                REGISTERED
+            </span>
+
+            <strong class="identity-date">
+                {{ registration.registered_at or '—' }}
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         MAIN GRID
+    ========================================================== -->
+    <div class="registration-details-grid">
+
+
+        <!-- =====================================================
+             STUDENT INFORMATION
+        ====================================================== -->
+        <section class="admin-card details-card">
+
+            <div class="admin-card-header">
+
+                <div>
+
+                    <div class="section-kicker">
+                        STUDENT PROFILE
+                    </div>
+
+                    <h2>
+                        Student Information
+                    </h2>
+
+                </div>
+
+                <div class="section-number">
+                    01
+                </div>
+
+            </div>
+
+
+            <div class="profile-hero">
+
+                <div class="profile-avatar-large">
+                    {{ (registration.name or '?')[:1]|upper }}
+                </div>
+
+                <div class="profile-hero-info">
+
+                    <h3>
+                        {{ registration.name or 'Unknown Student' }}
+                    </h3>
+
+                    <span>
+                        {{ registration.email or 'Email not available' }}
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="detail-list">
+
+                <div class="detail-row">
+
+                    <span class="detail-label">
+                        Student ID
+                    </span>
+
+                    <strong class="detail-value mono-value">
+                        {{ registration.student_id_display
+                           or registration.student_roll
+                           or registration.student_id
+                           or '—' }}
+                    </strong>
+
+                </div>
+
+
+                <div class="detail-row">
+
+                    <span class="detail-label">
+                        Full Name
+                    </span>
+
+                    <strong class="detail-value">
+                        {{ registration.name or '—' }}
+                    </strong>
+
+                </div>
+
+
+                <div class="detail-row">
+
+                    <span class="detail-label">
+                        Email
+                    </span>
+
+                    <strong class="detail-value">
+                        {{ registration.email or '—' }}
+                    </strong>
+
+                </div>
+
+
+                <div class="detail-row">
+
+                    <span class="detail-label">
+                        Phone
+                    </span>
+
+                    <strong class="detail-value">
+                        {{ registration.phone or '—' }}
+                    </strong>
+
+                </div>
+
+
+                {% if registration.branch is defined %}
+
+                <div class="detail-row">
+
+                    <span class="detail-label">
+                        Branch
+                    </span>
+
+                    <strong class="detail-value">
+                        {{ registration.branch or '—' }}
+                    </strong>
+
+                </div>
+
+                {% endif %}
+
+
+                {% if registration.section is defined %}
+
+                <div class="detail-row">
+
+                    <span class="detail-label">
+                        Section
+                    </span>
+
+                    <strong class="detail-value">
+                        {{ registration.section or '—' }}
+                    </strong>
+
+                </div>
+
+                {% endif %}
+
+
+                {% if registration.year is defined %}
+
+                <div class="detail-row">
+
+                    <span class="detail-label">
+                        Year
+                    </span>
+
+                    <strong class="detail-value">
+                        {{ registration.year or '—' }}
+                    </strong>
+
+                </div>
+
+                {% endif %}
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =====================================================
+             EVENT INFORMATION
+        ====================================================== -->
+        <section class="admin-card details-card">
+
+            <div class="admin-card-header">
+
+                <div>
+
+                    <div class="section-kicker">
+                        EVENT CONTEXT
+                    </div>
+
+                    <h2>
+                        Event Information
+                    </h2>
+
+                </div>
+
+                <div class="section-number">
+                    02
+                </div>
+
+            </div>
+
+
+            <div class="event-highlight">
+
+                <div class="event-symbol">
+                    EV
+                </div>
+
+                <div>
+
+                    <h3>
+                        {{ registration.game_name or 'Unknown Event' }}
+                    </h3>
+
+                    <span>
+                        Game ID: {{ registration.game_id }}
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="detail-list">
+
+                <div class="detail-row">
+
+                    <span class="detail-label">
+                        Event
+                    </span>
+
+                    <strong class="detail-value">
+                        {{ registration.game_name or '—' }}
+                    </strong>
+
+                </div>
+
+
+                <div class="detail-row">
+
+                    <span class="detail-label">
+                        Participation
+                    </span>
+
+                    <strong class="detail-value">
+
+                        {% if registration.registration_mode == 'TEAM' %}
+
+                            <span class="mode-badge mode-team">
+                                TEAM
+                            </span>
+
+                        {% else %}
+
+                            <span class="mode-badge mode-individual">
+                                INDIVIDUAL
+                            </span>
+
+                        {% endif %}
+
+                    </strong>
+
+                </div>
+
+
+                {% if registration.schedule_date is defined %}
+
+                <div class="detail-row">
+
+                    <span class="detail-label">
+                        Schedule
+                    </span>
+
+                    <strong class="detail-value">
+                        {{ registration.schedule_date or '—' }}
+                        {% if registration.schedule_time %}
+                            · {{ registration.schedule_time }}
+                        {% endif %}
+                    </strong>
+
+                </div>
+
+                {% endif %}
+
+
+                {% if registration.venue is defined %}
+
+                <div class="detail-row">
+
+                    <span class="detail-label">
+                        Venue
+                    </span>
+
+                    <strong class="detail-value">
+                        {{ registration.venue or '—' }}
+                    </strong>
+
+                </div>
+
+                {% endif %}
+
+
+                <div class="detail-row">
+
+                    <span class="detail-label">
+                        Registration Status
+                    </span>
+
+                    <strong class="detail-value">
+                        {{ registration.status }}
+                    </strong>
+
+                </div>
+
+
+                <div class="detail-row">
+
+                    <span class="detail-label">
+                        Registered At
+                    </span>
+
+                    <strong class="detail-value">
+                        {{ registration.registered_at or '—' }}
+                    </strong>
+
+                </div>
+
+
+                <div class="detail-row">
+
+                    <span class="detail-label">
+                        Last Updated
+                    </span>
+
+                    <strong class="detail-value">
+                        {{ registration.updated_at or '—' }}
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =====================================================
+             TEAM INFORMATION
+        ====================================================== -->
+        <section class="admin-card details-card team-details-card">
+
+            <div class="admin-card-header">
+
+                <div>
+
+                    <div class="section-kicker">
+                        PARTICIPATION UNIT
+                    </div>
+
+                    <h2>
+                        Team Information
+                    </h2>
+
+                </div>
+
+                <div class="section-number">
+                    03
+                </div>
+
+            </div>
+
+
+            {% if registration.team_id %}
+
+                <div class="team-banner">
+
+                    <div class="team-mark">
+                        T
+                    </div>
+
+                    <div class="team-banner-info">
+
+                        <span>
+                            TEAM
+                        </span>
+
+                        <h3>
+                            {{ registration.team_name or 'Unnamed Team' }}
+                        </h3>
+
+                    </div>
+
+                    <div class="team-status">
+
+                        {% if registration.team_status == 'APPROVED' %}
+
+                            <span class="status-badge status-approved">
+                                <i></i>
+                                Approved
+                            </span>
+
+                        {% elif registration.team_status == 'REJECTED' %}
+
+                            <span class="status-badge status-rejected">
+                                <i></i>
+                                Rejected
+                            </span>
+
+                        {% elif registration.team_status == 'CANCELLED' %}
+
+                            <span class="status-badge status-cancelled">
+                                <i></i>
+                                Cancelled
+                            </span>
+
+                        {% else %}
+
+                            <span class="status-badge status-registered">
+                                <i></i>
+                                Registered
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+                <div class="detail-list">
+
+                    <div class="detail-row">
+
+                        <span class="detail-label">
+                            Team ID
+                        </span>
+
+                        <strong class="detail-value mono-value">
+                            #{{ registration.team_id }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="detail-row">
+
+                        <span class="detail-label">
+                            Team Name
+                        </span>
+
+                        <strong class="detail-value">
+                            {{ registration.team_name or '—' }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="detail-row">
+
+                        <span class="detail-label">
+                            Team Leader
+                        </span>
+
+                        <strong class="detail-value">
+                            {{ registration.team_leader_name or '—' }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="detail-row">
+
+                        <span class="detail-label">
+                            Team Size
+                        </span>
+
+                        <strong class="detail-value">
+                            {{ team_members|length if team_members is defined else '—' }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <!-- TEAM MEMBERS -->
+
+                <div class="team-members-section">
+
+                    <div class="subsection-heading">
+
+                        <div>
+                            <span>TEAM ROSTER</span>
+                            <strong>
+                                {{ team_members|length if team_members is defined else 0 }}
+                                Member{{ '' if team_members is defined and team_members|length == 1 else 's' }}
+                            </strong>
+                        </div>
+
+                    </div>
+
+
+                    {% if team_members %}
+
+                        <div class="team-member-list">
+
+                            {% for member in team_members %}
+
+                            <div class="team-member-row">
+
+                                <div class="member-avatar">
+                                    {{ (member.name or '?')[:1]|upper }}
+                                </div>
+
+
+                                <div class="member-info">
+
+                                    <strong>
+                                        {{ member.name or 'Unknown Student' }}
+                                    </strong>
+
+                                    <span>
+                                        {{ member.email or member.phone or 'Contact unavailable' }}
+                                    </span>
+
+                                </div>
+
+
+                                <div class="member-id">
+
+                                    <span class="mono-value">
+                                        {{ member.student_id_display
+                                           or member.student_roll
+                                           or member.student_id
+                                           or '—' }}
+                                    </span>
+
+                                </div>
+
+
+                                <div class="member-role">
+
+                                    {% if member.member_role == 'LEADER' %}
+
+                                        <span class="role-badge role-leader">
+                                            LEADER
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="role-badge">
+                                            MEMBER
+                                        </span>
+
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+                            {% endfor %}
+
+                        </div>
+
+                    {% else %}
+
+                        <div class="mini-empty">
+                            No team members found.
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+
+            {% else %}
+
+                <div class="individual-participation">
+
+                    <div class="individual-icon">
+                        I
+                    </div>
+
+                    <div>
+
+                        <h3>
+                            Individual Participation
+                        </h3>
+
+                        <p>
+                            This registration does not belong to a team.
+                            The student is participating individually.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            {% endif %}
+
+        </section>
+
+
+
+        <!-- =====================================================
+             ADMIN ACTIONS
+        ====================================================== -->
+        <section class="admin-card details-card action-card">
+
+            <div class="admin-card-header">
+
+                <div>
+
+                    <div class="section-kicker">
+                        ADMIN CONTROL
+                    </div>
+
+                    <h2>
+                        Registration Actions
+                    </h2>
+
+                </div>
+
+                <div class="section-number">
+                    04
+                </div>
+
+            </div>
+
+
+            <div class="action-warning">
+
+                <span class="warning-symbol">
+                    !
+                </span>
+
+                <p>
+                    Registration status changes affect the official event
+                    registration record. Review the details before taking action.
+                </p>
+
+            </div>
+
+
+            <div class="registration-actions">
+
+                {% if registration.status != 'APPROVED' %}
+
+                <form
+                    method="POST"
+                    action="{{ url_for(
+                        'admin.update_registration_status',
+                        registration_id=registration.id
+                    ) }}"
+                >
+
+                    <input type="hidden" name="status" value="APPROVED">
+
+                    <button
+                        type="submit"
+                        class="admin-btn admin-btn-success action-button"
+                    >
+                        <span>✓</span>
+                        Approve Registration
+                    </button>
+
+                </form>
+
+                {% endif %}
+
+
+                {% if registration.status != 'REJECTED' %}
+
+                <form
+                    method="POST"
+                    action="{{ url_for(
+                        'admin.update_registration_status',
+                        registration_id=registration.id
+                    ) }}"
+                >
+
+                    <input type="hidden" name="status" value="REJECTED">
+
+                    <button
+                        type="submit"
+                        class="admin-btn admin-btn-danger action-button"
+                    >
+                        <span>×</span>
+                        Reject Registration
+                    </button>
+
+                </form>
+
+                {% endif %}
+
+
+                {% if registration.status != 'CANCELLED' %}
+
+                <form
+                    method="POST"
+                    action="{{ url_for(
+                        'admin.update_registration_status',
+                        registration_id=registration.id
+                    ) }}"
+                >
+
+                    <input type="hidden" name="status" value="CANCELLED">
+
+                    <button
+                        type="submit"
+                        class="admin-btn admin-btn-secondary action-button"
+                    >
+                        <span>⊘</span>
+                        Cancel Registration
+                    </button>
+
+                </form>
+
+                {% endif %}
+
+            </div>
+
+        </section>
+
+    </div>
+
+</div>
+
+
+<!-- =============================================================
+     PAGE-SPECIFIC STYLING
+============================================================= -->
+
+<style>
+
+    .registration-identity-strip {
+        display: flex;
+        align-items: center;
+        gap: 22px;
+        padding: 17px 20px;
+        margin-bottom: 24px;
+        border: 1px solid rgba(255,255,255,.08);
+        border-radius: 14px;
+        background: rgba(255,255,255,.025);
+    }
+
+    .identity-main {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .identity-label {
+        font-size: 9px;
+        font-weight: 800;
+        letter-spacing: .1em;
+        opacity: .42;
+    }
+
+    .identity-main strong {
+        font-size: 14px;
+    }
+
+    .identity-date {
+        font-size: 12px !important;
+        font-weight: 600 !important;
+        opacity: .72;
+    }
+
+    .identity-divider {
+        width: 1px;
+        height: 34px;
+        background: rgba(255,255,255,.08);
+    }
+
+
+    /* MAIN GRID */
+
+    .registration-details-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px;
+    }
+
+    .details-card {
+        min-width: 0;
+    }
+
+    .team-details-card,
+    .action-card {
+        grid-column: 1 / -1;
+    }
+
+
+    /* CARD HEADER */
+
+    .section-kicker {
+        margin-bottom: 5px;
+        font-size: 9px;
+        font-weight: 800;
+        letter-spacing: .12em;
+        opacity: .4;
+    }
+
+    .section-number {
+        font-family: ui-monospace, monospace;
+        font-size: 11px;
+        opacity: .28;
+    }
+
+
+    /* PROFILE */
+
+    .profile-hero {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 15px;
+        margin-bottom: 18px;
+        border-radius: 13px;
+        background: rgba(255,255,255,.025);
+        border: 1px solid rgba(255,255,255,.055);
+    }
+
+    .profile-avatar-large {
+        width: 54px;
+        height: 54px;
+        display: grid;
+        place-items: center;
+        flex: 0 0 54px;
+        border-radius: 15px;
+        background: linear-gradient(
+            135deg,
+            rgba(255,255,255,.13),
+            rgba(255,255,255,.035)
+        );
+        border: 1px solid rgba(255,255,255,.09);
+        font-size: 18px;
+        font-weight: 800;
+    }
+
+    .profile-hero-info {
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .profile-hero-info h3 {
+        margin: 0;
+        font-size: 17px;
+    }
+
+    .profile-hero-info span {
+        font-size: 11px;
+        opacity: .5;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+
+    /* EVENT */
+
+    .event-highlight {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        margin-bottom: 18px;
+        padding: 15px;
+        border-radius: 13px;
+        background: rgba(255,255,255,.025);
+        border: 1px solid rgba(255,255,255,.055);
+    }
+
+    .event-symbol {
+        width: 48px;
+        height: 48px;
+        display: grid;
+        place-items: center;
+        border-radius: 13px;
+        background: rgba(255,255,255,.07);
+        border: 1px solid rgba(255,255,255,.09);
+        font-family: ui-monospace, monospace;
+        font-size: 12px;
+        font-weight: 900;
+    }
+
+    .event-highlight h3 {
+        margin: 0 0 4px;
+        font-size: 15px;
+    }
+
+    .event-highlight span {
+        font-size: 10px;
+        opacity: .45;
+        font-family: ui-monospace, monospace;
+    }
+
+
+    /* DETAILS */
+
+    .detail-list {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .detail-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        min-height: 44px;
+        padding: 9px 0;
+        border-bottom: 1px solid rgba(255,255,255,.055);
+    }
+
+    .detail-row:last-child {
+        border-bottom: 0;
+    }
+
+    .detail-label {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: .07em;
+        opacity: .42;
+        flex: 0 0 auto;
+    }
+
+    .detail-value {
+        text-align: right;
+        font-size: 12px;
+        max-width: 65%;
+        overflow-wrap: anywhere;
+    }
+
+    .mono-value {
+        font-family:
+            ui-monospace,
+            SFMono-Regular,
+            Menlo,
+            Monaco,
+            Consolas,
+            monospace;
+        font-size: 11px;
+    }
+
+
+    /* TEAM */
+
+    .team-banner {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        padding: 16px;
+        margin-bottom: 18px;
+        border-radius: 13px;
+        background: rgba(255,255,255,.025);
+        border: 1px solid rgba(255,255,255,.055);
+    }
+
+    .team-mark {
+        width: 48px;
+        height: 48px;
+        display: grid;
+        place-items: center;
+        flex: 0 0 48px;
+        border-radius: 13px;
+        background: rgba(255,255,255,.07);
+        border: 1px solid rgba(255,255,255,.09);
+        font-size: 16px;
+        font-weight: 900;
+    }
+
+    .team-banner-info {
+        min-width: 0;
+        flex: 1;
+    }
+
+    .team-banner-info span {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 9px;
+        letter-spacing: .1em;
+        opacity: .4;
+    }
+
+    .team-banner-info h3 {
+        margin: 0;
+        font-size: 16px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+
+    /* MEMBERS */
+
+    .team-members-section {
+        margin-top: 22px;
+    }
+
+    .subsection-heading {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+
+    .subsection-heading > div {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+    }
+
+    .subsection-heading span {
+        font-size: 9px;
+        font-weight: 800;
+        letter-spacing: .1em;
+        opacity: .4;
+    }
+
+    .subsection-heading strong {
+        font-size: 13px;
+    }
+
+    .team-member-list {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+    }
+
+    .team-member-row {
+        display: grid;
+        grid-template-columns: 38px minmax(160px, 1fr) minmax(130px, auto) auto;
+        align-items: center;
+        gap: 11px;
+        padding: 10px;
+        border-radius: 10px;
+        background: rgba(255,255,255,.022);
+        border: 1px solid rgba(255,255,255,.045);
+    }
+
+    .member-avatar {
+        width: 34px;
+        height: 34px;
+        display: grid;
+        place-items: center;
+        border-radius: 9px;
+        background: rgba(255,255,255,.07);
+        font-size: 11px;
+        font-weight: 800;
+    }
+
+    .member-info {
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+    }
+
+    .member-info strong {
+        font-size: 12px;
+    }
+
+    .member-info span {
+        font-size: 10px;
+        opacity: .43;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .member-id {
+        min-width: 0;
+    }
+
+    .member-role {
+        justify-self: end;
+    }
+
+    .role-badge {
+        display: inline-flex;
+        padding: 5px 8px;
+        border-radius: 7px;
+        font-size: 8px;
+        font-weight: 800;
+        letter-spacing: .08em;
+        background: rgba(255,255,255,.05);
+        border: 1px solid rgba(255,255,255,.06);
+    }
+
+    .role-leader {
+        background: rgba(255,190,60,.09);
+    }
+
+
+    /* INDIVIDUAL */
+
+    .individual-participation {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 25px 20px;
+        border-radius: 13px;
+        background: rgba(255,255,255,.025);
+        border: 1px solid rgba(255,255,255,.055);
+    }
+
+    .individual-icon {
+        width: 52px;
+        height: 52px;
+        display: grid;
+        place-items: center;
+        flex: 0 0 52px;
+        border-radius: 14px;
+        background: rgba(255,255,255,.07);
+        font-weight: 900;
+        font-size: 16px;
+    }
+
+    .individual-participation h3 {
+        margin: 0 0 5px;
+        font-size: 15px;
+    }
+
+    .individual-participation p {
+        margin: 0;
+        font-size: 11px;
+        line-height: 1.6;
+        opacity: .48;
+    }
+
+
+    /* ACTION */
+
+    .action-warning {
+        display: flex;
+        align-items: flex-start;
+        gap: 11px;
+        padding: 13px 15px;
+        margin-bottom: 18px;
+        border-radius: 10px;
+        background: rgba(255,190,60,.055);
+        border: 1px solid rgba(255,190,60,.10);
+    }
+
+    .warning-symbol {
+        width: 22px;
+        height: 22px;
+        display: grid;
+        place-items: center;
+        flex: 0 0 22px;
+        border-radius: 6px;
+        background: rgba(255,190,60,.1);
+        font-weight: 900;
+        font-size: 11px;
+    }
+
+    .action-warning p {
+        margin: 0;
+        font-size: 11px;
+        line-height: 1.55;
+        opacity: .55;
+    }
+
+    .registration-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .registration-actions form {
+        margin: 0;
+    }
+
+    .action-button {
+        min-width: 190px;
+        justify-content: center;
+    }
+
+    .admin-btn-success {
+        background: rgba(55,205,125,.11);
+        border: 1px solid rgba(55,205,125,.18);
+    }
+
+    .admin-btn-danger {
+        background: rgba(240,80,100,.10);
+        border: 1px solid rgba(240,80,100,.17);
+    }
+
+
+    /* EMPTY */
+
+    .mini-empty {
+        padding: 25px;
+        text-align: center;
+        border-radius: 10px;
+        background: rgba(255,255,255,.02);
+        border: 1px dashed rgba(255,255,255,.08);
+        font-size: 11px;
+        opacity: .45;
+    }
+
+
+    /* RESPONSIVE */
+
+    @media (max-width: 900px) {
+
+        .registration-details-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .team-details-card,
+        .action-card {
+            grid-column: auto;
+        }
+
+        .team-member-row {
+            grid-template-columns: 38px 1fr auto;
+        }
+
+        .member-id {
+            display: none;
+        }
+
+    }
+
+
+    @media (max-width: 650px) {
+
+        .registration-identity-strip {
+            align-items: flex-start;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .identity-divider {
+            width: 100%;
+            height: 1px;
+        }
+
+        .detail-row {
+            align-items: flex-start;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .detail-value {
+            max-width: 100%;
+            text-align: left;
+        }
+
+        .team-banner {
+            flex-wrap: wrap;
+        }
+
+        .team-status {
+            width: 100%;
+        }
+
+        .registration-actions {
+            flex-direction: column;
+        }
+
+        .registration-actions form,
+        .action-button {
+            width: 100%;
+        }
+
+        .action-button {
+            min-width: 0;
+        }
+
+    }
+
+</style>
+
+{% endblock %}

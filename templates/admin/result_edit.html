@@ -1,0 +1,1007 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Manage Result | Admin{% endblock %}
+
+{% block content %}
+
+<div class="admin-page result-edit-page">
+    <!-- =========================================================
+         HEADER
+    ========================================================== -->
+    <div class="page-header">
+
+        <div>
+
+            <div class="page-eyebrow">
+                <span class="eyebrow-dot"></span>
+                RESULT EDITOR
+            </div>
+
+            <h1 class="page-title">
+                {% if result %}
+                    Manage Result
+                {% else %}
+                    Create Result
+                {% endif %}
+            </h1>
+
+            <p class="page-subtitle">
+                Configure winners, runner-up details, prizes and publication settings.
+            </p>
+
+        </div>
+
+        <div class="page-header-actions">
+
+            <a
+                href="{{ url_for('admin.results') }}"
+                class="admin-btn admin-btn-secondary"
+            >
+                <span>←</span>
+                Back to Results
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         RESULT STATUS
+    ========================================================== -->
+    {% if result %}
+
+    <div class="result-status-strip">
+
+        <div class="result-status-left">
+
+            <div class="result-status-symbol">
+                R
+            </div>
+
+            <div>
+
+                <span class="result-status-label">
+                    RESULT RECORD
+                </span>
+
+                <strong>
+                    #{{ result.id }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="result-status-right">
+
+            {% if result.is_published %}
+
+                <span class="status-badge status-approved">
+                    <i></i>
+                    Published
+                </span>
+
+                {% if result.published_at %}
+                    <span class="published-date">
+                        {{ result.published_at }}
+                    </span>
+                {% endif %}
+
+            {% else %}
+
+                <span class="status-badge status-registered">
+                    <i></i>
+                    Draft
+                </span>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+
+    <!-- =========================================================
+         FORM
+    ========================================================== -->
+    <form
+        method="POST"
+        action="{% if result %}
+                    {{ url_for('admin.result_edit', game_id=game.id) }}
+                {% else %}
+                    {{ url_for('admin.result_create') }}
+                {% endif %}"
+        id="resultForm"
+    >
+
+        <!-- =====================================================
+             EVENT
+        ====================================================== -->
+        <section class="admin-card editor-card">
+
+            <div class="admin-card-header">
+
+                <div>
+
+                    <div class="section-kicker">
+                        EVENT
+                    </div>
+
+                    <h2>
+                        Result Context
+                    </h2>
+
+                    <p>
+                        Select the event for which this result belongs.
+                    </p>
+
+                </div>
+
+                <div class="section-number">
+                    01
+                </div>
+
+            </div>
+
+
+            <div class="editor-grid">
+
+                <div class="admin-form-group full-width">
+
+                    <label for="game_id">
+                        Event *
+                    </label>
+
+                    <select
+                        id="game_id"
+                        name="game_id"
+                        class="admin-input"
+                        required
+                        {% if result %}disabled{% endif %}
+                    >
+
+                        <option value="">
+                            Select an event
+                        </option>
+
+                        {% for game in games %}
+
+                        <option
+                            value="{{ game.id }}"
+                            {% if result and result.game_id == game.id %}
+                                selected
+                            {% elif selected_game_id is defined and selected_game_id == game.id %}
+                                selected
+                            {% endif %}
+                        >
+                            {{ game.game_name }}
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+
+                    {% if result %}
+
+                        <input
+                            type="hidden"
+                            name="game_id"
+                            value="{{ result.game_id }}"
+                        >
+
+                    {% endif %}
+
+
+                    <small class="field-hint">
+                        Each event can have one official result record.
+                    </small>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =====================================================
+             WINNER
+        ====================================================== -->
+        <section class="admin-card editor-card">
+
+            <div class="admin-card-header">
+
+                <div>
+
+                    <div class="section-kicker">
+                        FIRST POSITION
+                    </div>
+
+                    <h2>
+                        Winner
+                    </h2>
+
+                    <p>
+                        Configure the official first-place winner.
+                    </p>
+
+                </div>
+
+                <div class="section-number">
+                    02
+                </div>
+
+            </div>
+
+
+            <div class="winner-editor-panel">
+
+                <div class="winner-rank-large">
+                    01
+                </div>
+
+
+                <div class="winner-editor-content">
+
+                    <div class="editor-grid">
+
+                        <!-- WINNER TYPE -->
+
+                        <div class="admin-form-group">
+
+                            <label for="winner_type">
+                                Winner Type
+                            </label>
+
+                            <select
+                                id="winner_type"
+                                name="winner_type"
+                                class="admin-input"
+                            >
+
+                                <option
+                                    value="TEXT"
+                                    {% if not result or (
+                                        not result.winner_student_id and
+                                        not result.winner_team_id
+                                    ) %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    Name / Text
+                                </option>
+
+                                <option
+                                    value="STUDENT"
+                                    {% if result and result.winner_student_id %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    Individual Student
+                                </option>
+
+                                <option
+                                    value="TEAM"
+                                    {% if result and result.winner_team_id %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    Team
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- WINNER NAME -->
+
+                        <div class="admin-form-group">
+
+                            <label for="winner">
+                                Winner Name / Title
+                            </label>
+
+                            <input
+                                type="text"
+                                id="winner"
+                                name="winner"
+                                class="admin-input"
+                                maxlength="200"
+                                value="{{ result.winner if result else '' }}"
+                                placeholder="Winner name or team name"
+                            >
+
+                        </div>
+
+
+                        <!-- WINNER STUDENT -->
+
+                        <div class="admin-form-group winner-student-field">
+
+                            <label for="winner_student_id">
+                                Winner Student ID
+                            </label>
+
+                            <input
+                                type="number"
+                                id="winner_student_id"
+                                name="winner_student_id"
+                                class="admin-input"
+                                min="1"
+                                value="{{ result.winner_student_id if result and result.winner_student_id else '' }}"
+                                placeholder="Database student ID"
+                            >
+
+                            <small class="field-hint">
+                                Use only when the winner is an individual student.
+                            </small>
+
+                        </div>
+
+
+                        <!-- WINNER TEAM -->
+
+                        <div class="admin-form-group winner-team-field">
+
+                            <label for="winner_team_id">
+                                Winner Team ID
+                            </label>
+
+                            <input
+                                type="number"
+                                id="winner_team_id"
+                                name="winner_team_id"
+                                class="admin-input"
+                                min="1"
+                                value="{{ result.winner_team_id if result and result.winner_team_id else '' }}"
+                                placeholder="Database team ID"
+                            >
+
+                            <small class="field-hint">
+                                Use only when the winner is a team.
+                            </small>
+
+                        </div>
+
+
+                        <!-- PRIZE -->
+
+                        <div class="admin-form-group">
+
+                            <label for="winner_prize">
+                                Winner Prize
+                            </label>
+
+                            <input
+                                type="text"
+                                id="winner_prize"
+                                name="winner_prize"
+                                class="admin-input"
+                                maxlength="100"
+                                value="{{ result.winner_prize if result else '' }}"
+                                placeholder="₹10,000 / Trophy / Gift"
+                            >
+
+                        </div>
+
+
+                        <!-- CERTIFICATE -->
+
+                        <div class="admin-form-group checkbox-field">
+
+                            <label>
+                                Winner Certificate
+                            </label>
+
+                            <label class="toggle-option">
+
+                                <input
+                                    type="checkbox"
+                                    name="winner_certificate"
+                                    value="1"
+                                    {% if not result or result.winner_certificate %}
+                                        checked
+                                    {% endif %}
+                                >
+
+                                <span class="toggle-ui"></span>
+
+                                <span>
+                                    Certificate enabled
+                                </span>
+
+                            </label>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =====================================================
+             RUNNER UP
+        ====================================================== -->
+        <section class="admin-card editor-card">
+
+            <div class="admin-card-header">
+
+                <div>
+
+                    <div class="section-kicker">
+                        SECOND POSITION
+                    </div>
+
+                    <h2>
+                        Runner-up
+                    </h2>
+
+                    <p>
+                        Configure the official second-place participant.
+                    </p>
+
+                </div>
+
+                <div class="section-number">
+                    03
+                </div>
+
+            </div>
+
+
+            <div class="runner-editor-panel">
+
+                <div class="runner-rank-large">
+                    02
+                </div>
+
+
+                <div class="runner-editor-content">
+
+                    <div class="editor-grid">
+
+                        <!-- RUNNER TYPE -->
+
+                        <div class="admin-form-group">
+
+                            <label for="runner_type">
+                                Runner-up Type
+                            </label>
+
+                            <select
+                                id="runner_type"
+                                name="runner_type"
+                                class="admin-input"
+                            >
+
+                                <option
+                                    value="TEXT"
+                                    {% if not result or (
+                                        not result.runner_up_student_id and
+                                        not result.runner_up_team_id
+                                    ) %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    Name / Text
+                                </option>
+
+                                <option
+                                    value="STUDENT"
+                                    {% if result and result.runner_up_student_id %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    Individual Student
+                                </option>
+
+                                <option
+                                    value="TEAM"
+                                    {% if result and result.runner_up_team_id %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    Team
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- NAME -->
+
+                        <div class="admin-form-group">
+
+                            <label for="runner_up">
+                                Runner-up Name / Title
+                            </label>
+
+                            <input
+                                type="text"
+                                id="runner_up"
+                                name="runner_up"
+                                class="admin-input"
+                                maxlength="200"
+                                value="{{ result.runner_up if result else '' }}"
+                                placeholder="Runner-up name or team name"
+                            >
+
+                        </div>
+
+
+                        <!-- STUDENT -->
+
+                        <div class="admin-form-group">
+
+                            <label for="runner_up_student_id">
+                                Runner-up Student ID
+                            </label>
+
+                            <input
+                                type="number"
+                                id="runner_up_student_id"
+                                name="runner_up_student_id"
+                                class="admin-input"
+                                min="1"
+                                value="{{ result.runner_up_student_id if result and result.runner_up_student_id else '' }}"
+                                placeholder="Database student ID"
+                            >
+
+                        </div>
+
+
+                        <!-- TEAM -->
+
+                        <div class="admin-form-group">
+
+                            <label for="runner_up_team_id">
+                                Runner-up Team ID
+                            </label>
+
+                            <input
+                                type="number"
+                                id="runner_up_team_id"
+                                name="runner_up_team_id"
+                                class="admin-input"
+                                min="1"
+                                value="{{ result.runner_up_team_id if result and result.runner_up_team_id else '' }}"
+                                placeholder="Database team ID"
+                            >
+
+                        </div>
+
+
+                        <!-- PRIZE -->
+
+                        <div class="admin-form-group">
+
+                            <label for="runner_up_prize">
+                                Runner-up Prize
+                            </label>
+
+                            <input
+                                type="text"
+                                id="runner_up_prize"
+                                name="runner_up_prize"
+                                class="admin-input"
+                                maxlength="100"
+                                value="{{ result.runner_up_prize if result else '' }}"
+                                placeholder="₹5,000 / Trophy / Gift"
+                            >
+
+                        </div>
+
+
+                        <!-- CERTIFICATE -->
+
+                        <div class="admin-form-group checkbox-field">
+
+                            <label>
+                                Runner-up Certificate
+                            </label>
+
+                            <label class="toggle-option">
+
+                                <input
+                                    type="checkbox"
+                                    name="runner_up_certificate"
+                                    value="1"
+                                    {% if result and result.runner_up_certificate %}
+                                        checked
+                                    {% endif %}
+                                >
+
+                                <span class="toggle-ui"></span>
+
+                                <span>
+                                    Certificate enabled
+                                </span>
+
+                            </label>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =====================================================
+             RESULT DETAILS
+        ====================================================== -->
+        <section class="admin-card editor-card">
+
+            <div class="admin-card-header">
+
+                <div>
+
+                    <div class="section-kicker">
+                        OFFICIAL RECORD
+                    </div>
+
+                    <h2>
+                        Result Details
+                    </h2>
+
+                    <p>
+                        Add the official result announcement or judging remarks.
+                    </p>
+
+                </div>
+
+                <div class="section-number">
+                    04
+                </div>
+
+            </div>
+
+
+            <div class="admin-form-group">
+
+                <label for="result_details">
+                    Details / Remarks
+                </label>
+
+                <textarea
+                    id="result_details"
+                    name="result_details"
+                    class="admin-textarea"
+                    rows="7"
+                    maxlength="10000"
+                    placeholder="Add official result details, judging notes, special mentions or announcement text..."
+                >{{ result.result_details if result else '' }}</textarea>
+
+                <div class="textarea-meta">
+                    <span>
+                        Visible as part of the official result information.
+                    </span>
+
+                    <span id="characterCount">
+                        0 / 10000
+                    </span>
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =====================================================
+             PUBLICATION
+        ====================================================== -->
+        <section class="admin-card editor-card publication-card">
+
+            <div class="admin-card-header">
+
+                <div>
+
+                    <div class="section-kicker">
+                        VISIBILITY
+                    </div>
+
+                    <h2>
+                        Publication Settings
+                    </h2>
+
+                    <p>
+                        Decide whether the result should be visible to students.
+                    </p>
+
+                </div>
+
+                <div class="section-number">
+                    05
+                </div>
+
+            </div>
+
+
+            <div class="publication-control">
+
+                <div class="publication-icon">
+                    {% if result and result.is_published %}
+                        ✓
+                    {% else %}
+                        ◷
+                    {% endif %}
+                </div>
+
+
+                <div class="publication-copy">
+
+                    <strong>
+                        Publish official result
+                    </strong>
+
+                    <span>
+                        Published results can be displayed on the student-facing
+                        results page.
+                    </span>
+
+                </div>
+
+
+                <label class="large-toggle">
+
+                    <input
+                        type="checkbox"
+                        name="is_published"
+                        value="1"
+                        {% if result and result.is_published %}
+                            checked
+                        {% endif %}
+                    >
+
+                    <span class="large-toggle-track">
+                        <span class="large-toggle-thumb"></span>
+                    </span>
+
+                </label>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =====================================================
+             SAVE BAR
+        ====================================================== -->
+        <div class="editor-save-bar">
+
+            <div class="save-bar-info">
+
+                <span class="save-bar-dot"></span>
+
+                <span>
+                    Changes are saved to the official result record.
+                </span>
+
+            </div>
+
+
+            <div class="save-bar-actions">
+
+                <a
+                    href="{{ url_for('admin.results') }}"
+                    class="admin-btn admin-btn-secondary"
+                >
+                    Cancel
+                </a>
+
+                <button
+                    type="submit"
+                    class="admin-btn admin-btn-primary"
+                >
+                    <span>✓</span>
+
+                    {% if result %}
+                        Save Result
+                    {% else %}
+                        Create Result
+                    {% endif %}
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+<!-- =============================================================
+     PAGE-SPECIFIC STYLING
+============================================================= -->
+
+
+
+
+<!-- =============================================================
+     PAGE SCRIPT
+============================================================= -->
+
+<script>
+
+(function () {
+
+    const textarea = document.getElementById("result_details");
+    const counter = document.getElementById("characterCount");
+
+    function updateCharacterCount() {
+
+        if (!textarea || !counter) {
+            return;
+        }
+
+        counter.textContent =
+            textarea.value.length + " / 10000";
+
+    }
+
+    if (textarea) {
+
+        textarea.addEventListener(
+            "input",
+            updateCharacterCount
+        );
+
+        updateCharacterCount();
+
+    }
+
+
+    /*
+     * Winner / runner type is primarily a visual/editor aid.
+     * Backend remains responsible for validating IDs and
+     * clearing incompatible fields.
+     */
+
+    const winnerType = document.getElementById("winner_type");
+    const runnerType = document.getElementById("runner_type");
+
+    const winnerStudent = document.getElementById("winner_student_id");
+    const winnerTeam = document.getElementById("winner_team_id");
+
+    const runnerStudent = document.getElementById("runner_up_student_id");
+    const runnerTeam = document.getElementById("runner_up_team_id");
+
+
+    function syncWinnerFields() {
+
+        if (!winnerType) {
+            return;
+        }
+
+        if (winnerType.value === "STUDENT") {
+
+            if (winnerStudent) {
+                winnerStudent.disabled = false;
+            }
+
+            if (winnerTeam) {
+                winnerTeam.disabled = true;
+                winnerTeam.value = "";
+            }
+
+        } else if (winnerType.value === "TEAM") {
+
+            if (winnerTeam) {
+                winnerTeam.disabled = false;
+            }
+
+            if (winnerStudent) {
+                winnerStudent.disabled = true;
+                winnerStudent.value = "";
+            }
+
+        } else {
+
+            if (winnerStudent) {
+                winnerStudent.disabled = true;
+                winnerStudent.value = "";
+            }
+
+            if (winnerTeam) {
+                winnerTeam.disabled = true;
+                winnerTeam.value = "";
+            }
+
+        }
+
+    }
+
+
+    function syncRunnerFields() {
+
+        if (!runnerType) {
+            return;
+        }
+
+        if (runnerType.value === "STUDENT") {
+
+            if (runnerStudent) {
+                runnerStudent.disabled = false;
+            }
+
+            if (runnerTeam) {
+                runnerTeam.disabled = true;
+                runnerTeam.value = "";
+            }
+
+        } else if (runnerType.value === "TEAM") {
+
+            if (runnerTeam) {
+                runnerTeam.disabled = false;
+            }
+
+            if (runnerStudent) {
+                runnerStudent.disabled = true;
+                runnerStudent.value = "";
+            }
+
+        } else {
+
+            if (runnerStudent) {
+                runnerStudent.disabled = true;
+                runnerStudent.value = "";
+            }
+
+            if (runnerTeam) {
+                runnerTeam.disabled = true;
+                runnerTeam.value = "";
+            }
+
+        }
+
+    }
+
+
+    if (winnerType) {
+
+        winnerType.addEventListener(
+            "change",
+            syncWinnerFields
+        );
+
+        syncWinnerFields();
+
+    }
+
+
+    if (runnerType) {
+
+        runnerType.addEventListener(
+            "change",
+            syncRunnerFields
+        );
+
+        syncRunnerFields();
+
+    }
+
+})();
+
+</script>
+
+{% endblock %}

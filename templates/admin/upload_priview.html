@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Import Preview</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #080c16;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+
+        main {
+            width: 90%;
+            max-width: 900px;
+            margin: 50px auto;
+        }
+
+        .card {
+            padding: 30px;
+            background: #111725;
+            border: 1px solid #252d40;
+            border-radius: 18px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .stat {
+            padding: 20px;
+            background: #0b101b;
+            border-radius: 12px;
+        }
+
+        .stat strong {
+            display: block;
+            font-size: 28px;
+            margin-top: 8px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 300px;
+            background: #080c16;
+            color: white;
+            border: 1px solid #303b53;
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 14px 24px;
+            border: 0;
+            border-radius: 10px;
+            background: #00e5ff;
+            color: #001015;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .cancel {
+            margin-left: 10px;
+            background: #20283a;
+            color: white;
+        }
+
+        @media(max-width:600px) {
+            .stats {
+                grid-template-columns: 1fr;
+            }
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<main>
+
+    <div class="card">
+
+        <h1>Import Preview</h1>
+
+        <p>
+            File: <strong>{{ filename }}</strong>
+        </p>
+
+        <div class="stats">
+
+            <div class="stat">
+                Total Found
+                <strong>{{ total }}</strong>
+            </div>
+
+            <div class="stat">
+                New
+                <strong>{{ new_ids|length }}</strong>
+            </div>
+
+            <div class="stat">
+                Existing
+                <strong>{{ existing_ids|length }}</strong>
+            </div>
+
+        </div>
+
+        <h3>Student IDs</h3>
+
+        <textarea readonly>{% for student_id in student_ids %}{{ student_id }}
+{% endfor %}</textarea>
+
+        <form
+            method="POST"
+            action="{{ url_for('admin.import_students') }}"
+        >
+
+            <textarea
+                name="student_ids"
+                hidden
+            >{% for student_id in student_ids %}{{ student_id }}
+{% endfor %}</textarea>
+
+            <button type="submit">
+                CONFIRM IMPORT
+            </button>
+
+            <a href="{{ url_for('admin.upload_students') }}">
+                <button
+                    type="button"
+                    class="cancel"
+                >
+                    CANCEL
+                </button>
+            </a>
+
+        </form>
+
+    </div>
+
+</main>
+
+</body>
+</html>

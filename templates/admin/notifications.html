@@ -1,0 +1,595 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Notifications | Admin Panel{% endblock %}
+
+{% block content %}
+
+<div class="admin-page notifications-page">
+
+    <!-- =========================================================
+         PAGE HEADER
+    ========================================================== -->
+    <div class="page-header">
+        <div>
+            <div class="eyebrow">
+                <span class="eyebrow-dot"></span>
+                COMMUNICATION CONTROL
+            </div>
+
+            <h1>Notifications</h1>
+
+            <p>
+                Create, publish and manage announcements for students
+                and event participants.
+            </p>
+        </div>
+
+        <div class="header-actions">
+            <a href="{{ url_for('admin.notifications') }}" class="btn btn-secondary">
+                <span>↻</span>
+                Refresh
+            </a>
+        </div>
+    </div>
+
+
+    <!-- =========================================================
+         QUICK STATS
+    ========================================================== -->
+    <div class="stats-grid">
+
+        <div class="stat-card">
+            <div class="stat-icon">◉</div>
+            <div>
+                <span>Total Notifications</span>
+                <strong>{{ notifications|length if notifications else 0 }}</strong>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">✓</div>
+            <div>
+                <span>Published</span>
+                <strong>
+                    {{ notifications|selectattr('is_published')|list|length if notifications else 0 }}
+                </strong>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">!</div>
+            <div>
+                <span>Important</span>
+                <strong>
+                    {{
+                        notifications
+                        |selectattr('notification_type', 'equalto', 'IMPORTANT')
+                        |list
+                        |length
+                        if notifications else 0
+                    }}
+                </strong>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">⌁</div>
+            <div>
+                <span>Event Alerts</span>
+                <strong>
+                    {{
+                        notifications
+                        |selectattr('notification_type', 'equalto', 'EVENT')
+                        |list
+                        |length
+                        if notifications else 0
+                    }}
+                </strong>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         CREATE NOTIFICATION
+    ========================================================== -->
+    <section class="admin-card notification-composer">
+
+        <div class="card-heading">
+            <div>
+                <span class="section-label">NEW BROADCAST</span>
+                <h2>Create Notification</h2>
+                <p>
+                    Publish an announcement globally or attach it to a
+                    particular event.
+                </p>
+            </div>
+        </div>
+
+
+        <form method="POST"
+              action="{{ url_for('admin.notification_create') }}"
+              class="admin-form">
+
+            {% if csrf_token is defined %}
+                {{ csrf_token() }}
+            {% endif %}
+
+            <div class="form-grid">
+
+                <div class="form-group full-width">
+                    <label for="title">
+                        Notification Title
+                    </label>
+
+                    <input
+                        type="text"
+                        id="title"
+                        name="title"
+                        maxlength="200"
+                        required
+                        placeholder="e.g. Registration deadline extended"
+                    >
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="notification_type">
+                        Notification Type
+                    </label>
+
+                    <select id="notification_type"
+                            name="notification_type"
+                            required>
+
+                        <option value="GENERAL">
+                            General
+                        </option>
+
+                        <option value="EVENT">
+                            Event
+                        </option>
+
+                        <option value="RESULT">
+                            Result
+                        </option>
+
+                        <option value="IMPORTANT">
+                            Important
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="game_id">
+                        Related Event
+                    </label>
+
+                    <select id="game_id"
+                            name="game_id">
+
+                        <option value="">
+                            — General Announcement —
+                        </option>
+
+                        {% for game in games or [] %}
+                            <option value="{{ game.id }}">
+                                {{ game.game_name }}
+                            </option>
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="expires_at">
+                        Expiry
+                    </label>
+
+                    <input
+                        type="datetime-local"
+                        id="expires_at"
+                        name="expires_at"
+                    >
+
+                    <small>
+                        Leave empty for no expiry.
+                    </small>
+
+                </div>
+
+
+                <div class="form-group full-width">
+
+                    <label for="message">
+                        Message
+                    </label>
+
+                    <textarea
+                        id="message"
+                        name="message"
+                        rows="6"
+                        maxlength="5000"
+                        required
+                        placeholder="Write the announcement students should see..."
+                    ></textarea>
+
+                    <div class="character-counter">
+                        <span id="messageCount">0</span> / 5000
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="form-footer">
+
+                <label class="switch-field">
+
+                    <input
+                        type="checkbox"
+                        name="is_published"
+                        value="1"
+                    >
+
+                    <span class="switch-ui"></span>
+
+                    <span>
+                        <strong>Publish immediately</strong>
+                        <small>
+                            Students can see this notification immediately.
+                        </small>
+                    </span>
+
+                </label>
+
+
+                <button type="submit" class="btn btn-primary">
+                    <span>＋</span>
+                    Create Notification
+                </button>
+
+            </div>
+
+        </form>
+
+    </section>
+
+
+    <!-- =========================================================
+         NOTIFICATION LIST
+    ========================================================== -->
+    <section class="admin-card">
+
+        <div class="card-heading list-heading">
+
+            <div>
+                <span class="section-label">BROADCAST LOG</span>
+
+                <h2>All Notifications</h2>
+
+                <p>
+                    Review previously created announcements and their
+                    publication status.
+                </p>
+            </div>
+
+            <div class="list-tools">
+
+                <input
+                    type="search"
+                    id="notificationSearch"
+                    placeholder="Search notifications..."
+                    autocomplete="off"
+                >
+
+                <select id="notificationFilter">
+
+                    <option value="ALL">
+                        All types
+                    </option>
+
+                    <option value="GENERAL">
+                        General
+                    </option>
+
+                    <option value="EVENT">
+                        Event
+                    </option>
+
+                    <option value="RESULT">
+                        Result
+                    </option>
+
+                    <option value="IMPORTANT">
+                        Important
+                    </option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+
+        {% if notifications %}
+
+        <div class="notification-list" id="notificationList">
+
+            {% for notification in notifications %}
+
+            <article
+                class="notification-row"
+                data-type="{{ notification.notification_type }}"
+                data-search="
+                    {{ notification.title }}
+                    {{ notification.message }}
+                    {{ notification.game_name or '' }}
+                "
+            >
+
+                <div class="notification-type
+                    type-{{ notification.notification_type|lower }}">
+
+                    {% if notification.notification_type == 'IMPORTANT' %}
+                        !
+                    {% elif notification.notification_type == 'RESULT' %}
+                        ★
+                    {% elif notification.notification_type == 'EVENT' %}
+                        ◆
+                    {% else %}
+                        ●
+                    {% endif %}
+
+                </div>
+
+
+                <div class="notification-main">
+
+                    <div class="notification-topline">
+
+                        <h3>
+                            {{ notification.title }}
+                        </h3>
+
+                        {% if notification.is_published %}
+                            <span class="status-badge status-published">
+                                Published
+                            </span>
+                        {% else %}
+                            <span class="status-badge status-draft">
+                                Draft
+                            </span>
+                        {% endif %}
+
+                    </div>
+
+
+                    <p class="notification-message">
+                        {{ notification.message }}
+                    </p>
+
+
+                    <div class="notification-meta">
+
+                        <span>
+                            {{ notification.notification_type }}
+                        </span>
+
+                        {% if notification.game_name %}
+                            <span>
+                                {{ notification.game_name }}
+                            </span>
+                        {% else %}
+                            <span>
+                                Global
+                            </span>
+                        {% endif %}
+
+                        {% if notification.created_at %}
+                            <span>
+                                Created:
+                                {{ notification.created_at }}
+                            </span>
+                        {% endif %}
+
+                        {% if notification.expires_at %}
+                            <span>
+                                Expires:
+                                {{ notification.expires_at }}
+                            </span>
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+                <div class="notification-actions">
+
+                    {% if notification.is_published %}
+
+                        <form method="POST"
+                              action="{{ url_for('admin.notification_toggle', notification_id=notification.id) }}">
+
+                            {% if csrf_token is defined %}
+                                {{ csrf_token() }}
+                            {% endif %}
+
+                            <button
+                                type="submit"
+                                class="btn btn-small btn-secondary"
+                                title="Unpublish notification"
+                            >
+                                Unpublish
+                            </button>
+
+                        </form>
+
+                    {% else %}
+
+                        <form method="POST"
+                              action="{{ url_for('admin.notification_toggle', notification_id=notification.id) }}">
+
+                            {% if csrf_token is defined %}
+                                {{ csrf_token() }}
+                            {% endif %}
+
+                            <button
+                                type="submit"
+                                class="btn btn-small btn-primary"
+                                title="Publish notification"
+                            >
+                                Publish
+                            </button>
+
+                        </form>
+
+                    {% endif %}
+
+
+                    <form method="POST"
+                          action="{{ url_for('admin.notification_delete', notification_id=notification.id) }}"
+                          onsubmit="return confirm('Delete this notification permanently?');">
+
+                        {% if csrf_token is defined %}
+                            {{ csrf_token() }}
+                        {% endif %}
+
+                        <button
+                            type="submit"
+                            class="btn btn-small btn-danger"
+                            title="Delete notification"
+                        >
+                            Delete
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </article>
+
+            {% endfor %}
+
+        </div>
+
+        <div id="emptySearchState" class="empty-state" style="display:none;">
+            <div class="empty-icon">⌕</div>
+            <h3>No matching notifications</h3>
+            <p>
+                Try another keyword or notification type.
+            </p>
+        </div>
+
+        {% else %}
+
+        <div class="empty-state">
+
+            <div class="empty-icon">◇</div>
+
+            <h3>No notifications yet</h3>
+
+            <p>
+                Create your first announcement using the composer above.
+            </p>
+
+        </div>
+
+        {% endif %}
+
+    </section>
+
+</div>
+
+
+
+<!-- =============================================================
+     PAGE-SPECIFIC JAVASCRIPT
+============================================================= -->
+<script>
+
+(function () {
+
+    const message = document.getElementById("message");
+    const counter = document.getElementById("messageCount");
+
+    if (message && counter) {
+
+        function updateCounter() {
+            counter.textContent = message.value.length;
+        }
+
+        message.addEventListener("input", updateCounter);
+        updateCounter();
+    }
+
+
+    const search = document.getElementById("notificationSearch");
+    const filter = document.getElementById("notificationFilter");
+    const list = document.getElementById("notificationList");
+    const empty = document.getElementById("emptySearchState");
+
+    if (!search || !filter || !list) {
+        return;
+    }
+
+    const rows = Array.from(
+        list.querySelectorAll(".notification-row")
+    );
+
+
+    function applyFilters() {
+
+        const term = search.value.trim().toLowerCase();
+        const type = filter.value;
+
+        let visible = 0;
+
+        rows.forEach(row => {
+
+            const rowType = row.dataset.type || "";
+            const text = row.dataset.search || "";
+
+            const matchesText =
+                !term || text.toLowerCase().includes(term);
+
+            const matchesType =
+                type === "ALL" || rowType === type;
+
+            const show = matchesText && matchesType;
+
+            row.style.display = show ? "" : "none";
+
+            if (show) {
+                visible++;
+            }
+
+        });
+
+        if (empty) {
+            empty.style.display =
+                visible === 0 ? "" : "none";
+        }
+
+    }
+
+
+    search.addEventListener("input", applyFilters);
+    filter.addEventListener("change", applyFilters);
+
+})();
+
+</script>
+
+{% endblock %}

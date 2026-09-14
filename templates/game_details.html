@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        {{ game.name }} | Engineers Day 2026
+    </title>
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <style>
+
+        :root {
+            --bg: #160f0a;
+            --bg2: #24160e;
+
+            --orange: #f3a369;
+            --orange-light: #ffd1aa;
+
+            --cream: #fff4e9;
+            --muted: #bda99a;
+
+            --line: rgba(255, 196, 150, 0.15);
+
+            --panel: rgba(255,255,255,0.045);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+
+            min-height: 100vh;
+
+            font-family: "Manrope", sans-serif;
+
+            color: var(--cream);
+
+            background:
+
+                radial-gradient(
+                    circle at 20% 15%,
+                    rgba(243,163,105,0.15),
+                    transparent 28%
+                ),
+
+                radial-gradient(
+                    circle at 85% 80%,
+                    rgba(255,205,160,0.08),
+                    transparent 30%
+                ),
+
+                linear-gradient(
+                    135deg,
+                    var(--bg),
+                    var(--bg2)
+                );
+
+            overflow-x: hidden;
+
+            caret-color: transparent;
+        }
+
+
+        body::before {
+
+            content: "";
+
+            position: fixed;
+
+            inset: 0;
+
+            pointer-events: none;
+
+            opacity: 0.16;
+
+            background-image:
+
+                linear-gradient(
+                    rgba(255,255,255,0.035) 1px,
+                    transparent 1px
+                ),
+
+                linear-gradient(
+                    90deg,
+                    rgba(255,255,255,0.035) 1px,
+                    transparent 1px
+                );
+
+            background-size: 42px 42px;
+        }
+
+
+        .page {
+
+            position: relative;
+
+            z-index: 1;
+
+            width: min(1200px, 92%);
+
+            margin: auto;
+
+            padding: 35px 0 80px;
+        }
+
+
+        /* =====================================================
+           NAV
+        ====================================================== */
+
+        .nav {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            padding-bottom: 22px;
+
+            border-bottom: 1px solid var(--line);
+        }
+
+
+        .back {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 9px;
+
+            color: var(--muted);
+
+            text-decoration: none;
+
+            font-family: "DM Mono", monospace;
+
+            font-size: 10px;
+
+            letter-spacing: 0.08em;
+
+            transition:
+                color 0.25s ease,
+                transform 0.25s ease;
+        }
+
+
+        .back:hover {
+
+            color: var(--orange-light);
+
+            transform: translateX(-3px);
+        }
+
+
+        .nav-label {
+
+            font-family: "DM Mono", monospace;
+
+            font-size: 9px;
+
+            letter-spacing: 0.14em;
+
+            color: var(--orange);
+        }
+
+
+        /* =====================================================
+           HERO
+        ====================================================== */
+
+        .hero {
+
+            min-height: 460px;
+
+            padding: 90px 0 65px;
+
+            display: grid;
+
+            grid-template-columns:
+                minmax(0, 1.4fr)
+                minmax(280px, 0.6fr);
+
+            gap: 70px;
+
+            align-items: center;
+        }
+
+
+        .eyebrow {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+
+            margin-bottom: 25px;
+
+            font-family: "DM Mono", monospace;
+
+            font-size: 10px;
+
+            letter-spacing: 0.18em;
+
+            color: var(--orange);
+        }
+
+
+        .eyebrow::before {
+
+            content: "";
+
+            width: 35px;
+
+            height: 1px;
+
+            background: var(--orange);
+        }
+
+
+        .event-number {
+
+            font-family: "DM Mono", monospace;
+
+            font-size: 11px;
+
+            color: var(--muted);
+
+            margin-bottom: 12px;
+        }
+
+
+        h1 {
+
+            font-size: clamp(
+                48px,
+                7vw,
+                94px
+            );
+
+            line-height: 0.92;
+
+            letter-spacing: -0.065em;
+
+            font-weight: 800;
+        }
+
+
+        h1::first-letter {
+
+            color: var(--orange);
+        }
+
+
+        .description {
+
+            max-width: 650px;
+
+            margin-top: 30px;
+
+            color: var(--muted);
+
+            font-size: 14px;
+
+            line-height: 1.8;
+        }
+
+
+        /* =====================================================
+           INFO PANEL
+        ====================================================== */
+
+        .info-panel {
+
+            position: relative;
+
+            padding: 25px;
+
+            border: 1px solid var(--line);
+
+            border-radius: 22px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(255,255,255,0.075),
+                    rgba(255,255,255,0.018)
+                );
+
+            backdrop-filter: blur(16px);
+
+            box-shadow:
+                0 30px 80px rgba(0,0,0,0.22);
+
+            transform-style: preserve-3d;
+
+            transition:
+                transform 0.35s ease,
+                border-color 0.3s ease;
+        }
+
+
+        .info-panel:hover {
+
+            transform:
+                perspective(900px)
+                rotateY(-3deg)
+                translateY(-4px);
+
+            border-color:
+                rgba(243,163,105,0.35);
+        }
+
+
+        .info-label {
+
+            font-family: "DM Mono", monospace;
+
+            font-size: 9px;
+
+            letter-spacing: 0.15em;
+
+            color: var(--orange);
+
+            margin-bottom: 20px;
+        }
+
+
+        .info-row {
+
+            padding: 15px 0;
+
+            border-top: 1px solid var(--line);
+        }
+
+
+        .info-row:first-of-type {
+
+            border-top: 0;
+        }
+
+
+        .info-row span {
+
+            display: block;
+
+            margin-bottom: 6px;
+
+            font-family: "DM Mono", monospace;
+
+            font-size: 8px;
+
+            letter-spacing: 0.08em;
+
+            color: var(--muted);
+        }
+
+
+        .info-row strong {
+
+            font-size: 13px;
+
+            font-weight: 600;
+
+            color: var(--cream);
+        }
+
+
+        /* =====================================================
+           CONTENT SECTIONS
+        ====================================================== */
+
+        .content-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+
+            gap: 16px;
+
+            margin-top: 15px;
+        }
+
+
+        .content-card {
+
+            padding: 28px;
+
+            min-height: 210px;
+
+            border: 1px solid var(--line);
+
+            border-radius: 20px;
+
+            background: var(--panel);
+
+            transition:
+                transform 0.3s ease,
+                border-color 0.3s ease;
+        }
+
+
+        .content-card:hover {
+
+            transform: translateY(-4px);
+
+            border-color:
+                rgba(243,163,105,0.3);
+        }
+
+
+        .content-card.full {
+
+            grid-column: 1 / -1;
+        }
+
+
+        .content-title {
+
+            margin-bottom: 18px;
+
+            font-family: "DM Mono", monospace;
+
+            font-size: 10px;
+
+            letter-spacing: 0.16em;
+
+            color: var(--orange);
+        }
+
+
+        .content-body {
+
+            color: var(--muted);
+
+            font-size: 13px;
+
+            line-height: 1.9;
+
+            white-space: pre-line;
+        }
+
+
+        .rules {
+
+            white-space: pre-line;
+        }
+
+
+        /* =====================================================
+           REGISTRATION
+        ====================================================== */
+
+        .register-zone {
+
+            margin-top: 18px;
+
+            padding: 35px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 30px;
+
+            border: 1px solid
+                rgba(243,163,105,0.20);
+
+            border-radius: 22px;
+
+            background:
+                linear-gradient(
+                    110deg,
+                    rgba(243,163,105,0.12),
+                    rgba(255,255,255,0.025)
+                );
+        }
+
+
+        .register-title {
+
+            font-size: 22px;
+
+            font-weight: 700;
+
+            letter-spacing: -0.03em;
+        }
+
+
+        .register-subtitle {
+
+            margin-top: 7px;
+
+            color: var(--muted);
+
+            font-size: 11px;
+        }
+
+
+        .register-button {
+
+            min-width: 220px;
+
+            min-height: 58px;
+
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            padding: 0 25px;
+
+            border-radius: 14px;
+
+            text-decoration: none;
+
+            font-size: 11px;
+
+            font-weight: 800;
+
+            letter-spacing: 0.08em;
+
+            text-transform: uppercase;
+
+            color: #28150c;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #ffd0a7,
+                    #ee9a5e
+                );
+
+            border: 1px solid
+                rgba(255,235,215,0.7);
+
+            box-shadow:
+                0 15px 35px
+                rgba(170,82,32,0.18);
+
+            transition:
+                transform 0.3s ease,
+                box-shadow 0.3s ease;
+        }
+
+
+        .register-button:hover {
+
+            transform: translateY(-4px);
+
+            box-shadow:
+                0 22px 45px
+                rgba(170,82,32,0.25);
+        }
+
+
+        .register-button.disabled {
+
+            cursor: not-allowed;
+
+            opacity: 0.45;
+
+            filter: grayscale(0.25);
+
+            pointer-events: none;
+        }
+
+
+        /* =====================================================
+           FOOTER
+        ====================================================== */
+
+        footer {
+
+            margin-top: 70px;
+
+            padding-top: 22px;
+
+            border-top: 1px solid var(--line);
+
+            display: flex;
+
+            justify-content: space-between;
+
+            font-family: "DM Mono", monospace;
+
+            font-size: 9px;
+
+            color: var(--muted);
+
+            letter-spacing: 0.08em;
+        }
+
+
+        footer strong {
+
+            color: var(--orange-light);
+
+            font-weight: 500;
+        }
+
+
+        /* =====================================================
+           RESPONSIVE
+        ====================================================== */
+
+        @media (max-width: 800px) {
+
+            .hero {
+
+                grid-template-columns: 1fr;
+
+                gap: 35px;
+
+                padding-top: 60px;
+            }
+
+            .content-grid {
+
+                grid-template-columns: 1fr;
+            }
+
+            .content-card.full {
+
+                grid-column: auto;
+            }
+
+            .register-zone {
+
+                flex-direction: column;
+
+                align-items: flex-start;
+            }
+
+            .register-button {
+
+                width: 100%;
+            }
+        }
+
+
+        @media (max-width: 500px) {
+
+            .page {
+
+                width: 92%;
+            }
+
+            .nav-label {
+
+                display: none;
+            }
+
+            .hero {
+
+                padding-top: 50px;
+            }
+
+            footer {
+
+                flex-direction: column;
+
+                gap: 10px;
+            }
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="page">
+
+
+    <!-- =====================================================
+         NAVIGATION
+    ====================================================== -->
+
+    <nav class="nav">
+
+        <a
+            href="{{ url_for('games.games') }}"
+            class="back"
+        >
+            ← BACK TO EVENTS
+        </a>
+
+        <span class="nav-label">
+            SR GROUP OF INSTITUTION / ENGINEERS DAY 2026
+        </span>
+
+    </nav>
+
+
+    <!-- =====================================================
+         EVENT HERO
+    ====================================================== -->
+
+    <section class="hero">
+
+        <div>
+
+            <div class="eyebrow">
+                EVENT EXPERIENCE
+            </div>
+
+            <div class="event-number">
+                EVENT // {{ "%02d"|format(game.id) }}
+            </div>
+
+            <h1>
+                {{ game.name }}
+            </h1>
+
+            <p class="description">
+                {{ game.description or
+                   "Event information will be announced soon." }}
+            </p>
+
+        </div>
+
+
+        <!-- EVENT INFO -->
+
+        <aside class="info-panel">
+
+            <div class="info-label">
+                EVENT CONFIGURATION
+            </div>
+
+
+            <div class="info-row">
+
+                <span>PARTICIPATION</span>
+
+                <strong>
+                    {% if game.registration_mode == "TEAM" %}
+                        TEAM
+                    {% else %}
+                        INDIVIDUAL
+                    {% endif %}
+                </strong>
+
+            </div>
+
+
+            {% if game.registration_mode == "TEAM"
+                  and game.team_min_size
+                  and game.team_max_size %}
+
+            <div class="info-row">
+
+                <span>TEAM SIZE</span>
+
+                <strong>
+                    {{ game.team_min_size }}
+                    –
+                    {{ game.team_max_size }}
+                    PARTICIPANTS
+                </strong>
+
+            </div>
+
+            {% endif %}
+
+
+            <div class="info-row">
+
+                <span>DATE</span>
+
+                <strong>
+                    {{ game.event_date or "TBA" }}
+                </strong>
+
+            </div>
+
+
+            <div class="info-row">
+
+                <span>TIME</span>
+
+                <strong>
+
+                    {% if game.start_time %}
+
+                        {{ game.start_time }}
+
+                        {% if game.end_time %}
+                            — {{ game.end_time }}
+                        {% endif %}
+
+                    {% else %}
+
+                        TBA
+
+                    {% endif %}
+
+                </strong>
+
+            </div>
+
+
+            <div class="info-row">
+
+                <span>VENUE</span>
+
+                <strong>
+                    {{ game.venue or "TBA" }}
+                </strong>
+
+            </div>
+
+
+            <div class="info-row">
+
+                <span>REGISTRATION</span>
+
+                <strong>
+
+                    {% if game.registration_open %}
+
+                        OPEN
+
+                    {% else %}
+
+                        CLOSED
+
+                    {% endif %}
+
+                </strong>
+
+            </div>
+
+        </aside>
+
+    </section>
+
+
+    <!-- =====================================================
+         EVENT INFORMATION
+    ====================================================== -->
+
+    <section class="content-grid">
+
+
+        <!-- RULES -->
+
+        <article class="content-card full">
+
+            <div class="content-title">
+                RULES & REGULATIONS
+            </div>
+
+            <div class="content-body rules">
+
+                {{ game.rules or
+                   "Official rules will be published by the event administration team." }}
+
+            </div>
+
+        </article>
+
+
+        <!-- REQUIREMENTS -->
+
+        <article class="content-card">
+
+            <div class="content-title">
+                REQUIREMENTS
+            </div>
+
+            <div class="content-body">
+
+                {{ game.requirements or
+                   "Participation requirements will be announced soon." }}
+
+            </div>
+
+        </article>
+
+
+        <!-- PRIZES -->
+
+        <article class="content-card">
+
+            <div class="content-title">
+                PRIZES
+            </div>
+
+            <div class="content-body">
+
+                {{ game.prizes or
+                   "Prize information will be announced soon." }}
+
+            </div>
+
+        </article>
+
+
+        <!-- CERTIFICATE -->
+
+        <article class="content-card">
+
+            <div class="content-title">
+                CERTIFICATION
+            </div>
+
+            <div class="content-body">
+
+                {% if game.certificate_enabled %}
+
+                    Certificate:
+                    {{ game.certificate_type or
+                       "Participation / Achievement Certificate" }}
+
+                {% else %}
+
+                    Certificate information is not available
+                    for this event.
+
+                {% endif %}
+
+            </div>
+
+        </article>
+
+
+        <!-- STATUS -->
+
+        <article class="content-card">
+
+            <div class="content-title">
+                EVENT STATUS
+            </div>
+
+            <div class="content-body">
+
+                {{ game.status or "ACTIVE" }}
+
+            </div>
+
+        </article>
+
+    </section>
+
+
+    <!-- =====================================================
+         REGISTRATION CTA
+    ====================================================== -->
+
+    <section class="register-zone">
+
+        <div>
+
+            <div class="register-title">
+                Ready to enter the arena?
+            </div>
+
+            <div class="register-subtitle">
+
+                Your student profile is already connected.
+                Registration will only ask for
+                event-specific information.
+
+            </div>
+
+        </div>
+
+
+        {% if game.registration_open %}
+
+            <a
+                href="#"
+                class="register-button"
+                id="registerButton"
+            >
+                REGISTER FOR EVENT →
+            </a>
+
+        {% else %}
+
+            <div
+                class="register-button disabled"
+            >
+                REGISTRATION CLOSED
+            </div>
+
+        {% endif %}
+
+    </section>
+
+
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
+
+    <footer>
+
+        <span>
+            ENGINEERS DAY / 16 SEPTEMBER 2026
+        </span>
+
+        <span>
+            POWERED BY
+            <strong>ANURAG YADAV</strong>
+        </span>
+
+    </footer>
+
+</div>
+
+
+<script>
+
+    /*
+     * Gentle 3D interaction for the event information panel.
+     */
+
+    const panel =
+        document.querySelector(".info-panel");
+
+
+    if (panel) {
+
+        panel.addEventListener(
+            "mousemove",
+            (event) => {
+
+                const rect =
+                    panel.getBoundingClientRect();
+
+                const x =
+                    event.clientX - rect.left;
+
+                const y =
+                    event.clientY - rect.top;
+
+                const centerX =
+                    rect.width / 2;
+
+                const centerY =
+                    rect.height / 2;
+
+                const rotateY =
+                    ((x - centerX) / centerX) * 4;
+
+                const rotateX =
+                    ((centerY - y) / centerY) * 4;
+
+                panel.style.transform =
+                    `perspective(900px)
+                     rotateX(${rotateX}deg)
+                     rotateY(${rotateY}deg)
+                     translateY(-4px)`;
+            }
+        );
+
+
+        panel.addEventListener(
+            "mouseleave",
+            () => {
+
+                panel.style.transform = "";
+            }
+        );
+
+    }
+
+</script>
+
+</body>
+
+</html>

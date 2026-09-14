@@ -1,0 +1,484 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Registrations | Admin{% endblock %}
+
+{% block content %}
+
+<div class="admin-page">
+
+    <!-- =========================================================
+         HEADER
+    ========================================================== -->
+    <div class="page-header">
+        <div>
+            <div class="page-eyebrow">
+                <span class="eyebrow-dot"></span>
+                REGISTRATION CONTROL
+            </div>
+
+            <h1 class="page-title">
+                Registrations
+            </h1>
+
+            <p class="page-subtitle">
+                Monitor, review and control student registrations across all Engineers Day events.
+            </p>
+        </div>
+
+        <div class="page-header-actions">
+            <a href="{{ url_for('admin.dashboard') }}" class="admin-btn admin-btn-secondary">
+                <span>←</span>
+                Dashboard
+            </a>
+        </div>
+    </div>
+
+
+    <!-- =========================================================
+         QUICK STATS
+    ========================================================== -->
+    <div class="admin-stat-grid">
+
+        <div class="admin-stat-card">
+            <div class="admin-stat-icon">◎</div>
+            <div class="admin-stat-content">
+                <span class="admin-stat-label">TOTAL</span>
+                <strong>{{ stats.total if stats is defined else registrations|length }}</strong>
+                <small>All registrations</small>
+            </div>
+        </div>
+
+        <div class="admin-stat-card">
+            <div class="admin-stat-icon">✓</div>
+            <div class="admin-stat-content">
+                <span class="admin-stat-label">APPROVED</span>
+                <strong>{{ stats.approved if stats is defined else 0 }}</strong>
+                <small>Approved entries</small>
+            </div>
+        </div>
+
+        <div class="admin-stat-card">
+            <div class="admin-stat-icon">◷</div>
+            <div class="admin-stat-content">
+                <span class="admin-stat-label">PENDING</span>
+                <strong>{{ stats.registered if stats is defined else 0 }}</strong>
+                <small>Awaiting review</small>
+            </div>
+        </div>
+
+        <div class="admin-stat-card">
+            <div class="admin-stat-icon">×</div>
+            <div class="admin-stat-content">
+                <span class="admin-stat-label">REJECTED</span>
+                <strong>{{ stats.rejected if stats is defined else 0 }}</strong>
+                <small>Rejected entries</small>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         FILTER PANEL
+    ========================================================== -->
+    <section class="admin-card registration-filter-card">
+
+        <div class="admin-card-header">
+            <div>
+                <h2>Registration Explorer</h2>
+                <p>Search and filter registrations instantly.</p>
+            </div>
+        </div>
+
+        <form method="GET"
+              action="{{ url_for('admin.registrations') }}"
+              class="admin-filter-form">
+
+            <div class="admin-form-group">
+                <label for="search">Search</label>
+
+                <input
+                    type="text"
+                    id="search"
+                    name="search"
+                    value="{{ request.args.get('search', '') }}"
+                    placeholder="Name, email, phone or student ID"
+                    class="admin-input"
+                    autocomplete="off"
+                >
+            </div>
+
+
+            <div class="admin-form-group">
+                <label for="game_id">Event</label>
+
+                <select
+                    id="game_id"
+                    name="game_id"
+                    class="admin-input"
+                >
+                    <option value="">All Events</option>
+
+                    {% for game in games %}
+                        <option
+                            value="{{ game.id }}"
+                            {% if request.args.get('game_id')|string == game.id|string %}
+                                selected
+                            {% endif %}
+                        >
+                            {{ game.game_name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+
+            <div class="admin-form-group">
+                <label for="status">Status</label>
+
+                <select
+                    id="status"
+                    name="status"
+                    class="admin-input"
+                >
+                    <option value="">All Status</option>
+
+                    <option value="REGISTERED"
+                        {% if request.args.get('status') == 'REGISTERED' %}selected{% endif %}>
+                        Registered
+                    </option>
+
+                    <option value="APPROVED"
+                        {% if request.args.get('status') == 'APPROVED' %}selected{% endif %}>
+                        Approved
+                    </option>
+
+                    <option value="REJECTED"
+                        {% if request.args.get('status') == 'REJECTED' %}selected{% endif %}>
+                        Rejected
+                    </option>
+
+                    <option value="CANCELLED"
+                        {% if request.args.get('status') == 'CANCELLED' %}selected{% endif %}>
+                        Cancelled
+                    </option>
+                </select>
+            </div>
+
+
+            <div class="admin-filter-actions">
+
+                <button type="submit" class="admin-btn admin-btn-primary">
+                    <span>⌕</span>
+                    Search
+                </button>
+
+                <a
+                    href="{{ url_for('admin.registrations') }}"
+                    class="admin-btn admin-btn-secondary"
+                >
+                    Reset
+                </a>
+
+            </div>
+
+        </form>
+
+    </section>
+
+
+    <!-- =========================================================
+         REGISTRATION TABLE
+    ========================================================== -->
+    <section class="admin-card">
+
+        <div class="admin-card-header">
+
+            <div>
+                <h2>Registration Records</h2>
+
+                <p>
+                    {% if registrations %}
+                        {{ registrations|length }} record{{ '' if registrations|length == 1 else 's' }} displayed
+                    {% else %}
+                        No registration records found
+                    {% endif %}
+                </p>
+            </div>
+
+        </div>
+
+
+        {% if registrations %}
+
+        <div class="admin-table-wrapper">
+
+            <table class="admin-table">
+
+                <thead>
+                    <tr>
+
+                        <th>#</th>
+
+                        <th>Student</th>
+
+                        <th>Student ID</th>
+
+                        <th>Event</th>
+
+                        <th>Participation</th>
+
+                        <th>Team</th>
+
+                        <th>Status</th>
+
+                        <th>Registered</th>
+
+                        <th>Action</th>
+
+                    </tr>
+                </thead>
+
+
+                <tbody>
+
+                    {% for registration in registrations %}
+
+                    <tr>
+
+                        <!-- NUMBER -->
+                        <td>
+                            <span class="table-index">
+                                {{ loop.index }}
+                            </span>
+                        </td>
+
+
+                        <!-- STUDENT -->
+                        <td>
+
+                            <div class="student-table-profile">
+
+                                <div class="student-avatar">
+                                    {{ (registration.name or '?')[:1]|upper }}
+                                </div>
+
+                                <div class="student-table-info">
+
+                                    <strong>
+                                        {{ registration.name or 'Unknown Student' }}
+                                    </strong>
+
+                                    {% if registration.email %}
+                                        <span>
+                                            {{ registration.email }}
+                                        </span>
+                                    {% elif registration.phone %}
+                                        <span>
+                                            {{ registration.phone }}
+                                        </span>
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+                        </td>
+
+
+                        <!-- STUDENT ID -->
+                        <td>
+
+                            <span class="mono-value">
+                                {{ registration.student_id_display
+                                   or registration.student_roll
+                                   or registration.student_id
+                                   or '—' }}
+                            </span>
+
+                        </td>
+
+
+                        <!-- EVENT -->
+                        <td>
+
+                            <div class="event-table-info">
+
+                                <strong>
+                                    {{ registration.game_name }}
+                                </strong>
+
+                                {% if registration.schedule_date %}
+                                    <span>
+                                        {{ registration.schedule_date }}
+                                    </span>
+                                {% endif %}
+
+                            </div>
+
+                        </td>
+
+
+                        <!-- PARTICIPATION -->
+                        <td>
+
+                            {% if registration.registration_mode == 'TEAM' %}
+
+                                <span class="mode-badge mode-team">
+                                    TEAM
+                                </span>
+
+                            {% else %}
+
+                                <span class="mode-badge mode-individual">
+                                    INDIVIDUAL
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- TEAM -->
+                        <td>
+
+                            {% if registration.team_name %}
+
+                                <div class="team-cell">
+
+                                    <strong>
+                                        {{ registration.team_name }}
+                                    </strong>
+
+                                    {% if registration.team_role %}
+                                        <span>
+                                            {{ registration.team_role }}
+                                        </span>
+                                    {% endif %}
+
+                                </div>
+
+                            {% else %}
+
+                                <span class="muted-value">
+                                    Individual
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- STATUS -->
+                        <td>
+
+                            {% if registration.status == 'APPROVED' %}
+
+                                <span class="status-badge status-approved">
+                                    <i></i>
+                                    Approved
+                                </span>
+
+                            {% elif registration.status == 'REJECTED' %}
+
+                                <span class="status-badge status-rejected">
+                                    <i></i>
+                                    Rejected
+                                </span>
+
+                            {% elif registration.status == 'CANCELLED' %}
+
+                                <span class="status-badge status-cancelled">
+                                    <i></i>
+                                    Cancelled
+                                </span>
+
+                            {% else %}
+
+                                <span class="status-badge status-registered">
+                                    <i></i>
+                                    Registered
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- REGISTERED DATE -->
+                        <td>
+
+                            <span class="date-value">
+                                {{ registration.registered_at or '—' }}
+                            </span>
+
+                        </td>
+
+
+                        <!-- ACTION -->
+                        <td>
+
+                            <a
+                                href="{{ url_for(
+                                    'admin.registration_details',
+                                    registration_id=registration.id
+                                ) }}"
+                                class="table-action-btn"
+                                title="View registration"
+                            >
+                                View
+                                <span>→</span>
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        {% else %}
+
+        <!-- EMPTY STATE -->
+
+        <div class="admin-empty-state">
+
+            <div class="empty-state-icon">
+                ◎
+            </div>
+
+            <h3>No registrations found</h3>
+
+            <p>
+                There are no registration records matching the current filters.
+            </p>
+
+            <a
+                href="{{ url_for('admin.registrations') }}"
+                class="admin-btn admin-btn-secondary"
+            >
+                Clear Filters
+            </a>
+
+        </div>
+
+        {% endif %}
+
+    </section>
+
+</div>
+
+
+<!-- =============================================================
+     PAGE-SPECIFIC POLISH
+============================================================= -->
+
+
+
+{% endblock %}

@@ -1,0 +1,1419 @@
+/* =========================================================
+   ENGINEERS DAY ADMIN
+   DASHBOARD COMMAND CENTER
+   ---------------------------------------------------------
+   Page-specific layer
+   Shared shell/buttons/tokens remain in admin.css
+   ========================================================= */
+
+
+/* =========================================================
+   DASHBOARD PAGE FOUNDATION
+   ========================================================= */
+
+.command-center,
+.dashboard-page {
+    position: relative;
+    isolation: isolate;
+}
+
+
+/* =========================================================
+   HERO / COMMAND HEADER
+   ========================================================= */
+
+.command-hero {
+    position: relative;
+    overflow: hidden;
+    border-radius: 26px;
+    padding: 30px;
+    margin-bottom: 24px;
+
+    background:
+        radial-gradient(
+            circle at 88% 12%,
+            rgba(99, 102, 241, 0.18),
+            transparent 32%
+        ),
+        radial-gradient(
+            circle at 12% 88%,
+            rgba(14, 165, 233, 0.12),
+            transparent 34%
+        ),
+        linear-gradient(
+            145deg,
+            rgba(255, 255, 255, 0.055),
+            rgba(255, 255, 255, 0.018)
+        );
+
+    border: 1px solid rgba(255, 255, 255, 0.075);
+
+    box-shadow:
+        0 20px 55px rgba(0, 0, 0, 0.20),
+        inset 0 1px 0 rgba(255, 255, 255, 0.045);
+
+    transform: translateZ(0);
+
+    animation:
+        dashboardHeroIn 700ms cubic-bezier(.16, 1, .3, 1) both;
+}
+
+
+/* Ambient light sweep */
+
+.command-hero::before {
+    content: "";
+    position: absolute;
+    inset: -45%;
+
+    background:
+        conic-gradient(
+            from 180deg,
+            transparent 0deg,
+            rgba(99, 102, 241, 0.06) 70deg,
+            transparent 135deg,
+            rgba(14, 165, 233, 0.045) 210deg,
+            transparent 285deg
+        );
+
+    pointer-events: none;
+
+    animation: heroOrbit 18s linear infinite;
+}
+
+
+/* Top edge highlight */
+
+.command-hero::after {
+    content: "";
+    position: absolute;
+
+    left: 8%;
+    right: 8%;
+    top: 0;
+
+    height: 1px;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,255,255,.22),
+            transparent
+        );
+
+    opacity: .7;
+}
+
+
+/* =========================================================
+   HERO CONTENT
+   ========================================================= */
+
+.command-hero-content,
+.hero-content {
+    position: relative;
+    z-index: 2;
+}
+
+
+.command-hero h1,
+.hero-title {
+    letter-spacing: -0.035em;
+    line-height: 1.05;
+}
+
+
+.command-hero p,
+.hero-subtitle {
+    max-width: 720px;
+    opacity: .72;
+}
+
+
+/* =========================================================
+   LIVE INDICATOR
+   ========================================================= */
+
+.live-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+
+    padding: 7px 11px;
+
+    border-radius: 999px;
+
+    background: rgba(16, 185, 129, 0.08);
+    border: 1px solid rgba(16, 185, 129, 0.20);
+
+    color: #6ee7b7;
+
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .10em;
+    text-transform: uppercase;
+}
+
+
+.live-indicator::before {
+    content: "";
+
+    width: 7px;
+    height: 7px;
+
+    border-radius: 50%;
+
+    background: #34d399;
+
+    box-shadow:
+        0 0 0 4px rgba(52, 211, 153, .08),
+        0 0 14px rgba(52, 211, 153, .65);
+
+    animation: livePulse 1.9s ease-in-out infinite;
+}
+
+
+/* =========================================================
+   DASHBOARD METRIC GRID
+   ========================================================= */
+
+.command-metrics,
+.dashboard-metrics,
+.metrics-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: 16px;
+
+    margin-bottom: 24px;
+}
+
+
+/* =========================================================
+   METRIC CARD
+   ========================================================= */
+
+.metric-card,
+.command-metric {
+    position: relative;
+    overflow: hidden;
+
+    min-height: 150px;
+
+    padding: 21px;
+
+    border-radius: 21px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.055),
+            rgba(255,255,255,.018)
+        );
+
+    border: 1px solid rgba(255,255,255,.07);
+
+    box-shadow:
+        0 12px 35px rgba(0,0,0,.14),
+        inset 0 1px 0 rgba(255,255,255,.035);
+
+    transition:
+        transform .32s cubic-bezier(.16,1,.3,1),
+        border-color .28s ease,
+        box-shadow .32s ease,
+        background .28s ease;
+}
+
+
+/* Accent light */
+
+.metric-card::before,
+.command-metric::before {
+    content: "";
+
+    position: absolute;
+
+    width: 110px;
+    height: 110px;
+
+    right: -45px;
+    top: -50px;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(99,102,241,.18),
+            transparent 68%
+        );
+
+    filter: blur(2px);
+
+    transition:
+        transform .4s cubic-bezier(.16,1,.3,1),
+        opacity .3s ease;
+}
+
+
+.metric-card:hover,
+.command-metric:hover {
+    transform:
+        translateY(-5px)
+        scale(1.008);
+
+    border-color: rgba(129,140,248,.20);
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.075),
+            rgba(255,255,255,.025)
+        );
+
+    box-shadow:
+        0 20px 45px rgba(0,0,0,.22),
+        0 0 0 1px rgba(99,102,241,.045),
+        inset 0 1px 0 rgba(255,255,255,.06);
+}
+
+
+.metric-card:hover::before,
+.command-metric:hover::before {
+    transform: scale(1.35);
+    opacity: .9;
+}
+
+
+/* =========================================================
+   METRIC NUMBER
+   ========================================================= */
+
+.metric-value,
+.metric-number {
+    position: relative;
+    z-index: 2;
+
+    font-size: clamp(28px, 3vw, 42px);
+    font-weight: 850;
+
+    letter-spacing: -0.045em;
+    line-height: 1;
+
+    font-variant-numeric: tabular-nums;
+}
+
+
+.metric-label {
+    position: relative;
+    z-index: 2;
+
+    margin-top: 10px;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    letter-spacing: .055em;
+    text-transform: uppercase;
+
+    opacity: .56;
+}
+
+
+.metric-meta {
+    position: relative;
+    z-index: 2;
+
+    margin-top: 13px;
+
+    font-size: 12px;
+    opacity: .58;
+}
+
+
+/* =========================================================
+   METRIC ACCENTS
+   ========================================================= */
+
+.metric-card:nth-child(1)::before {
+    background:
+        radial-gradient(
+            circle,
+            rgba(99,102,241,.22),
+            transparent 68%
+        );
+}
+
+.metric-card:nth-child(2)::before {
+    background:
+        radial-gradient(
+            circle,
+            rgba(14,165,233,.20),
+            transparent 68%
+        );
+}
+
+.metric-card:nth-child(3)::before {
+    background:
+        radial-gradient(
+            circle,
+            rgba(16,185,129,.19),
+            transparent 68%
+        );
+}
+
+.metric-card:nth-child(4)::before {
+    background:
+        radial-gradient(
+            circle,
+            rgba(245,158,11,.19),
+            transparent 68%
+        );
+}
+
+
+/* =========================================================
+   MAIN WORKSPACE
+   ========================================================= */
+
+.command-workspace,
+.dashboard-workspace {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1.7fr)
+        minmax(300px, .9fr);
+
+    gap: 18px;
+
+    align-items: start;
+}
+
+
+/* =========================================================
+   DASHBOARD PANEL
+   ========================================================= */
+
+.command-panel,
+.dashboard-panel,
+.workspace-panel {
+    position: relative;
+
+    border-radius: 23px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.045),
+            rgba(255,255,255,.015)
+        );
+
+    border: 1px solid rgba(255,255,255,.065);
+
+    box-shadow:
+        0 14px 40px rgba(0,0,0,.13),
+        inset 0 1px 0 rgba(255,255,255,.035);
+
+    overflow: hidden;
+}
+
+
+.command-panel-header,
+.panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 16px;
+
+    padding: 20px 21px;
+
+    border-bottom:
+        1px solid rgba(255,255,255,.055);
+}
+
+
+.panel-header h2,
+.command-panel-header h2 {
+    margin: 0;
+
+    font-size: 15px;
+    font-weight: 800;
+
+    letter-spacing: -.01em;
+}
+
+
+.panel-header p {
+    margin: 4px 0 0;
+
+    font-size: 12px;
+    opacity: .52;
+}
+
+
+/* =========================================================
+   EVENT LIST
+   ========================================================= */
+
+.event-list {
+    display: flex;
+    flex-direction: column;
+
+    padding: 7px;
+}
+
+
+.event-row,
+.event-item {
+    position: relative;
+
+    display: grid;
+
+    grid-template-columns:
+        auto
+        minmax(0, 1fr)
+        auto;
+
+    align-items: center;
+
+    gap: 14px;
+
+    padding: 15px 14px;
+
+    border-radius: 15px;
+
+    border: 1px solid transparent;
+
+    transition:
+        transform .26s cubic-bezier(.16,1,.3,1),
+        background .25s ease,
+        border-color .25s ease;
+}
+
+
+.event-row:hover,
+.event-item:hover {
+    transform: translateX(4px);
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(99,102,241,.075),
+            rgba(99,102,241,.018)
+        );
+
+    border-color:
+        rgba(129,140,248,.11);
+}
+
+
+/* =========================================================
+   EVENT NUMBER
+   ========================================================= */
+
+.event-number {
+    display: grid;
+    place-items: center;
+
+    width: 34px;
+    height: 34px;
+
+    flex: 0 0 34px;
+
+    border-radius: 11px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(99,102,241,.15),
+            rgba(99,102,241,.035)
+        );
+
+    border: 1px solid rgba(129,140,248,.12);
+
+    font-size: 11px;
+    font-weight: 800;
+
+    color: #a5b4fc;
+
+    transition:
+        transform .25s ease,
+        box-shadow .25s ease;
+}
+
+
+.event-row:hover .event-number,
+.event-item:hover .event-number {
+    transform: rotate(-3deg) scale(1.06);
+
+    box-shadow:
+        0 7px 20px rgba(99,102,241,.14);
+}
+
+
+/* =========================================================
+   EVENT INFORMATION
+   ========================================================= */
+
+.event-info {
+    min-width: 0;
+}
+
+
+.event-name {
+    overflow: hidden;
+
+    font-size: 13px;
+    font-weight: 760;
+
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+
+.event-meta {
+    display: flex;
+    flex-wrap: wrap;
+
+    gap: 8px;
+
+    margin-top: 5px;
+
+    font-size: 11px;
+
+    opacity: .52;
+}
+
+
+/* =========================================================
+   EVENT STATUS
+   ========================================================= */
+
+.event-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 84px;
+
+    padding: 7px 10px;
+
+    border-radius: 999px;
+
+    font-size: 10px;
+    font-weight: 850;
+
+    letter-spacing: .07em;
+    text-transform: uppercase;
+
+    border: 1px solid transparent;
+
+    transition:
+        transform .22s ease,
+        filter .22s ease;
+}
+
+
+.event-status:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.08);
+}
+
+
+/* Status variants */
+
+.event-status.upcoming,
+.status-upcoming {
+    color: #c4b5fd;
+
+    background: rgba(139,92,246,.09);
+    border-color: rgba(139,92,246,.17);
+}
+
+
+.event-status.live,
+.status-live {
+    color: #6ee7b7;
+
+    background: rgba(16,185,129,.09);
+    border-color: rgba(16,185,129,.18);
+}
+
+
+.event-status.completed,
+.status-completed {
+    color: #93c5fd;
+
+    background: rgba(59,130,246,.09);
+    border-color: rgba(59,130,246,.17);
+}
+
+
+.event-status.cancelled,
+.status-cancelled {
+    color: #fda4af;
+
+    background: rgba(244,63,94,.08);
+    border-color: rgba(244,63,94,.16);
+}
+
+
+/* =========================================================
+   ATTENTION / ALERT PANEL
+   ========================================================= */
+
+.attention-list {
+    display: flex;
+    flex-direction: column;
+
+    gap: 9px;
+
+    padding: 13px;
+}
+
+
+.attention-item {
+    display: flex;
+    align-items: flex-start;
+
+    gap: 12px;
+
+    padding: 13px;
+
+    border-radius: 14px;
+
+    background:
+        rgba(255,255,255,.025);
+
+    border: 1px solid rgba(255,255,255,.05);
+
+    transition:
+        transform .24s ease,
+        background .24s ease,
+        border-color .24s ease;
+}
+
+
+.attention-item:hover {
+    transform: translateX(3px);
+
+    background:
+        rgba(255,255,255,.042);
+
+    border-color:
+        rgba(255,255,255,.085);
+}
+
+
+.attention-icon {
+    display: grid;
+    place-items: center;
+
+    width: 31px;
+    height: 31px;
+
+    flex: 0 0 31px;
+
+    border-radius: 10px;
+
+    background:
+        rgba(245,158,11,.09);
+
+    border:
+        1px solid rgba(245,158,11,.16);
+
+    color: #fbbf24;
+}
+
+
+/* =========================================================
+   OPERATIONS BLOCK
+   ========================================================= */
+
+.operations-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 10px;
+
+    padding: 14px;
+}
+
+
+.operation-item {
+    position: relative;
+
+    padding: 15px;
+
+    border-radius: 15px;
+
+    background:
+        rgba(255,255,255,.025);
+
+    border:
+        1px solid rgba(255,255,255,.05);
+
+    transition:
+        transform .28s cubic-bezier(.16,1,.3,1),
+        background .25s ease,
+        border-color .25s ease,
+        box-shadow .28s ease;
+}
+
+
+.operation-item:hover {
+    transform: translateY(-3px);
+
+    background:
+        rgba(255,255,255,.045);
+
+    border-color:
+        rgba(129,140,248,.13);
+
+    box-shadow:
+        0 12px 25px rgba(0,0,0,.12);
+}
+
+
+.operation-label {
+    font-size: 10px;
+    font-weight: 800;
+
+    letter-spacing: .08em;
+    text-transform: uppercase;
+
+    opacity: .48;
+}
+
+
+.operation-value {
+    margin-top: 7px;
+
+    font-size: 14px;
+    font-weight: 750;
+}
+
+
+/* =========================================================
+   RECENT REGISTRATIONS
+   ========================================================= */
+
+.recent-registrations {
+    display: flex;
+    flex-direction: column;
+
+    gap: 7px;
+
+    padding: 9px;
+}
+
+
+.registration-row {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        auto;
+
+    gap: 14px;
+
+    align-items: center;
+
+    padding: 13px;
+
+    border-radius: 14px;
+
+    border: 1px solid transparent;
+
+    transition:
+        background .22s ease,
+        transform .22s ease,
+        border-color .22s ease;
+}
+
+
+.registration-row:hover {
+    transform: translateX(3px);
+
+    background:
+        rgba(255,255,255,.035);
+
+    border-color:
+        rgba(255,255,255,.06);
+}
+
+
+.registration-name {
+    font-size: 13px;
+    font-weight: 750;
+}
+
+
+.registration-meta {
+    margin-top: 4px;
+
+    font-size: 11px;
+    opacity: .48;
+}
+
+
+/* =========================================================
+   SYSTEM HEALTH
+   ========================================================= */
+
+.system-health {
+    display: flex;
+    flex-direction: column;
+
+    gap: 10px;
+
+    padding: 14px;
+}
+
+
+.health-item {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0,1fr)
+        auto;
+
+    align-items: center;
+
+    gap: 14px;
+
+    padding: 12px 13px;
+
+    border-radius: 14px;
+
+    background:
+        rgba(255,255,255,.022);
+
+    border:
+        1px solid rgba(255,255,255,.045);
+}
+
+
+.health-name {
+    font-size: 12px;
+    font-weight: 700;
+}
+
+
+.health-state {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    font-size: 10px;
+    font-weight: 800;
+
+    text-transform: uppercase;
+    letter-spacing: .07em;
+}
+
+
+.health-state::before {
+    content: "";
+
+    width: 6px;
+    height: 6px;
+
+    border-radius: 50%;
+
+    background: currentColor;
+
+    box-shadow:
+        0 0 10px currentColor;
+}
+
+
+/* =========================================================
+   QUICK ACTIONS
+   ========================================================= */
+
+.quick-actions {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 10px;
+
+    padding: 14px;
+}
+
+
+.quick-action {
+    position: relative;
+    overflow: hidden;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    min-height: 54px;
+
+    padding: 13px 14px;
+
+    border-radius: 15px;
+
+    text-decoration: none;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.04),
+            rgba(255,255,255,.015)
+        );
+
+    border:
+        1px solid rgba(255,255,255,.06);
+
+    transition:
+        transform .28s cubic-bezier(.16,1,.3,1),
+        border-color .25s ease,
+        box-shadow .28s ease,
+        background .25s ease;
+}
+
+
+.quick-action::after {
+    content: "→";
+
+    font-size: 16px;
+
+    opacity: .38;
+
+    transform: translateX(-3px);
+
+    transition:
+        opacity .22s ease,
+        transform .25s ease;
+}
+
+
+.quick-action:hover {
+    transform:
+        translateY(-3px);
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(99,102,241,.09),
+            rgba(255,255,255,.025)
+        );
+
+    border-color:
+        rgba(129,140,248,.18);
+
+    box-shadow:
+        0 13px 28px rgba(0,0,0,.16);
+}
+
+
+.quick-action:hover::after {
+    opacity: .85;
+    transform: translateX(2px);
+}
+
+
+/* =========================================================
+   DASHBOARD BUTTON MICRO-INTERACTION
+   ========================================================= */
+
+.command-center .btn,
+.dashboard-page .btn {
+    position: relative;
+    overflow: hidden;
+
+    transform: translateZ(0);
+
+    transition:
+        transform .18s cubic-bezier(.16,1,.3,1),
+        box-shadow .22s ease,
+        background .25s ease,
+        border-color .22s ease,
+        filter .22s ease;
+}
+
+
+.command-center .btn::after,
+.dashboard-page .btn::after {
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    bottom: 0;
+
+    left: -70%;
+
+    width: 45%;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,255,255,.13),
+            transparent
+        );
+
+    transform: skewX(-20deg);
+
+    transition:
+        left .55s cubic-bezier(.16,1,.3,1);
+
+    pointer-events: none;
+}
+
+
+.command-center .btn:hover,
+.dashboard-page .btn:hover {
+    transform:
+        translateY(-2px);
+}
+
+
+.command-center .btn:hover::after,
+.dashboard-page .btn:hover::after {
+    left: 125%;
+}
+
+
+.command-center .btn:active,
+.dashboard-page .btn:active {
+    transform:
+        translateY(1px)
+        scale(.975);
+}
+
+
+/* =========================================================
+   EMPTY STATE
+   ========================================================= */
+
+.command-center .empty-state,
+.dashboard-page .empty-state {
+    display: grid;
+    place-items: center;
+
+    min-height: 170px;
+
+    padding: 25px;
+
+    text-align: center;
+
+    border-radius: 16px;
+
+    background:
+        radial-gradient(
+            circle at center,
+            rgba(99,102,241,.045),
+            transparent 65%
+        );
+
+    color: inherit;
+
+    opacity: .72;
+}
+
+
+.command-center .empty-state-icon {
+    display: grid;
+    place-items: center;
+
+    width: 48px;
+    height: 48px;
+
+    margin-bottom: 10px;
+
+    border-radius: 15px;
+
+    background:
+        rgba(99,102,241,.08);
+
+    border:
+        1px solid rgba(129,140,248,.12);
+}
+
+
+/* =========================================================
+   FOOTER / STATUS STRIP
+   ========================================================= */
+
+.dashboard-footer,
+.command-footer {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 14px;
+
+    margin-top: 20px;
+    padding: 15px 3px;
+
+    font-size: 11px;
+
+    opacity: .48;
+}
+
+
+/* =========================================================
+   STAGGERED REVEAL
+   ========================================================= */
+
+.command-center .metric-card,
+.dashboard-page .metric-card {
+    animation:
+        dashboardReveal 550ms cubic-bezier(.16,1,.3,1) both;
+}
+
+
+.command-center .metric-card:nth-child(1),
+.dashboard-page .metric-card:nth-child(1) {
+    animation-delay: 80ms;
+}
+
+
+.command-center .metric-card:nth-child(2),
+.dashboard-page .metric-card:nth-child(2) {
+    animation-delay: 140ms;
+}
+
+
+.command-center .metric-card:nth-child(3),
+.dashboard-page .metric-card:nth-child(3) {
+    animation-delay: 200ms;
+}
+
+
+.command-center .metric-card:nth-child(4),
+.dashboard-page .metric-card:nth-child(4) {
+    animation-delay: 260ms;
+}
+
+
+.command-center .command-panel,
+.dashboard-page .dashboard-panel {
+    animation:
+        dashboardReveal 620ms cubic-bezier(.16,1,.3,1) 300ms both;
+}
+
+
+/* =========================================================
+   KEYFRAMES
+   ========================================================= */
+
+@keyframes dashboardHeroIn {
+    from {
+        opacity: 0;
+        transform:
+            translateY(14px)
+            scale(.985);
+    }
+
+    to {
+        opacity: 1;
+        transform:
+            translateY(0)
+            scale(1);
+    }
+}
+
+
+@keyframes dashboardReveal {
+    from {
+        opacity: 0;
+        transform:
+            translateY(13px);
+    }
+
+    to {
+        opacity: 1;
+        transform:
+            translateY(0);
+    }
+}
+
+
+@keyframes heroOrbit {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+
+@keyframes livePulse {
+    0%,
+    100% {
+        transform: scale(.85);
+        opacity: .75;
+    }
+
+    50% {
+        transform: scale(1.12);
+        opacity: 1;
+    }
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1180px) {
+
+    .command-metrics,
+    .dashboard-metrics,
+    .metrics-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    .command-workspace,
+    .dashboard-workspace {
+        grid-template-columns:
+            minmax(0, 1fr);
+    }
+}
+
+
+@media (max-width: 720px) {
+
+    .command-hero {
+        padding: 22px;
+
+        border-radius: 20px;
+    }
+
+    .command-metrics,
+    .dashboard-metrics,
+    .metrics-grid {
+        grid-template-columns:
+            minmax(0, 1fr);
+
+        gap: 11px;
+    }
+
+    .metric-card,
+    .command-metric {
+        min-height: 130px;
+    }
+
+    .event-row,
+    .event-item {
+        grid-template-columns:
+            auto
+            minmax(0, 1fr);
+    }
+
+    .event-status {
+        grid-column: 2;
+        justify-self: start;
+    }
+
+    .operations-grid,
+    .quick-actions {
+        grid-template-columns:
+            minmax(0, 1fr);
+    }
+
+    .command-panel-header,
+    .panel-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .dashboard-footer,
+    .command-footer {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+
+
+@media (max-width: 480px) {
+
+    .command-hero {
+        padding: 18px;
+    }
+
+    .event-row,
+    .event-item {
+        gap: 10px;
+        padding: 12px 10px;
+    }
+
+    .event-number {
+        width: 30px;
+        height: 30px;
+        flex-basis: 30px;
+    }
+
+    .metric-card,
+    .command-metric {
+        padding: 17px;
+    }
+}
+
+
+/* =========================================================
+   ACCESSIBILITY
+   ========================================================= */
+
+.command-center :is(
+    a,
+    button,
+    input,
+    select,
+    textarea
+):focus-visible,
+.dashboard-page :is(
+    a,
+    button,
+    input,
+    select,
+    textarea
+):focus-visible {
+    outline: 2px solid rgba(129,140,248,.85);
+    outline-offset: 3px;
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .command-hero,
+    .metric-card,
+    .command-metric,
+    .command-panel,
+    .dashboard-panel,
+    .live-indicator::before {
+        animation: none !important;
+    }
+
+    .command-hero::before {
+        animation: none !important;
+    }
+
+    .command-center *,
+    .dashboard-page * {
+        scroll-behavior: auto !important;
+        transition-duration: .01ms !important;
+    }
+}

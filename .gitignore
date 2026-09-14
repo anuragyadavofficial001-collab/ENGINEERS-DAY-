@@ -1,0 +1,125 @@
+# ============================================================
+# ENGINEERS DAY - GITIGNORE
+# ============================================================
+
+# -------------------------
+# Python
+# -------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+
+# Virtual environments
+venv/
+env/
+.venv/
+ENV/
+env.bak/
+venv.bak/
+
+# -------------------------
+# Environment / Secrets
+# -------------------------
+.env
+.env.*
+!.env.example
+
+# -------------------------
+# Flask
+# -------------------------
+instance/
+.webassets-cache/
+
+# -------------------------
+# Database / Local Data
+# -------------------------
+*.db
+*.sqlite
+*.sqlite3
+
+# MySQL dumps / backups
+*.sql.gz
+*.dump
+*.bak
+
+# -------------------------
+# Uploaded Files
+# -------------------------
+uploads/
+upload/
+instance/uploads/
+
+# Excel / CSV / PDF files
+# Uncomment these if they contain real student data
+# *.xlsx
+# *.xls
+# *.csv
+# *.pdf
+
+# -------------------------
+# Logs
+# -------------------------
+*.log
+logs/
+
+# -------------------------
+# IDE / Editors
+# -------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# -------------------------
+# Operating System
+# -------------------------
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# -------------------------
+# Testing / Coverage
+# -------------------------
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+
+# -------------------------
+# Build / Packaging
+# -------------------------
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# -------------------------
+# Jupyter
+# -------------------------
+.ipynb_checkpoints/
+
+# -------------------------
+# Temporary files
+# -------------------------
+*.tmp
+*.temp
+*.cache
+
+# -------------------------
+# Security / Certificates
+# -------------------------
+*.pem
+*.key
+*.crt
+*.cer
+
+# -------------------------
+# Local configuration
+# -------------------------
+config.local.py
+secrets.py

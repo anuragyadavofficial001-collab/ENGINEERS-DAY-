@@ -1,0 +1,3021 @@
+/* ============================================================
+   ENGINEERS DAY 2026
+   STUDENT PORTAL
+   PREMIUM ANIMATED UI
+============================================================ */
+
+
+/* ============================================================
+   RESET
+============================================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+html,
+body {
+    width: 100%;
+    min-height: 100%;
+}
+
+
+body {
+
+    font-family:
+        "Segoe UI",
+        Arial,
+        sans-serif;
+
+    color: #ffffff;
+
+    background:
+        radial-gradient(
+            circle at 75% 35%,
+            rgba(76, 105, 255, 0.22),
+            transparent 30%
+        ),
+        radial-gradient(
+            circle at 55% 75%,
+            rgba(0, 229, 255, 0.10),
+            transparent 32%
+        ),
+        linear-gradient(
+            120deg,
+            #070817,
+            #0b1025 48%,
+            #07141d
+        );
+
+    overflow-x: hidden;
+}
+
+
+/* ============================================================
+   SCENE
+============================================================ */
+
+.scene {
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: -5;
+
+    overflow: hidden;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(16, 24, 62, 0.5),
+            rgba(4, 8, 20, 0.9)
+        );
+}
+
+
+/* ============================================================
+   SKY
+============================================================ */
+
+.sky-glow {
+
+    position: absolute;
+
+    width: 800px;
+    height: 800px;
+
+    right: 10%;
+    top: 10%;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(100, 128, 255, 0.20),
+            rgba(255, 105, 180, 0.08),
+            transparent 70%
+        );
+
+    filter: blur(20px);
+
+    animation: skyPulse 7s ease-in-out infinite alternate;
+}
+
+
+@keyframes skyPulse {
+
+    from {
+        transform: scale(0.95);
+        opacity: 0.65;
+    }
+
+    to {
+        transform: scale(1.12);
+        opacity: 1;
+    }
+
+}
+
+
+/* ============================================================
+   MOON
+============================================================ */
+
+.moon {
+
+    position: absolute;
+
+    right: 16%;
+    top: 18%;
+
+    width: 90px;
+    height: 90px;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle at 35% 35%,
+            #ffffff,
+            #dfe7ff 45%,
+            rgba(150, 180, 255, 0.4)
+        );
+
+    box-shadow:
+        0 0 50px rgba(150, 180, 255, 0.45);
+
+    opacity: 0.7;
+
+    animation:
+        moonFloat 8s ease-in-out infinite;
+}
+
+
+@keyframes moonFloat {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-15px);
+    }
+
+}
+
+
+/* ============================================================
+   GRID FLOOR
+============================================================ */
+
+.grid-floor {
+
+    position: absolute;
+
+    left: -10%;
+    right: -10%;
+    bottom: -25%;
+
+    height: 55%;
+
+    background-image:
+        linear-gradient(
+            rgba(45, 117, 255, 0.14) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(45, 117, 255, 0.14) 1px,
+            transparent 1px
+        );
+
+    background-size:
+        65px 65px;
+
+    transform:
+        perspective(500px)
+        rotateX(63deg);
+
+    transform-origin: bottom;
+
+    opacity: 0.6;
+
+    animation:
+        gridMove 5s linear infinite;
+}
+
+
+@keyframes gridMove {
+
+    from {
+        background-position:
+            0 0,
+            0 0;
+    }
+
+    to {
+        background-position:
+            0 65px,
+            65px 0;
+    }
+
+}
+
+
+/* ============================================================
+   BUILDINGS
+============================================================ */
+
+.building {
+
+    position: absolute;
+
+    bottom: 15%;
+
+    border:
+        1px solid rgba(91, 147, 255, 0.16);
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(42, 63, 120, 0.2),
+            rgba(8, 14, 34, 0.7)
+        );
+
+    box-shadow:
+        inset 0 0 40px rgba(55, 100, 255, 0.08);
+}
+
+
+.building-one {
+
+    width: 170px;
+    height: 260px;
+
+    right: 8%;
+}
+
+
+.building-two {
+
+    width: 130px;
+    height: 190px;
+
+    right: 24%;
+}
+
+
+.building-three {
+
+    width: 210px;
+    height: 310px;
+
+    left: 3%;
+}
+
+
+/* ============================================================
+   CRANE
+============================================================ */
+
+.crane {
+
+    position: absolute;
+
+    right: 27%;
+    top: 13%;
+
+    width: 3px;
+    height: 430px;
+
+    background:
+        rgba(100, 145, 255, 0.4);
+
+    transform-origin: bottom;
+
+    animation:
+        craneSway 5s ease-in-out infinite alternate;
+}
+
+
+.crane-arm {
+
+    position: absolute;
+
+    top: 0;
+    left: 0;
+
+    width: 330px;
+    height: 3px;
+
+    background:
+        rgba(100, 145, 255, 0.4);
+}
+
+
+.crane-cable {
+
+    position: absolute;
+
+    top: 0;
+    left: 230px;
+
+    width: 1px;
+    height: 120px;
+
+    background:
+        rgba(100, 145, 255, 0.35);
+}
+
+
+@keyframes craneSway {
+
+    from {
+        transform: rotate(-1deg);
+    }
+
+    to {
+        transform: rotate(1deg);
+    }
+
+}
+
+
+/* ============================================================
+   FLOATING ORBS
+============================================================ */
+
+.floating-orb {
+
+    position: absolute;
+
+    width: 5px;
+    height: 5px;
+
+    border-radius: 50%;
+
+    background: #70d8ff;
+
+    box-shadow:
+        0 0 15px #70d8ff;
+
+    animation:
+        orbFloat 6s ease-in-out infinite;
+}
+
+
+.orb-one {
+    left: 44%;
+    top: 25%;
+}
+
+
+.orb-two {
+    right: 40%;
+    top: 60%;
+
+    animation-delay: 1.5s;
+}
+
+
+.orb-three {
+    right: 10%;
+    top: 45%;
+
+    animation-delay: 3s;
+}
+
+
+@keyframes orbFloat {
+
+    0%,
+    100% {
+        transform:
+            translateY(0)
+            translateX(0);
+
+        opacity: 0.4;
+    }
+
+    50% {
+        transform:
+            translateY(-35px)
+            translateX(20px);
+
+        opacity: 1;
+    }
+
+}
+
+
+/* ============================================================
+   TOP BAR
+============================================================ */
+
+.top-bar {
+
+    height: 70px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding:
+        0 4%;
+
+    border-bottom:
+        1px solid rgba(255, 255, 255, 0.08);
+
+    background:
+        rgba(7, 12, 31, 0.42);
+
+    backdrop-filter:
+        blur(18px);
+}
+
+
+.brand {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+}
+
+
+.brand-icon {
+
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    border:
+        1px solid rgba(100, 180, 255, 0.4);
+
+    background:
+        rgba(35, 91, 160, 0.18);
+
+    font-size: 23px;
+
+    animation:
+        gearSpin 10s linear infinite;
+}
+
+
+@keyframes gearSpin {
+
+    to {
+        transform: rotate(360deg);
+    }
+
+}
+
+
+.brand strong {
+
+    display: block;
+
+    font-size: 14px;
+
+    letter-spacing: 0.5px;
+}
+
+
+.brand span {
+
+    display: block;
+
+    margin-top: 3px;
+
+    font-size: 9px;
+
+    color: #7db9ff;
+
+    letter-spacing: 1.5px;
+}
+
+
+.top-title {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+
+    font-size: 14px;
+
+    font-style: italic;
+}
+
+
+.top-title small {
+
+    color: #8da7d4;
+
+}
+
+
+/* ============================================================
+   PORTAL
+============================================================ */
+
+.portal {
+
+    min-height:
+        calc(100vh - 105px);
+
+    display: grid;
+
+    grid-template-columns:
+        minmax(450px, 520px)
+        1fr;
+
+    gap: 40px;
+
+    padding:
+        35px 6%;
+
+    align-items: center;
+}
+
+
+/* ============================================================
+   LOGIN PANEL
+============================================================ */
+
+.login-panel {
+
+    position: relative;
+
+    padding:
+        32px;
+
+    border-radius: 24px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(29, 42, 86, 0.72),
+            rgba(7, 13, 34, 0.78)
+        );
+
+    border:
+        1px solid rgba(123, 171, 255, 0.28);
+
+    box-shadow:
+        0 30px 80px rgba(0, 0, 0, 0.45),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+
+    backdrop-filter:
+        blur(24px);
+
+    overflow: hidden;
+
+    animation:
+        panelEnter 0.9s ease forwards;
+}
+
+
+@keyframes panelEnter {
+
+    from {
+        opacity: 0;
+        transform:
+            translateX(-35px)
+            scale(0.97);
+    }
+
+    to {
+        opacity: 1;
+        transform:
+            translateX(0)
+            scale(1);
+    }
+
+}
+
+
+.panel-glow {
+
+    position: absolute;
+
+    width: 220px;
+    height: 220px;
+
+    top: -120px;
+    right: -100px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(74, 119, 255, 0.22);
+
+    filter: blur(45px);
+
+    pointer-events: none;
+}
+
+
+/* ============================================================
+   PORTAL HEADING
+============================================================ */
+
+.portal-heading {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+}
+
+
+.portal-symbol {
+
+    width: 52px;
+    height: 52px;
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    border-radius: 15px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(48, 139, 255, 0.25),
+            rgba(132, 77, 255, 0.2)
+        );
+
+    border:
+        1px solid rgba(104, 165, 255, 0.3);
+
+    font-size: 26px;
+
+    animation:
+        symbolFloat 4s ease-in-out infinite;
+}
+
+
+@keyframes symbolFloat {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-5px);
+    }
+
+}
+
+
+.portal-heading h1 {
+
+    font-size: 25px;
+
+    letter-spacing: 1px;
+}
+
+
+.portal-heading h1 span {
+
+    color: #32d6ff;
+}
+
+
+.portal-heading p {
+
+    margin-top: 4px;
+
+    font-size: 13px;
+
+    color: #7ea9df;
+}
+
+
+.heading-line {
+
+    margin:
+        18px 0 22px;
+
+    height: 1px;
+
+    background:
+        rgba(255, 255, 255, 0.08);
+
+    position: relative;
+}
+
+
+.heading-line span {
+
+    display: block;
+
+    width: 70px;
+    height: 2px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #27b9ff,
+            #9a5cff
+        );
+
+    box-shadow:
+        0 0 12px rgba(39, 185, 255, 0.8);
+}
+
+
+/* ============================================================
+   FLASH
+============================================================ */
+
+.flash-container {
+
+    margin-bottom: 15px;
+}
+
+
+.flash {
+
+    padding: 11px 13px;
+
+    border-radius: 10px;
+
+    margin-bottom: 8px;
+
+    font-size: 12px;
+
+    background:
+        rgba(255, 70, 100, 0.10);
+
+    border:
+        1px solid rgba(255, 70, 100, 0.25);
+
+    color: #ffb5c1;
+}
+
+
+/* ============================================================
+   FIELDS
+============================================================ */
+
+.field,
+.otp-section {
+
+    margin-bottom: 16px;
+
+    transition:
+        transform 0.3s ease,
+        opacity 0.3s ease;
+}
+
+
+.field.active-field {
+
+    transform:
+        translateX(5px);
+}
+
+
+label {
+
+    display: block;
+
+    margin-bottom: 7px;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    color: #dce8ff;
+}
+
+
+.label-icon {
+
+    color: #57c8ff;
+
+    margin-right: 5px;
+}
+
+
+.input-wrap {
+
+    position: relative;
+}
+
+
+input[type="text"],
+input[type="tel"],
+input[type="email"] {
+
+    width: 100%;
+
+    height: 45px;
+
+    padding:
+        0 42px 0 15px;
+
+    border-radius: 11px;
+
+    border:
+        1px solid rgba(125, 157, 220, 0.17);
+
+    outline: none;
+
+    color: white;
+
+    background:
+        rgba(3, 9, 27, 0.48);
+
+    transition:
+        border 0.25s ease,
+        box-shadow 0.25s ease,
+        transform 0.25s ease;
+}
+
+
+input::placeholder {
+
+    color: #60708f;
+}
+
+
+input:focus {
+
+    border-color:
+        rgba(50, 190, 255, 0.75);
+
+    box-shadow:
+        0 0 0 3px rgba(50, 190, 255, 0.08),
+        0 0 25px rgba(50, 190, 255, 0.09);
+
+    transform:
+        translateY(-1px);
+}
+
+
+.input-status {
+
+    position: absolute;
+
+    right: 14px;
+    top: 50%;
+
+    transform:
+        translateY(-50%);
+
+    color: #37e3ad;
+
+    opacity: 0;
+
+    transition:
+        opacity 0.25s ease;
+}
+
+
+.field.completed .input-status {
+
+    opacity: 1;
+}
+
+
+/* ============================================================
+   OTP OPTIONS
+============================================================ */
+
+.otp-options {
+
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap: 10px;
+}
+
+
+.otp-card {
+
+    margin: 0;
+
+    cursor: pointer;
+
+    position: relative;
+}
+
+
+.otp-card input {
+
+    position: absolute;
+
+    opacity: 0;
+}
+
+
+.otp-card-inner {
+
+    min-height: 55px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    padding:
+        10px 12px;
+
+    border-radius: 12px;
+
+    border:
+        1px solid rgba(125, 157, 220, 0.15);
+
+    background:
+        rgba(5, 12, 32, 0.45);
+
+    transition:
+        0.25s ease;
+}
+
+
+.otp-card:hover .otp-card-inner {
+
+    border-color:
+        rgba(57, 188, 255, 0.45);
+
+    transform:
+        translateY(-2px);
+}
+
+
+.otp-card input:checked
++
+.otp-card-inner {
+
+    border-color:
+        #249cff;
+
+    background:
+        linear-gradient(
+            120deg,
+            rgba(0, 130, 255, 0.18),
+            rgba(120, 65, 255, 0.16)
+        );
+
+    box-shadow:
+        0 0 20px rgba(0, 153, 255, 0.12);
+}
+
+
+.otp-icon {
+
+    width: 32px;
+    height: 32px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 9px;
+
+    background:
+        rgba(58, 160, 255, 0.12);
+
+    color: #63c9ff;
+
+    font-size: 16px;
+}
+
+
+.otp-card strong {
+
+    display: block;
+
+    font-size: 11px;
+}
+
+
+.otp-card small {
+
+    display: block;
+
+    margin-top: 3px;
+
+    font-size: 8px;
+
+    color: #7285a7;
+}
+
+
+/* ============================================================
+   CONTINUE BUTTON
+============================================================ */
+
+.continue-btn {
+
+    width: 100%;
+
+    height: 49px;
+
+    border: none;
+
+    border-radius: 13px;
+
+    cursor: pointer;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 10px;
+
+    color: white;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    background:
+        linear-gradient(
+            100deg,
+            #148cff,
+            #7251ff,
+            #c34dff
+        );
+
+    box-shadow:
+        0 12px 35px rgba(80, 86, 255, 0.24);
+
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+
+.continue-btn:hover {
+
+    transform:
+        translateY(-3px);
+
+    box-shadow:
+        0 17px 40px rgba(80, 86, 255, 0.35);
+}
+
+
+.continue-btn:active {
+
+    transform:
+        translateY(0)
+        scale(0.98);
+}
+
+
+.btn-icon {
+
+    font-size: 16px;
+}
+
+
+.btn-arrow {
+
+    transition:
+        transform 0.25s ease;
+}
+
+
+.continue-btn:hover .btn-arrow {
+
+    transform:
+        translateX(5px);
+}
+
+
+/* ============================================================
+   SECURITY
+============================================================ */
+
+.security-note {
+
+    margin-top: 13px;
+
+    text-align: center;
+
+    padding: 9px;
+
+    border-radius: 9px;
+
+    color: #91a6ca;
+
+    font-size: 10px;
+
+    background:
+        rgba(32, 190, 155, 0.04);
+
+    border:
+        1px solid rgba(32, 190, 155, 0.10);
+}
+
+
+/* ============================================================
+   BACK LINK
+============================================================ */
+
+.back-link {
+
+    display: block;
+
+    margin-top: 16px;
+
+    text-align: center;
+
+    color: #6f9fd3;
+
+    font-size: 10px;
+
+    text-decoration: none;
+
+    transition:
+        color 0.2s ease;
+}
+
+
+.back-link:hover {
+
+    color: #6bd5ff;
+}
+
+
+/* ============================================================
+   CHARACTER AREA
+============================================================ */
+
+.character-area {
+
+    position: relative;
+
+    min-height: 650px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    overflow: hidden;
+}
+
+
+/* ============================================================
+   HERO COPY
+============================================================ */
+
+.hero-copy {
+
+    position: absolute;
+
+    top: 7%;
+    left: 5%;
+
+    z-index: 1;
+}
+
+
+.hero-small {
+
+    color: #6fcfff;
+
+    font-size: 11px;
+
+    letter-spacing: 4px;
+
+    margin-bottom: 15px;
+}
+
+
+.hero-copy h2 {
+
+    font-size: clamp(42px, 5vw, 78px);
+
+    line-height: 0.87;
+
+    font-weight: 800;
+
+    letter-spacing: -3px;
+
+    text-shadow:
+        0 10px 40px rgba(65, 110, 255, 0.25);
+}
+
+
+.hero-copy h2 span {
+
+    color: #6fdcff;
+
+    text-shadow:
+        0 0 30px rgba(79, 207, 255, 0.4);
+}
+
+
+.hero-copy p {
+
+    margin-top: 20px;
+
+    color: #91a6c9;
+
+    font-size: 14px;
+}
+
+
+.hero-copy strong {
+
+    color: white;
+}
+
+
+/* ============================================================
+   CROCODILE
+============================================================ */
+
+.engineer-character {
+
+    position: absolute;
+
+    width: 350px;
+    height: 440px;
+
+    right: 17%;
+    bottom: 9%;
+
+    z-index: 5;
+
+    transition:
+        transform 0.18s cubic-bezier(.2,.8,.2,1);
+
+    animation:
+        crocoIdle 3.6s ease-in-out infinite;
+
+    filter:
+        drop-shadow(
+            0 30px 35px rgba(0, 0, 0, 0.45)
+        );
+}
+
+
+@keyframes crocoIdle {
+
+    0%,
+    100% {
+        transform:
+            translateY(0)
+            rotate(0deg);
+    }
+
+    50% {
+        transform:
+            translateY(-9px)
+            rotate(-1deg);
+    }
+
+}
+
+
+/* ============================================================
+   SPEECH BUBBLE
+============================================================ */
+
+.speech-bubble {
+
+    position: absolute;
+
+    width: 260px;
+
+    right: -90px;
+    top: 5px;
+
+    padding:
+        15px 17px;
+
+    border-radius: 18px;
+
+    background:
+        rgba(12, 24, 52, 0.92);
+
+    border:
+        1px solid rgba(91, 193, 255, 0.45);
+
+    box-shadow:
+        0 15px 40px rgba(0, 0, 0, 0.35),
+        0 0 30px rgba(48, 156, 255, 0.10);
+
+    backdrop-filter:
+        blur(15px);
+
+    animation:
+        bubbleFloat 3s ease-in-out infinite;
+}
+
+
+.speech-bubble::after {
+
+    content: "";
+
+    position: absolute;
+
+    bottom: 30px;
+    left: -14px;
+
+    border-top:
+        10px solid transparent;
+
+    border-bottom:
+        10px solid transparent;
+
+    border-right:
+        15px solid rgba(91, 193, 255, 0.45);
+}
+
+
+@keyframes bubbleFloat {
+
+    0%,
+    100% {
+        transform:
+            translateY(0);
+    }
+
+    50% {
+        transform:
+            translateY(-5px);
+    }
+
+}
+
+
+.speech-name {
+
+    color: #59ceff;
+
+    font-size: 9px;
+
+    font-weight: 800;
+
+    letter-spacing: 2px;
+
+    margin-bottom: 6px;
+}
+
+
+.speech-text {
+
+    min-height: 34px;
+
+    font-size: 13px;
+
+    line-height: 1.45;
+
+    color: #f1f6ff;
+}
+
+
+/* ============================================================
+   CROCODILE BODY
+============================================================ */
+
+.croco-body {
+
+    position: absolute;
+
+    width: 190px;
+    height: 205px;
+
+    left: 80px;
+    top: 185px;
+
+    border-radius:
+        45% 48% 38% 38%;
+
+    background:
+        linear-gradient(
+            145deg,
+            #59d889,
+            #22a967 55%,
+            #117a50
+        );
+
+    border:
+        3px solid #0d7048;
+
+    box-shadow:
+        inset -15px -15px 25px rgba(0,0,0,0.15);
+}
+
+
+/* ============================================================
+   SHIRT
+============================================================ */
+
+.shirt {
+
+    position: absolute;
+
+    left: 28px;
+    bottom: 0;
+
+    width: 135px;
+    height: 120px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #eef4ff,
+            #a8c5e9
+        );
+
+    border-radius:
+        20px 20px 45px 45px;
+
+    clip-path:
+        polygon(
+            0 25%,
+            25% 0,
+            75% 0,
+            100% 25%,
+            88% 100%,
+            12% 100%
+        );
+}
+
+
+/* ============================================================
+   TIE
+============================================================ */
+
+.tie {
+
+    position: absolute;
+
+    left: 52px;
+    top: 4px;
+
+    width: 32px;
+
+    z-index: 3;
+}
+
+
+.tie-knot {
+
+    width: 25px;
+    height: 20px;
+
+    margin: auto;
+
+    background:
+        #e63d4f;
+
+    clip-path:
+        polygon(
+            0 0,
+            100% 0,
+            75% 100%,
+            25% 100%
+        );
+}
+
+
+.tie-body {
+
+    width: 30px;
+    height: 67px;
+
+    margin-top: -1px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #a9172d,
+            #ef4454,
+            #a9172d
+        );
+
+    clip-path:
+        polygon(
+            15% 0,
+            85% 0,
+            100% 78%,
+            50% 100%,
+            0 78%
+        );
+}
+
+
+/* ============================================================
+   CROCODILE HEAD
+============================================================ */
+
+.croco-head {
+
+    position: absolute;
+
+    width: 225px;
+    height: 160px;
+
+    left: 48px;
+    top: 80px;
+
+    border-radius:
+        45% 48% 40% 42%;
+
+    background:
+        linear-gradient(
+            145deg,
+            #65e292,
+            #29b76e 60%,
+            #158456
+        );
+
+    border:
+        3px solid #0c7448;
+
+    z-index: 5;
+}
+
+
+/* ============================================================
+   TOP HEAD
+============================================================ */
+
+.croco-top {
+
+    position: absolute;
+
+    width: 145px;
+    height: 60px;
+
+    left: 30px;
+    top: -18px;
+
+    border-radius:
+        50%;
+
+    background:
+        #42c77b;
+}
+
+
+/* ============================================================
+   EYES
+============================================================ */
+
+.eyes {
+
+    position: absolute;
+
+    top: 8px;
+    left: 38px;
+
+    display: flex;
+
+    gap: 65px;
+}
+
+
+.eye {
+
+    width: 45px;
+    height: 45px;
+
+    border-radius: 50%;
+
+    background:
+        #fffef0;
+
+    border:
+        3px solid #167a4e;
+
+    position: relative;
+
+    box-shadow:
+        0 4px 5px rgba(0,0,0,0.2);
+}
+
+
+.pupil {
+
+    position: absolute;
+
+    width: 18px;
+    height: 24px;
+
+    border-radius: 50%;
+
+    background:
+        #18221d;
+
+    left: 14px;
+    top: 10px;
+
+    transition:
+        transform 0.2s ease;
+}
+
+
+.pupil::after {
+
+    content: "";
+
+    position: absolute;
+
+    width: 5px;
+    height: 5px;
+
+    background: white;
+
+    border-radius: 50%;
+
+    top: 4px;
+    left: 4px;
+}
+
+
+/* ============================================================
+   BROWS
+============================================================ */
+
+.brow {
+
+    position: absolute;
+
+    width: 45px;
+    height: 9px;
+
+    background:
+        #176b47;
+
+    border-radius: 10px;
+
+    top: 0;
+
+    transition:
+        transform 0.25s ease;
+}
+
+
+.left-brow {
+
+    left: 37px;
+
+    transform:
+        rotate(8deg);
+}
+
+
+.right-brow {
+
+    left: 105px;
+
+    transform:
+        rotate(-8deg);
+}
+
+
+/* ============================================================
+   SNOUT
+============================================================ */
+
+.snout {
+
+    position: absolute;
+
+    width: 160px;
+    height: 80px;
+
+    right: -78px;
+    top: 62px;
+
+    border-radius:
+        35px 45px 35px 35px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #69db8b,
+            #39b96d
+        );
+
+    border:
+        3px solid #0d7548;
+}
+
+
+/* ============================================================
+   NOSTRILS
+============================================================ */
+
+.nostril {
+
+    position: absolute;
+
+    width: 11px;
+    height: 7px;
+
+    border-radius: 50%;
+
+    background:
+        #125738;
+
+    top: 15px;
+}
+
+
+.nostril-one {
+    left: 38px;
+}
+
+
+.nostril-two {
+    left: 82px;
+}
+
+
+/* ============================================================
+   MOUTH
+============================================================ */
+
+.mouth {
+
+    position: absolute;
+
+    width: 125px;
+    height: 47px;
+
+    right: 12px;
+    bottom: -17px;
+
+    border-radius:
+        0 0 50px 50px;
+
+    background:
+        #39151b;
+
+    border:
+        3px solid #0d5d3b;
+
+    overflow: hidden;
+
+    transition:
+        height 0.25s ease;
+}
+
+
+/* ============================================================
+   TEETH
+============================================================ */
+
+.teeth {
+
+    position: absolute;
+
+    left: 10px;
+    right: 10px;
+
+    top: 0;
+
+    height: 17px;
+
+    background:
+        repeating-linear-gradient(
+            90deg,
+            #fff8d9 0,
+            #fff8d9 12px,
+            transparent 12px,
+            transparent 18px
+        );
+
+    clip-path:
+        polygon(
+            0 0,
+            100% 0,
+            94% 100%,
+            88% 45%,
+            82% 100%,
+            76% 45%,
+            70% 100%,
+            64% 45%,
+            58% 100%,
+            52% 45%,
+            46% 100%,
+            40% 45%,
+            34% 100%,
+            28% 45%,
+            22% 100%,
+            16% 45%,
+            10% 100%
+        );
+}
+
+
+/* ============================================================
+   TONGUE
+============================================================ */
+
+.tongue {
+
+    position: absolute;
+
+    width: 65px;
+    height: 18px;
+
+    left: 30px;
+    bottom: 1px;
+
+    border-radius:
+        50% 50% 0 0;
+
+    background:
+        #ef6277;
+}
+
+
+/* ============================================================
+   CHEEKS
+============================================================ */
+
+.cheek {
+
+    position: absolute;
+
+    width: 25px;
+    height: 15px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(255, 121, 130, 0.35);
+
+    top: 100px;
+}
+
+
+.cheek-left {
+    left: 15px;
+}
+
+
+.cheek-right {
+    left: 90px;
+}
+
+
+/* ============================================================
+   SCHOOL BAG
+============================================================ */
+
+.school-bag {
+
+    position: absolute;
+
+    left: 30px;
+    top: 205px;
+
+    width: 90px;
+    height: 125px;
+
+    transform:
+        rotate(-8deg);
+
+    z-index: 2;
+}
+
+
+.bag-body {
+
+    width: 85px;
+    height: 105px;
+
+    border-radius:
+        15px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #293d91,
+            #162257
+        );
+
+    border:
+        3px solid #101a47;
+
+    box-shadow:
+        0 8px 15px rgba(0,0,0,0.25);
+}
+
+
+.bag-body span {
+
+    position: absolute;
+
+    top: 40px;
+    left: 24px;
+
+    font-size: 12px;
+
+    font-weight: 900;
+
+    color: #62d8ff;
+}
+
+
+.bag-top {
+
+    position: absolute;
+
+    top: -10px;
+    left: 14px;
+
+    width: 58px;
+    height: 20px;
+
+    border-radius: 12px 12px 4px 4px;
+
+    background:
+        #3b50ad;
+}
+
+
+.bag-pocket {
+
+    position: absolute;
+
+    width: 55px;
+    height: 35px;
+
+    bottom: 10px;
+    left: 15px;
+
+    border-radius:
+        8px;
+
+    border:
+        2px solid #4261bd;
+
+    background:
+        rgba(0,0,0,0.12);
+}
+
+
+/* ============================================================
+   ARMS
+============================================================ */
+
+.croco-arm {
+
+    position: absolute;
+
+    width: 95px;
+    height: 38px;
+
+    border-radius: 40px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #51ce7f,
+            #25a965
+        );
+
+    z-index: 7;
+}
+
+
+.arm-back {
+
+    left: 55px;
+    top: 270px;
+
+    transform:
+        rotate(25deg);
+}
+
+
+.arm-front {
+
+    right: 35px;
+    top: 255px;
+
+    transform-origin:
+        left center;
+
+    transform:
+        rotate(-28deg);
+
+    transition:
+        transform 0.35s ease;
+}
+
+
+.hand {
+
+    position: absolute;
+
+    right: -10px;
+    top: -4px;
+
+    width: 38px;
+    height: 38px;
+
+    border-radius: 50%;
+
+    background:
+        #48c977;
+}
+
+
+/* ============================================================
+   POINTING FINGER
+============================================================ */
+
+.pointing-finger {
+
+    position: absolute;
+
+    width: 60px;
+    height: 14px;
+
+    right: -45px;
+    top: -7px;
+
+    border-radius:
+        15px;
+
+    background:
+        #48c977;
+
+    transform:
+        rotate(-8deg);
+}
+
+
+/* ============================================================
+   FEET
+============================================================ */
+
+.foot {
+
+    position: absolute;
+
+    width: 72px;
+    height: 30px;
+
+    border-radius:
+        50%;
+
+    background:
+        #2aaa68;
+
+    bottom: 3px;
+
+    z-index: 4;
+}
+
+
+.foot-left {
+
+    left: 75px;
+
+    transform:
+        rotate(8deg);
+}
+
+
+.foot-right {
+
+    left: 190px;
+
+    transform:
+        rotate(-8deg);
+}
+
+
+/* ============================================================
+   MOTION LINES
+============================================================ */
+
+.motion-line {
+
+    position: absolute;
+
+    height: 3px;
+
+    border-radius: 3px;
+
+    background:
+        rgba(93, 213, 255, 0.7);
+
+    animation:
+        motionDash 1.4s linear infinite;
+}
+
+
+.motion-one {
+
+    width: 80px;
+
+    left: 5px;
+    bottom: 80px;
+}
+
+
+.motion-two {
+
+    width: 50px;
+
+    left: -15px;
+    bottom: 110px;
+
+    animation-delay:
+        0.4s;
+}
+
+
+.motion-three {
+
+    width: 65px;
+
+    left: 15px;
+    bottom: 140px;
+
+    animation-delay:
+        0.8s;
+}
+
+
+@keyframes motionDash {
+
+    from {
+        opacity: 0;
+        transform:
+            translateX(20px);
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+        transform:
+            translateX(-20px);
+    }
+
+}
+
+
+/* ============================================================
+   EVENT HIGHLIGHTS
+============================================================ */
+
+.event-highlights {
+
+    position: absolute;
+
+    right: 2%;
+    top: 30%;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 12px;
+}
+
+
+.highlight-card {
+
+    width: 220px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    padding:
+        14px;
+
+    border-radius:
+        15px;
+
+    background:
+        rgba(15, 30, 66, 0.55);
+
+    border:
+        1px solid rgba(108, 171, 255, 0.2);
+
+    backdrop-filter:
+        blur(15px);
+
+    animation:
+        cardFloat 5s ease-in-out infinite;
+}
+
+
+.highlight-card:nth-child(2) {
+    animation-delay: 0.8s;
+}
+
+
+.highlight-card:nth-child(3) {
+    animation-delay: 1.6s;
+}
+
+
+@keyframes cardFloat {
+
+    0%,
+    100% {
+        transform:
+            translateX(0);
+    }
+
+    50% {
+        transform:
+            translateX(-8px);
+    }
+
+}
+
+
+.highlight-icon {
+
+    width: 39px;
+    height: 39px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius:
+        11px;
+
+    background:
+        rgba(67, 151, 255, 0.12);
+
+    font-size: 18px;
+}
+
+
+.highlight-card strong {
+
+    display: block;
+
+    font-size: 12px;
+}
+
+
+.highlight-card small {
+
+    display: block;
+
+    margin-top: 4px;
+
+    color: #7891b8;
+
+    font-size: 9px;
+}
+
+
+/* ============================================================
+   BOTTOM BAR
+============================================================ */
+
+.bottom-bar {
+
+    position: fixed;
+
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    height: 35px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding:
+        0 4%;
+
+    background:
+        rgba(4, 8, 20, 0.65);
+
+    border-top:
+        1px solid rgba(255,255,255,0.06);
+
+    backdrop-filter:
+        blur(15px);
+
+    color: #647ea7;
+
+    font-size: 9px;
+
+    letter-spacing: 1px;
+}
+
+
+/* ============================================================
+   CROCODILE EXPRESSIONS
+============================================================ */
+
+.engineer-character.happy .mouth {
+
+    height: 57px;
+}
+
+
+.engineer-character.happy .eyes {
+
+    transform:
+        translateY(-2px);
+}
+
+
+.engineer-character.happy .arm-front {
+
+    transform:
+        rotate(-48deg);
+}
+
+
+.engineer-character.thinking .left-brow {
+
+    transform:
+        rotate(-20deg)
+        translateY(-6px);
+}
+
+
+.engineer-character.thinking .right-brow {
+
+    transform:
+        rotate(20deg)
+        translateY(-6px);
+}
+
+
+.engineer-character.excited {
+
+    animation:
+        crocoExcited 0.45s ease-in-out 4;
+}
+
+
+@keyframes crocoExcited {
+
+    0%,
+    100% {
+        transform:
+            translateY(0)
+            rotate(0deg);
+    }
+
+    50% {
+        transform:
+            translateY(-18px)
+            rotate(4deg);
+    }
+
+}
+
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+
+@media (max-width: 1100px) {
+
+    .portal {
+
+        grid-template-columns:
+            minmax(400px, 480px)
+            1fr;
+
+        padding:
+            25px 3%;
+    }
+
+
+    .engineer-character {
+
+        right: 5%;
+
+        transform:
+            scale(0.85);
+    }
+
+
+    .event-highlights {
+
+        right: -5%;
+    }
+
+}
+
+
+@media (max-width: 850px) {
+
+    .top-title {
+
+        display: none;
+    }
+
+
+    .portal {
+
+        display: block;
+
+        padding:
+            25px 20px 60px;
+    }
+
+
+    .login-panel {
+
+        max-width: 520px;
+
+        margin:
+            0 auto;
+    }
+
+
+    .character-area {
+
+        min-height: 570px;
+
+        margin-top: 30px;
+    }
+
+
+    .hero-copy {
+
+        top: 3%;
+        left: 10%;
+    }
+
+
+    .hero-copy h2 {
+
+        font-size: 48px;
+    }
+
+
+    .engineer-character {
+
+        right: 22%;
+
+        bottom: 0;
+
+        transform:
+            scale(0.8);
+    }
+
+
+    .event-highlights {
+
+        right: 0;
+        top: 40%;
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .top-bar {
+
+        height: 60px;
+    }
+
+
+    .brand strong {
+
+        font-size: 11px;
+    }
+
+
+    .brand span {
+
+        display: none;
+    }
+
+
+    .login-panel {
+
+        padding:
+            23px 18px;
+    }
+
+
+    .portal-heading h1 {
+
+        font-size: 20px;
+    }
+
+
+    .otp-options {
+
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .character-area {
+
+        min-height: 520px;
+    }
+
+
+    .hero-copy {
+
+        left: 5%;
+    }
+
+
+    .hero-copy h2 {
+
+        font-size: 39px;
+    }
+
+
+    .engineer-character {
+
+        right: 3%;
+
+        transform:
+            scale(0.67);
+    }
+
+
+    .speech-bubble {
+
+        right: -30px;
+
+        width: 230px;
+    }
+
+
+    .event-highlights {
+
+        display: none;
+    }
+
+
+    .bottom-bar {
+
+        font-size: 7px;
+    }
+
+}
+
+
+/* ============================================================
+   DIRECT STUDENT LOGIN - UI PATCH
+   OTP UI removed
+   ============================================================ */
+
+/* ---------- Login form spacing ---------- */
+
+#studentLoginForm {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+
+/* ---------- Flash messages ---------- */
+
+.flash-container {
+    margin-bottom: 18px;
+}
+
+.flash-message {
+    padding: 11px 14px;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    font-size: 12px;
+    line-height: 1.5;
+    border: 1px solid rgba(255,255,255,.08);
+    backdrop-filter: blur(12px);
+}
+
+.flash-message.error {
+    color: #ffd6dc;
+    background: rgba(255, 50, 80, .09);
+    border-color: rgba(255, 80, 100, .25);
+}
+
+.flash-message.success {
+    color: #d7ffe9;
+    background: rgba(50, 255, 150, .08);
+    border-color: rgba(50, 255, 150, .22);
+}
+
+
+/* ---------- Verification information ---------- */
+
+.verification-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    margin: 4px 0 18px;
+    padding: 13px 14px;
+
+    border-radius: 12px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(80, 120, 255, .08),
+            rgba(150, 70, 255, .05)
+        );
+
+    border: 1px solid rgba(130, 150, 255, .15);
+
+    transition:
+        border-color .3s ease,
+        background .3s ease,
+        transform .3s ease;
+}
+
+.verification-info:hover {
+    border-color: rgba(130, 160, 255, .30);
+    background:
+        linear-gradient(
+            135deg,
+            rgba(80, 120, 255, .12),
+            rgba(150, 70, 255, .08)
+        );
+
+    transform: translateY(-1px);
+}
+
+.verification-icon {
+    width: 30px;
+    height: 30px;
+
+    flex: 0 0 30px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 50%;
+
+    color: #bfffe0;
+    font-size: 14px;
+    font-weight: 700;
+
+    background: rgba(50, 255, 150, .10);
+    border: 1px solid rgba(50, 255, 150, .25);
+
+    box-shadow:
+        0 0 20px rgba(50, 255, 150, .08);
+}
+
+.verification-info strong {
+    display: block;
+
+    color: rgba(255,255,255,.90);
+    font-size: 11px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+
+    margin-bottom: 3px;
+}
+
+.verification-info p {
+    margin: 0;
+
+    color: rgba(210,220,245,.55);
+    font-size: 11px;
+    line-height: 1.45;
+}
+
+
+/* ---------- Login button ---------- */
+
+.login-button {
+    position: relative;
+    overflow: hidden;
+
+    width: 100%;
+    min-height: 52px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+
+    border: 1px solid rgba(150, 170, 255, .28);
+    border-radius: 12px;
+
+    color: #fff;
+
+    background:
+        linear-gradient(
+            100deg,
+            rgba(82, 91, 255, .85),
+            rgba(132, 72, 255, .85)
+        );
+
+    box-shadow:
+        0 12px 35px rgba(75, 70, 255, .16);
+
+    cursor: pointer;
+
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .13em;
+
+    transition:
+        transform .25s ease,
+        box-shadow .25s ease,
+        border-color .25s ease;
+}
+
+.login-button::before {
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    left: -120%;
+
+    width: 80%;
+    height: 100%;
+
+    background:
+        linear-gradient(
+            100deg,
+            transparent,
+            rgba(255,255,255,.18),
+            transparent
+        );
+
+    transform: skewX(-20deg);
+
+    transition: left .65s ease;
+}
+
+.login-button:hover::before {
+    left: 140%;
+}
+
+.login-button:hover {
+    transform: translateY(-2px);
+
+    border-color: rgba(180,190,255,.50);
+
+    box-shadow:
+        0 16px 42px rgba(75,70,255,.25);
+}
+
+.login-button:active {
+    transform: translateY(0);
+}
+
+.button-text {
+    position: relative;
+    z-index: 2;
+}
+
+.button-arrow {
+    position: relative;
+    z-index: 2;
+
+    font-size: 18px;
+
+    transition:
+        transform .25s ease;
+}
+
+.login-button:hover .button-arrow {
+    transform: translateX(5px);
+}
+
+
+/* ---------- Loading state ---------- */
+
+.login-button.loading {
+    pointer-events: none;
+    opacity: .82;
+}
+
+.login-button.loading .button-text {
+    animation: loginPulse 1.1s ease-in-out infinite;
+}
+
+.button-loader {
+    display: none;
+
+    width: 15px;
+    height: 15px;
+
+    border-radius: 50%;
+
+    border: 2px solid rgba(255,255,255,.25);
+    border-top-color: #fff;
+
+    animation: loginSpin .7s linear infinite;
+}
+
+.login-button.loading .button-loader {
+    display: block;
+}
+
+@keyframes loginSpin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes loginPulse {
+    0%, 100% {
+        opacity: .55;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}
+
+
+/* ---------- Footer ---------- */
+
+.card-footer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    margin-top: 16px;
+
+    color: rgba(205,215,240,.42);
+
+    font-size: 9px;
+    line-height: 1.5;
+    letter-spacing: .03em;
+}
+
+.footer-dot {
+    width: 5px;
+    height: 5px;
+
+    flex: 0 0 5px;
+
+    border-radius: 50%;
+
+    background: #72ffc0;
+
+    box-shadow:
+        0 0 10px rgba(114,255,192,.55);
+
+    animation: footerBlink 2s ease-in-out infinite;
+}
+
+@keyframes footerBlink {
+    0%, 100% {
+        opacity: .35;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}
+
+
+/* ---------- Focus effect ---------- */
+
+.input-shell {
+    transition:
+        border-color .25s ease,
+        box-shadow .25s ease,
+        transform .25s ease;
+}
+
+.input-shell.focused {
+    transform: translateY(-1px);
+
+    border-color: rgba(130,150,255,.48);
+
+    box-shadow:
+        0 0 0 1px rgba(100,120,255,.08),
+        0 8px 30px rgba(70,70,255,.08);
+}
+
+
+/* ---------- Character speech ---------- */
+
+.speech-bubble {
+    transition:
+        opacity .25s ease,
+        transform .25s ease;
+}
+
+.speech-bubble .message-out {
+    opacity: 0;
+    transform: translateY(5px);
+}
+
+
+/* ---------- Mobile ---------- */
+
+@media (max-width: 900px) {
+
+    .visual-section {
+        display: none;
+    }
+
+    .login-page {
+        justify-content: center;
+    }
+
+    .login-content {
+        width: min(100%, 520px);
+    }
+}
+
+
+@media (max-width: 600px) {
+
+    .top-message {
+        display: none;
+    }
+
+    .top-bar {
+        padding: 16px;
+    }
+
+    .brand-title {
+        font-size: 10px;
+    }
+
+    .brand-subtitle {
+        font-size: 8px;
+    }
+
+    .login-page {
+        padding: 90px 16px 70px;
+    }
+
+    .login-content {
+        width: 100%;
+    }
+
+    .login-card {
+        padding: 20px 17px;
+    }
+
+    .login-button {
+        min-height: 50px;
+    }
+
+    .bottom-bar {
+        padding: 10px 16px;
+    }
+
+    .portal-version {
+        display: none;
+    }
+
+    .verification-info {
+        align-items: flex-start;
+    }
+}

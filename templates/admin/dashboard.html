@@ -1,0 +1,1115 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Command Center{% endblock %}
+
+{% block content %}
+
+<div class="command-center">
+
+    <!-- =========================================================
+         HERO / GLOBAL EVENT CONTEXT
+    ========================================================== -->
+    <section class="command-hero">
+
+        <div class="hero-main">
+
+            <div class="eyebrow">
+                <span class="eyebrow-dot"></span>
+                ENGINEERS DAY 2026
+                <span class="eyebrow-line"></span>
+                ADMIN COMMAND CENTER
+            </div>
+
+            <h1>
+                Event Operations
+                <span>Command Center</span>
+            </h1>
+
+            <p class="hero-description">
+                Monitor registrations, student access, event activity
+                and operational priorities from one centralized workspace.
+            </p>
+
+            <div class="hero-actions">
+
+                <a href="{{ url_for('admin.events') }}" class="hero-primary">
+                    <span>Manage Events</span>
+                    <span class="hero-action-arrow">→</span>
+                </a>
+
+                <a href="{{ url_for('admin.registrations') }}" class="hero-secondary">
+                    View Registrations
+                    <span>↗</span>
+                </a>
+
+            </div>
+
+        </div>
+
+        <div class="hero-status-panel">
+
+            <div class="hero-status-top">
+                <span>EVENT STATUS</span>
+
+                <span class="live-status">
+                    <span class="live-dot"></span>
+                    LIVE
+                </span>
+            </div>
+
+            <div class="event-date-big">
+                <span>15</span>
+                <div>
+                    <strong>SEP</strong>
+                    <small>2026</small>
+                </div>
+            </div>
+
+            <div class="countdown-label">
+                EVENT COUNTDOWN
+            </div>
+
+            <div
+                class="event-countdown"
+                data-event-date="2026-09-15T09:00:00+05:30"
+            >
+                <div class="countdown-unit">
+                    <strong data-countdown-days>--</strong>
+                    <span>DAYS</span>
+                </div>
+
+                <div class="countdown-separator">:</div>
+
+                <div class="countdown-unit">
+                    <strong data-countdown-hours>--</strong>
+                    <span>HRS</span>
+                </div>
+
+                <div class="countdown-separator">:</div>
+
+                <div class="countdown-unit">
+                    <strong data-countdown-minutes>--</strong>
+                    <span>MIN</span>
+                </div>
+
+                <div class="countdown-separator">:</div>
+
+                <div class="countdown-unit">
+                    <strong data-countdown-seconds>--</strong>
+                    <span>SEC</span>
+                </div>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================================================
+         KPI STRIP
+    ========================================================== -->
+    <section class="metrics-grid">
+
+        <a href="{{ url_for('admin.students') }}" class="metric-card metric-students">
+
+            <div class="metric-header">
+                <span class="metric-index">01</span>
+                <span class="metric-label">STUDENT ACCESS</span>
+
+                <span class="metric-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <circle cx="12" cy="8" r="3.5"></circle>
+                        <path d="M5 20c.8-3.4 3.1-5 7-5s6.2 1.6 7 5"></path>
+                    </svg>
+                </span>
+            </div>
+
+            <div class="metric-value">
+                {{ total_students }}
+            </div>
+
+            <div class="metric-footer">
+                <span>Authorized students</span>
+                <span class="metric-arrow">→</span>
+            </div>
+
+        </a>
+
+
+        <div class="metric-card metric-active">
+
+            <div class="metric-header">
+                <span class="metric-index">02</span>
+                <span class="metric-label">ACTIVE ACCOUNTS</span>
+
+                <span class="metric-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <circle cx="12" cy="12" r="7"></circle>
+                        <path d="m9 12 2 2 4-4"></path>
+                    </svg>
+                </span>
+            </div>
+
+            <div class="metric-value">
+                {{ active_accounts }}
+            </div>
+
+            <div class="metric-footer">
+                <span>Verified portal users</span>
+
+                <span class="metric-state">
+                    <span></span>
+                    ACTIVE
+                </span>
+            </div>
+
+        </div>
+
+
+        <a href="{{ url_for('admin.events') }}" class="metric-card metric-events">
+
+            <div class="metric-header">
+                <span class="metric-index">03</span>
+                <span class="metric-label">EVENT CATALOG</span>
+
+                <span class="metric-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <rect x="4" y="5" width="16" height="15" rx="2"></rect>
+                        <path d="M8 3v4M16 3v4M4 10h16"></path>
+                    </svg>
+                </span>
+            </div>
+
+            <div class="metric-value">
+                {{ total_events }}
+            </div>
+
+            <div class="metric-footer">
+                <span>Configured events</span>
+                <span class="metric-arrow">→</span>
+            </div>
+
+        </a>
+
+
+        <a href="{{ url_for('admin.registrations') }}" class="metric-card metric-registrations">
+
+            <div class="metric-header">
+                <span class="metric-index">04</span>
+                <span class="metric-label">REGISTRATIONS</span>
+
+                <span class="metric-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <rect x="5" y="4" width="14" height="17" rx="2"></rect>
+                        <path d="M8 9h8M8 13h6M8 17h4"></path>
+                    </svg>
+                </span>
+            </div>
+
+            <div class="metric-value">
+                {{ total_registrations }}
+            </div>
+
+            <div class="metric-footer">
+                <span>Participation records</span>
+                <span class="metric-arrow">→</span>
+            </div>
+
+        </a>
+
+    </section>
+
+
+    <!-- =========================================================
+         PRIMARY OPERATIONS
+    ========================================================== -->
+    <section class="workspace-grid">
+
+        <!-- EVENT ACTIVITY -->
+        <div class="workspace-panel event-activity-panel">
+
+            <div class="panel-top">
+
+                <div>
+                    <div class="panel-kicker">
+                        EVENT OPERATIONS
+                    </div>
+
+                    <h2>
+                        Event Activity
+                    </h2>
+
+                    <p>
+                        Current event catalog and operational state.
+                    </p>
+                </div>
+
+                <a href="{{ url_for('admin.events') }}" class="panel-link">
+                    Open Events
+                    <span>→</span>
+                </a>
+
+            </div>
+
+
+            <div class="event-list">
+
+                {% if upcoming_events %}
+
+                    {% for event in upcoming_events %}
+
+                    <a
+                        href="{{ url_for('admin.event_edit', game_id=event.id) }}"
+                        class="event-row"
+                    >
+
+                        <div class="event-number">
+                            {{ "%02d"|format(loop.index) }}
+                        </div>
+
+                        <div class="event-info">
+
+                            <strong>
+                                {{ event.game_name }}
+                            </strong>
+
+                            <span>
+                                {% if event.registration_mode %}
+                                    {{ event.registration_mode }}
+                                {% else %}
+                                    EVENT
+                                {% endif %}
+
+                                {% if event.venue %}
+                                    · {{ event.venue }}
+                                {% endif %}
+                            </span>
+
+                        </div>
+
+                        <div class="event-date">
+
+                            {% if event.schedule_date %}
+                                <strong>
+                                    {{ event.schedule_date.strftime('%d %b') if event.schedule_date.strftime else event.schedule_date }}
+                                </strong>
+                            {% else %}
+                                <strong>—</strong>
+                            {% endif %}
+
+                            <span>
+                                {% if event.schedule_time %}
+                                    {{ event.schedule_time }}
+                                {% else %}
+                                    SCHEDULE TBD
+                                {% endif %}
+                            </span>
+
+                        </div>
+
+                        <div class="event-status">
+
+                            {% if event.registration_open %}
+                                <span class="status-pill status-open">
+                                    OPEN
+                                </span>
+                            {% elif event.status %}
+                                <span class="status-pill">
+                                    {{ event.status }}
+                                </span>
+                            {% else %}
+                                <span class="status-pill status-muted">
+                                    CLOSED
+                                </span>
+                            {% endif %}
+
+                        </div>
+
+                        <div class="row-arrow">
+                            →
+                        </div>
+
+                    </a>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <div class="empty-state">
+
+                        <div class="empty-icon">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <rect x="4" y="5" width="16" height="15" rx="2"></rect>
+                                <path d="M8 3v4M16 3v4M4 10h16"></path>
+                            </svg>
+                        </div>
+
+                        <div>
+                            <strong>No upcoming event activity</strong>
+                            <span>
+                                Event schedules will appear here once configured.
+                            </span>
+                        </div>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+        <!-- ATTENTION REQUIRED -->
+        <div class="workspace-panel attention-panel">
+
+            <div class="panel-top">
+
+                <div>
+                    <div class="panel-kicker">
+                        OPERATIONS
+                    </div>
+
+                    <h2>
+                        Attention Required
+                    </h2>
+
+                    <p>
+                        Actions that may need administrator review.
+                    </p>
+                </div>
+
+                <span class="attention-counter">
+                    {{ attention_items|length if attention_items else 0 }}
+                </span>
+
+            </div>
+
+
+            <div class="attention-list">
+
+                {% if attention_items %}
+
+                    {% for item in attention_items %}
+
+                    <a
+                        href="{{ item.url }}"
+                        class="attention-item attention-{{ item.level|default('normal') }}"
+                    >
+
+                        <div class="attention-marker">
+                            <span></span>
+                        </div>
+
+                        <div class="attention-content">
+
+                            <strong>
+                                {{ item.title }}
+                            </strong>
+
+                            <span>
+                                {{ item.description }}
+                            </span>
+
+                        </div>
+
+                        <span class="attention-arrow">
+                            →
+                        </span>
+
+                    </a>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <div class="clear-state">
+
+                        <div class="clear-check">
+                            ✓
+                        </div>
+
+                        <div>
+                            <strong>
+                                All systems clear
+                            </strong>
+
+                            <span>
+                                No immediate administrative action is required.
+                            </span>
+                        </div>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================================================
+         SECONDARY OPERATIONS
+    ========================================================== -->
+    <section class="operations-grid">
+
+        <!-- EVENT MANAGEMENT -->
+        <a href="{{ url_for('admin.events') }}" class="operation-card operation-events">
+
+            <div class="operation-top">
+
+                <span class="operation-code">
+                    EVENT / 01
+                </span>
+
+                <span class="operation-arrow">
+                    ↗
+                </span>
+
+            </div>
+
+            <div class="operation-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <rect x="4" y="5" width="16" height="15" rx="2"></rect>
+                    <path d="M8 3v4M16 3v4M4 10h16"></path>
+                </svg>
+            </div>
+
+            <h3>
+                Event Management
+            </h3>
+
+            <p>
+                Configure schedules, venues, registration modes,
+                team sizes, rules and requirements.
+            </p>
+
+            <div class="operation-bottom">
+                <span>MANAGE CATALOG</span>
+                <span>→</span>
+            </div>
+
+        </a>
+
+
+        <!-- REGISTRATION MANAGEMENT -->
+        <a href="{{ url_for('admin.registrations') }}" class="operation-card operation-registration">
+
+            <div class="operation-top">
+
+                <span class="operation-code">
+                    PARTICIPATION / 02
+                </span>
+
+                <span class="operation-arrow">
+                    ↗
+                </span>
+
+            </div>
+
+            <div class="operation-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <rect x="5" y="4" width="14" height="17" rx="2"></rect>
+                    <path d="M8 9h8M8 13h6M8 17h4"></path>
+                </svg>
+            </div>
+
+            <h3>
+                Registration Control
+            </h3>
+
+            <p>
+                Review participation records, registration status
+                and individual event entries.
+            </p>
+
+            <div class="operation-bottom">
+                <span>REVIEW PARTICIPANTS</span>
+                <span>→</span>
+            </div>
+
+        </a>
+
+
+        <!-- STUDENT OPERATIONS -->
+        <a href="{{ url_for('admin.students') }}" class="operation-card operation-students">
+
+            <div class="operation-top">
+
+                <span class="operation-code">
+                    ACCESS / 03
+                </span>
+
+                <span class="operation-arrow">
+                    ↗
+                </span>
+
+            </div>
+
+            <div class="operation-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="12" cy="8" r="3.5"></circle>
+                    <path d="M5 20c.8-3.4 3.1-5 7-5s6.2 1.6 7 5"></path>
+                </svg>
+            </div>
+
+            <h3>
+                Student Registry
+            </h3>
+
+            <p>
+                Control authorized student access and inspect
+                imported student information.
+            </p>
+
+            <div class="operation-bottom">
+                <span>OPEN REGISTRY</span>
+                <span>→</span>
+            </div>
+
+        </a>
+
+
+        <!-- RESULTS -->
+        <a href="{{ url_for('admin.results') }}" class="operation-card operation-results">
+
+            <div class="operation-top">
+
+                <span class="operation-code">
+                    OUTCOMES / 04
+                </span>
+
+                <span class="operation-arrow">
+                    ↗
+                </span>
+
+            </div>
+
+            <div class="operation-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M6 20V10M12 20V4M18 20v-7"></path>
+                </svg>
+            </div>
+
+            <h3>
+                Results Control
+            </h3>
+
+            <p>
+                Publish winners, runner-ups, prizes and
+                certificate information for completed events.
+            </p>
+
+            <div class="operation-bottom">
+                <span>MANAGE RESULTS</span>
+                <span>→</span>
+            </div>
+
+        </a>
+
+    </section>
+
+
+    <!-- =========================================================
+         RECENT REGISTRATIONS
+    ========================================================== -->
+    <section class="recent-section">
+
+        <div class="recent-header">
+
+            <div>
+                <div class="panel-kicker">
+                    LIVE PARTICIPATION
+                </div>
+
+                <h2>
+                    Recent Registrations
+                </h2>
+
+                <p>
+                    Latest activity entering the event system.
+                </p>
+            </div>
+
+            <a
+                href="{{ url_for('admin.registrations') }}"
+                class="panel-link"
+            >
+                View All
+                <span>→</span>
+            </a>
+
+        </div>
+
+
+        <div class="recent-table-wrap">
+
+            {% if recent_registrations %}
+
+            <table class="recent-table">
+
+                <thead>
+
+                    <tr>
+                        <th>PARTICIPANT</th>
+                        <th>EVENT</th>
+                        <th>STATUS</th>
+                        <th>REGISTERED</th>
+                        <th></th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for registration in recent_registrations %}
+
+                    <tr>
+
+                        <td>
+
+                            <div class="participant-cell">
+
+                                <div class="participant-avatar">
+                                    {{ registration.name[:1]|upper if registration.name else '?' }}
+                                </div>
+
+                                <div>
+                                    <strong>
+                                        {{ registration.name or 'Unknown Student' }}
+                                    </strong>
+
+                                    <span>
+                                        {{ registration.student_id or 'ID unavailable' }}
+                                    </span>
+                                </div>
+
+                            </div>
+
+                        </td>
+
+                        <td>
+                            <span class="event-name-cell">
+                                {{ registration.game_name }}
+                            </span>
+                        </td>
+
+                        <td>
+
+                            {% if registration.status == 'APPROVED' %}
+
+                                <span class="status-pill status-approved">
+                                    APPROVED
+                                </span>
+
+                            {% elif registration.status == 'CANCELLED' %}
+
+                                <span class="status-pill status-cancelled">
+                                    CANCELLED
+                                </span>
+
+                            {% elif registration.status == 'REJECTED' %}
+
+                                <span class="status-pill status-rejected">
+                                    REJECTED
+                                </span>
+
+                            {% else %}
+
+                                <span class="status-pill status-open">
+                                    REGISTERED
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+
+                            <span class="registered-time">
+                                {{ registration.registered_at }}
+                            </span>
+
+                        </td>
+
+                        <td>
+
+                            <a
+                                href="{{ url_for('admin.registration_details', registration_id=registration.id) }}"
+                                class="table-arrow"
+                                aria-label="Open registration"
+                            >
+                                →
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+            {% else %}
+
+            <div class="table-empty">
+
+                <div class="table-empty-symbol">
+                    00
+                </div>
+
+                <div>
+                    <strong>
+                        No registrations yet
+                    </strong>
+
+                    <span>
+                        Registration activity will appear here once students begin entering events.
+                    </span>
+                </div>
+
+                <a href="{{ url_for('admin.events') }}">
+                    Configure Events →
+                </a>
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================================================
+         SYSTEM HEALTH
+    ========================================================== -->
+    <section class="system-health">
+
+        <div class="health-heading">
+
+            <div>
+                <div class="panel-kicker">
+                    PLATFORM
+                </div>
+
+                <h2>
+                    System Health
+                </h2>
+            </div>
+
+            <div class="system-operational">
+                <span></span>
+                OPERATIONAL
+            </div>
+
+        </div>
+
+
+        <div class="health-grid">
+
+            <div class="health-item">
+
+                <div class="health-symbol">
+                    DB
+                </div>
+
+                <div class="health-info">
+                    <strong>Database</strong>
+                    <span>MySQL data layer</span>
+                </div>
+
+                <div class="health-state">
+                    READY
+                </div>
+
+            </div>
+
+
+            <div class="health-item">
+
+                <div class="health-symbol">
+                    ID
+                </div>
+
+                <div class="health-info">
+                    <strong>Student Access</strong>
+                    <span>Registry verification</span>
+                </div>
+
+                <div class="health-state">
+                    READY
+                </div>
+
+            </div>
+
+
+            <div class="health-item">
+
+                <div class="health-symbol">
+                    OTP
+                </div>
+
+                <div class="health-info">
+                    <strong>Authentication</strong>
+                    <span>OTP verification</span>
+                </div>
+
+                <div class="health-state">
+                    ACTIVE
+                </div>
+
+            </div>
+
+
+            <div class="health-item">
+
+                <div class="health-symbol">
+                    {{ total_events }}
+                </div>
+
+                <div class="health-info">
+                    <strong>Event Catalog</strong>
+                    <span>Engineers Day events</span>
+                </div>
+
+                <div class="health-state">
+                    LOADED
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================================================
+         LIVE CLOCK FOOTER
+    ========================================================== -->
+    <footer class="command-footer">
+
+        <div class="footer-left">
+
+            <span class="footer-pulse"></span>
+
+            <span>
+                ADMIN CONSOLE
+            </span>
+
+            <span class="footer-divider"></span>
+
+            <span>
+                ENGINEERS DAY 2026
+            </span>
+
+        </div>
+
+        <div class="footer-clock">
+            <span data-live-clock>--:--:--</span>
+            <small>IST</small>
+        </div>
+
+    </footer>
+
+</div>
+
+
+<!-- =============================================================
+     DASHBOARD-SPECIFIC JAVASCRIPT
+============================================================== -->
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    /* ---------------------------------------------------------
+       LIVE CLOCK
+    --------------------------------------------------------- */
+
+    const clock = document.querySelector("[data-live-clock]");
+
+    function updateClock() {
+
+        if (!clock) return;
+
+        const now = new Date();
+
+        const formatter = new Intl.DateTimeFormat(
+            "en-IN",
+            {
+                timeZone: "Asia/Kolkata",
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+                hour12: false
+            }
+        );
+
+        clock.textContent = formatter.format(now);
+
+    }
+
+    updateClock();
+
+    setInterval(updateClock, 1000);
+
+
+    /* ---------------------------------------------------------
+       EVENT COUNTDOWN
+    --------------------------------------------------------- */
+
+    const countdown = document.querySelector(".event-countdown");
+
+    if (countdown) {
+
+        const eventDateString = countdown.dataset.eventDate;
+
+        const eventDate = new Date(eventDateString);
+
+        const daysElement =
+            countdown.querySelector("[data-countdown-days]");
+
+        const hoursElement =
+            countdown.querySelector("[data-countdown-hours]");
+
+        const minutesElement =
+            countdown.querySelector("[data-countdown-minutes]");
+
+        const secondsElement =
+            countdown.querySelector("[data-countdown-seconds]");
+
+
+        function updateCountdown() {
+
+            const now = new Date();
+
+            let difference =
+                eventDate.getTime() - now.getTime();
+
+
+            if (difference <= 0) {
+
+                daysElement.textContent = "00";
+                hoursElement.textContent = "00";
+                minutesElement.textContent = "00";
+                secondsElement.textContent = "00";
+
+                return;
+            }
+
+
+            const totalSeconds =
+                Math.floor(difference / 1000);
+
+
+            const days =
+                Math.floor(totalSeconds / 86400);
+
+            const hours =
+                Math.floor((totalSeconds % 86400) / 3600);
+
+            const minutes =
+                Math.floor((totalSeconds % 3600) / 60);
+
+            const seconds =
+                totalSeconds % 60;
+
+
+            daysElement.textContent =
+                String(days).padStart(2, "0");
+
+            hoursElement.textContent =
+                String(hours).padStart(2, "0");
+
+            minutesElement.textContent =
+                String(minutes).padStart(2, "0");
+
+            secondsElement.textContent =
+                String(seconds).padStart(2, "0");
+
+        }
+
+
+        updateCountdown();
+
+        setInterval(updateCountdown, 1000);
+
+    }
+
+
+    /* ---------------------------------------------------------
+       STAGGERED REVEAL
+    --------------------------------------------------------- */
+
+    const revealItems = document.querySelectorAll(
+        ".metric-card, " +
+        ".workspace-panel, " +
+        ".operation-card, " +
+        ".recent-section, " +
+        ".system-health"
+    );
+
+
+    revealItems.forEach(function (item, index) {
+
+        item.style.setProperty(
+            "--reveal-delay",
+            `${Math.min(index * 55, 500)}ms`
+        );
+
+        item.classList.add("dashboard-reveal");
+
+    });
+
+
+    /* ---------------------------------------------------------
+       CURSOR-BASED DEPTH — SUBTLE ONLY
+    --------------------------------------------------------- */
+
+    const hero = document.querySelector(".command-hero");
+
+    if (hero && window.matchMedia("(pointer:fine)").matches) {
+
+        hero.addEventListener("mousemove", function (event) {
+
+            const rect =
+                hero.getBoundingClientRect();
+
+            const x =
+                (event.clientX - rect.left) / rect.width - 0.5;
+
+            const y =
+                (event.clientY - rect.top) / rect.height - 0.5;
+
+
+            hero.style.setProperty(
+                "--hero-x",
+                `${x * 8}px`
+            );
+
+            hero.style.setProperty(
+                "--hero-y",
+                `${y * 6}px`
+            );
+
+        });
+
+
+        hero.addEventListener("mouseleave", function () {
+
+            hero.style.setProperty("--hero-x", "0px");
+            hero.style.setProperty("--hero-y", "0px");
+
+        });
+
+    }
+
+});
+
+</script>
+
+{% endblock %}

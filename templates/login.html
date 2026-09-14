@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Student Login | Engineers Day</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/auth.css') }}">
+</head>
+
+<body>
+
+    <!-- =====================================================
+         BACKGROUND
+    ====================================================== -->
+
+    <div class="scene">
+
+        <div class="stars"></div>
+
+        <div class="moon">
+            <div class="moon-glow"></div>
+        </div>
+
+        <div class="grid-floor"></div>
+
+        <div class="city">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+        <div class="floating-orb orb-one"></div>
+        <div class="floating-orb orb-two"></div>
+        <div class="floating-orb orb-three"></div>
+
+    </div>
+
+
+    <!-- =====================================================
+         TOP BAR
+    ====================================================== -->
+
+    <header class="top-bar">
+
+        <div class="brand">
+
+            <div class="brand-mark">
+                SR
+            </div>
+
+            <div>
+                <div class="brand-title">
+                    SR GROUP OF INSTITUTION
+                </div>
+
+                <div class="brand-subtitle">
+                    ENGINEERS DAY 2026
+                </div>
+            </div>
+
+        </div>
+
+        <div class="top-message">
+            ENGINEERS BUILD TOMORROW
+        </div>
+
+    </header>
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main class="login-page">
+
+        <!-- =================================================
+             LEFT CONTENT
+        ================================================== -->
+
+        <section class="login-content">
+
+            <div class="eyebrow">
+                <span class="status-dot"></span>
+                STUDENT PORTAL
+            </div>
+
+            <h1>
+                ENTER THE
+                <span>ENGINEER'S ZONE.</span>
+            </h1>
+
+            <p class="intro">
+                Verify your identity using the information
+                registered by the administration.
+            </p>
+
+
+            <!-- =============================================
+                 LOGIN CARD
+            ============================================== -->
+
+            <div class="login-card">
+
+                <div class="card-header">
+
+                    <div>
+                        <span class="card-label">
+                            SECURE ACCESS
+                        </span>
+
+                        <h2>
+                            Student Verification
+                        </h2>
+                    </div>
+
+                    <div class="lock-icon">
+                        <span></span>
+                    </div>
+
+                </div>
+
+
+                <!-- =========================================
+                     FLASH MESSAGES
+                ========================================== -->
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+
+                    {% if messages %}
+
+                        <div class="flash-container">
+
+                            {% for category, message in messages %}
+
+                                <div class="flash-message {{ category }}">
+                                    {{ message }}
+                                </div>
+
+                            {% endfor %}
+
+                        </div>
+
+                    {% endif %}
+
+                {% endwith %}
+
+
+                <!-- =========================================
+                     LOGIN FORM
+                ========================================== -->
+
+                <form
+                    action="{{ url_for('auth.login_post') }}"
+                    method="POST"
+                    id="studentLoginForm"
+                    autocomplete="off"
+                >
+
+                    <!-- Student ID -->
+
+                    <div class="field-group">
+
+                        <label for="student_id">
+                            STUDENT ID / ROLL NUMBER
+                        </label>
+
+                        <div class="input-shell">
+
+                            <span class="input-icon">
+                                #
+                            </span>
+
+                            <input
+                                type="text"
+                                id="student_id"
+                                name="student_id"
+                                placeholder="Enter your student ID"
+                                maxlength="50"
+                                required
+                            >
+
+                            <span class="input-line"></span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Name -->
+
+                    <div class="field-group">
+
+                        <label for="name">
+                            FULL NAME
+                        </label>
+
+                        <div class="input-shell">
+
+                            <span class="input-icon">
+                                ◉
+                            </span>
+
+                            <input
+                                type="text"
+                                id="name"
+                                name="name"
+                                placeholder="Enter your registered name"
+                                maxlength="100"
+                                required
+                            >
+
+                            <span class="input-line"></span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Email -->
+
+                    <div class="field-group">
+
+                        <label for="email">
+                            REGISTERED EMAIL
+                        </label>
+
+                        <div class="input-shell">
+
+                            <span class="input-icon">
+                                @
+                            </span>
+
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                placeholder="Enter your registered email"
+                                maxlength="150"
+                                required
+                            >
+
+                            <span class="input-line"></span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Phone -->
+
+                    <div class="field-group">
+
+                        <label for="phone">
+                            REGISTERED MOBILE
+                        </label>
+
+                        <div class="input-shell">
+
+                            <span class="input-icon">
+                                +
+                            </span>
+
+                            <input
+                                type="tel"
+                                id="phone"
+                                name="phone"
+                                placeholder="Enter your registered mobile"
+                                maxlength="15"
+                                inputmode="numeric"
+                                required
+                            >
+
+                            <span class="input-line"></span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Security Information -->
+
+                    <div class="verification-info">
+
+                        <div class="verification-icon">
+                            ✓
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                Identity Match Required
+                            </strong>
+
+                            <p>
+                                All details must match the information
+                                registered by the administration.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Submit -->
+
+                    <button
+                        type="submit"
+                        class="login-button"
+                        id="loginButton"
+                    >
+
+                        <span class="button-text">
+                            ENTER STUDENT PORTAL
+                        </span>
+
+                        <span class="button-arrow">
+                            →
+                        </span>
+
+                        <span class="button-loader"></span>
+
+                    </button>
+
+                </form>
+
+
+                <!-- Footer -->
+
+                <div class="card-footer">
+
+                    <span class="footer-dot"></span>
+
+                    <span>
+                        Your information is checked against
+                        the official student registry.
+                    </span>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             RIGHT VISUAL
+        ================================================== -->
+
+        <section class="visual-section">
+
+            <div class="visual-glow"></div>
+
+            <!-- Decorative rings -->
+
+            <div class="energy-ring ring-one"></div>
+            <div class="energy-ring ring-two"></div>
+            <div class="energy-ring ring-three"></div>
+
+
+            <!-- Engineer Character -->
+
+            <div class="engineer-character">
+
+                <div class="character-shadow"></div>
+
+                <div class="character-body">
+
+                    <div class="helmet">
+                        <div class="helmet-light"></div>
+                    </div>
+
+                    <div class="face">
+
+                        <div class="eye eye-left"></div>
+                        <div class="eye eye-right"></div>
+
+                        <div class="face-detail"></div>
+
+                    </div>
+
+                    <div class="neck"></div>
+
+                    <div class="jacket">
+
+                        <div class="jacket-line"></div>
+
+                        <div class="badge">
+                            SR
+                        </div>
+
+                    </div>
+
+                    <div class="arm arm-left"></div>
+                    <div class="arm arm-right"></div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Speech -->
+
+            <div class="speech-bubble">
+
+                <span class="bubble-status"></span>
+
+                <div id="characterMessage">
+                    Identity verified?
+                    Let's get you inside.
+                </div>
+
+            </div>
+
+
+            <!-- Event Stats -->
+
+            <div class="event-stats">
+
+                <div class="stat">
+
+                    <strong>
+                        27+
+                    </strong>
+
+                    <span>
+                        EVENTS
+                    </span>
+
+                </div>
+
+                <div class="stat-divider"></div>
+
+                <div class="stat">
+
+                    <strong>
+                        TEAM
+                    </strong>
+
+                    <span>
+                        & SOLO
+                    </span>
+
+                </div>
+
+                <div class="stat-divider"></div>
+
+                <div class="stat">
+
+                    <strong>
+                        WIN
+                    </strong>
+
+                    <span>
+                        & GROW
+                    </span>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- =====================================================
+         BOTTOM STATUS
+    ====================================================== -->
+
+    <footer class="bottom-bar">
+
+        <div class="system-status">
+
+            <span class="status-dot"></span>
+
+            SYSTEM ONLINE
+
+        </div>
+
+        <div class="live-clock" id="liveClock">
+            --:--:--
+        </div>
+
+        <div class="portal-version">
+            STUDENT PORTAL / 2026
+        </div>
+
+    </footer>
+
+
+    <!-- =====================================================
+         JAVASCRIPT
+    ====================================================== -->
+
+    <script>
+
+        const form = document.getElementById("studentLoginForm");
+        const loginButton = document.getElementById("loginButton");
+        const buttonText = loginButton.querySelector(".button-text");
+        const buttonArrow = loginButton.querySelector(".button-arrow");
+
+        const studentIdInput =
+            document.getElementById("student_id");
+
+        const nameInput =
+            document.getElementById("name");
+
+        const phoneInput =
+            document.getElementById("phone");
+
+        const emailInput =
+            document.getElementById("email");
+
+
+        /* =================================================
+           STUDENT ID
+        ================================================= */
+
+        studentIdInput.addEventListener("input", function () {
+
+            this.value = this.value
+                .toUpperCase()
+                .replace(/\s+/g, "");
+
+        });
+
+
+        /* =================================================
+           PHONE
+        ================================================= */
+
+        phoneInput.addEventListener("input", function () {
+
+            this.value = this.value
+                .replace(/[^\d+]/g, "");
+
+        });
+
+
+        /* =================================================
+           NAME
+        ================================================= */
+
+        nameInput.addEventListener("input", function () {
+
+            this.value = this.value
+                .replace(/\s{2,}/g, " ");
+
+        });
+
+
+        /* =================================================
+           FORM SUBMIT
+        ================================================= */
+
+        form.addEventListener("submit", function () {
+
+            loginButton.classList.add("loading");
+
+            buttonText.textContent =
+                "VERIFYING DETAILS";
+
+            buttonArrow.style.display = "none";
+
+        });
+
+
+        /* =================================================
+           CHARACTER MESSAGES
+        ================================================= */
+
+        const messages = [
+
+            "Identity verified? Let's get you inside.",
+
+            "Match your details. Unlock your portal.",
+
+            "Your student data. Your access.",
+
+            "Ready to engineer something great?",
+
+            "27+ events are waiting for you.",
+
+            "Build. Compete. Create. Repeat."
+
+        ];
+
+        const characterMessage =
+            document.getElementById("characterMessage");
+
+        let messageIndex = 0;
+
+
+        setInterval(() => {
+
+            messageIndex =
+                (messageIndex + 1) % messages.length;
+
+            characterMessage.classList.add("message-out");
+
+            setTimeout(() => {
+
+                characterMessage.textContent =
+                    messages[messageIndex];
+
+                characterMessage.classList.remove(
+                    "message-out"
+                );
+
+            }, 250);
+
+        }, 5000);
+
+
+        /* =================================================
+           LIVE CLOCK
+        ================================================= */
+
+        function updateClock() {
+
+            const now = new Date();
+
+            const hours =
+                String(now.getHours()).padStart(2, "0");
+
+            const minutes =
+                String(now.getMinutes()).padStart(2, "0");
+
+            const seconds =
+                String(now.getSeconds()).padStart(2, "0");
+
+            document.getElementById("liveClock")
+                .textContent =
+                `${hours}:${minutes}:${seconds}`;
+
+        }
+
+        updateClock();
+
+        setInterval(updateClock, 1000);
+
+
+        /* =================================================
+           INPUT FOCUS EFFECT
+        ================================================= */
+
+        document.querySelectorAll(".input-shell input")
+            .forEach(input => {
+
+                input.addEventListener("focus", () => {
+
+                    input
+                        .closest(".input-shell")
+                        .classList.add("focused");
+
+                });
+
+                input.addEventListener("blur", () => {
+
+                    input
+                        .closest(".input-shell")
+                        .classList.remove("focused");
+
+                });
+
+            });
+
+    </script>
+
+</body>
+</html>

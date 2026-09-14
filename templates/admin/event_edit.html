@@ -1,0 +1,530 @@
+{% extends "admin/base.html" %}
+
+{% block title %}
+Edit Event
+{% endblock %}
+
+{% block content %}
+
+<div class="event-edit-page">
+
+    <div class="page-header">
+        <div>
+            <div class="section-kicker">EVENT OPERATIONS / CONFIGURATION</div>
+
+            <h1>Edit Event</h1>
+
+            <p>
+                Configure event details, participation, schedule,
+                venue, prizes and registration settings.
+            </p>
+        </div>
+
+        <div class="header-date">
+            <span class="date-label">EVENT ID</span>
+            <strong>#{{ game.id }}</strong>
+        </div>
+    </div>
+
+
+    <form method="POST" class="event-edit-form">
+
+        <!-- =====================================================
+             BASIC INFORMATION
+        ====================================================== -->
+
+        <section class="edit-section">
+
+            <div class="edit-section-heading">
+                <div>
+                    <span class="edit-kicker">01 / IDENTITY</span>
+                    <h2>Basic Information</h2>
+                </div>
+
+                <span class="section-state">EVENT</span>
+            </div>
+
+
+            <div class="form-grid">
+
+                <div class="form-field full">
+                    <label for="game_name">Event Name</label>
+
+                    <input
+                        type="text"
+                        id="game_name"
+                        name="game_name"
+                        value="{{ game.game_name or '' }}"
+                        required
+                    >
+                </div>
+
+
+                <div class="form-field full">
+                    <label for="description">Description</label>
+
+                    <textarea
+                        id="description"
+                        name="description"
+                        rows="5"
+                    >{{ game.description or '' }}</textarea>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             PARTICIPATION
+        ====================================================== -->
+
+        <section class="edit-section">
+
+            <div class="edit-section-heading">
+                <div>
+                    <span class="edit-kicker">02 / PARTICIPATION</span>
+                    <h2>Registration & Team Format</h2>
+                </div>
+
+                <span class="section-state">CONFIG</span>
+            </div>
+
+
+            <div class="form-grid">
+
+                <div class="form-field">
+
+                    <label for="registration_mode">
+                        Registration Mode
+                    </label>
+
+                    <select
+                        id="registration_mode"
+                        name="registration_mode"
+                    >
+
+                        <option
+                            value="INDIVIDUAL"
+                            {% if game.registration_mode == "INDIVIDUAL" %}
+                            selected
+                            {% endif %}
+                        >
+                            Individual
+                        </option>
+
+                        <option
+                            value="TEAM"
+                            {% if game.registration_mode == "TEAM" %}
+                            selected
+                            {% endif %}
+                        >
+                            Team
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-field">
+
+                    <label for="status">
+                        Event Status
+                    </label>
+
+                    <select
+                        id="status"
+                        name="status"
+                    >
+
+                        {% for value in [
+                            "UPCOMING",
+                            "REGISTRATION_OPEN",
+                            "REGISTRATION_CLOSED",
+                            "LIVE",
+                            "COMPLETED",
+                            "CANCELLED"
+                        ] %}
+
+                        <option
+                            value="{{ value }}"
+                            {% if game.status == value %}
+                            selected
+                            {% endif %}
+                        >
+                            {{ value.replace("_", " ") }}
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-field">
+
+                    <label for="team_min_size">
+                        Minimum Team Size
+                    </label>
+
+                    <input
+                        type="number"
+                        id="team_min_size"
+                        name="team_min_size"
+                        min="1"
+                        value="{{ game.team_min_size or 1 }}"
+                    >
+
+                </div>
+
+
+                <div class="form-field">
+
+                    <label for="team_max_size">
+                        Maximum Team Size
+                    </label>
+
+                    <input
+                        type="number"
+                        id="team_max_size"
+                        name="team_max_size"
+                        min="1"
+                        value="{{ game.team_max_size or 1 }}"
+                    >
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             SCHEDULE
+        ====================================================== -->
+
+        <section class="edit-section">
+
+            <div class="edit-section-heading">
+                <div>
+                    <span class="edit-kicker">03 / TIMELINE</span>
+                    <h2>Schedule</h2>
+                </div>
+
+                <span class="section-state">TIME</span>
+            </div>
+
+
+            <div class="form-grid">
+
+                <div class="form-field">
+
+                    <label for="event_date">
+                        Event Date
+                    </label>
+
+                    <input
+                        type="date"
+                        id="event_date"
+                        name="event_date"
+                        value="{{ game.event_date or '' }}"
+                    >
+
+                </div>
+
+
+                <div class="form-field">
+
+                    <label for="start_time">
+                        Start Time
+                    </label>
+
+                    <input
+                        type="time"
+                        id="start_time"
+                        name="start_time"
+                        value="{{ game.start_time or '' }}"
+                    >
+
+                </div>
+
+
+                <div class="form-field">
+
+                    <label for="end_time">
+                        End Time
+                    </label>
+
+                    <input
+                        type="time"
+                        id="end_time"
+                        name="end_time"
+                        value="{{ game.end_time or '' }}"
+                    >
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             VENUE
+        ====================================================== -->
+
+        <section class="edit-section">
+
+            <div class="edit-section-heading">
+                <div>
+                    <span class="edit-kicker">04 / LOCATION</span>
+                    <h2>Venue</h2>
+                </div>
+
+                <span class="section-state">LOCATION</span>
+            </div>
+
+
+            <div class="form-grid">
+
+                <div class="form-field">
+
+                    <label for="block">
+                        Block
+                    </label>
+
+                    <input
+                        type="text"
+                        id="block"
+                        name="block"
+                        value="{{ game.block or '' }}"
+                        placeholder="e.g. Block A"
+                    >
+
+                </div>
+
+
+                <div class="form-field">
+
+                    <label for="floor">
+                        Floor
+                    </label>
+
+                    <input
+                        type="text"
+                        id="floor"
+                        name="floor"
+                        value="{{ game.floor or '' }}"
+                        placeholder="e.g. 2nd Floor"
+                    >
+
+                </div>
+
+
+                <div class="form-field full">
+
+                    <label for="room">
+                        Room / Lab / Hall
+                    </label>
+
+                    <input
+                        type="text"
+                        id="room"
+                        name="room"
+                        value="{{ game.room or '' }}"
+                        placeholder="e.g. Seminar Hall 2"
+                    >
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             PRIZE + RULES
+        ====================================================== -->
+
+        <section class="edit-section">
+
+            <div class="edit-section-heading">
+                <div>
+                    <span class="edit-kicker">05 / EVENT POLICY</span>
+                    <h2>Prize, Rules & Requirements</h2>
+                </div>
+
+                <span class="section-state">POLICY</span>
+            </div>
+
+
+            <div class="form-grid">
+
+                <div class="form-field full">
+
+                    <label for="prize_pool">
+                        Prize Pool
+                    </label>
+
+                    <input
+                        type="text"
+                        id="prize_pool"
+                        name="prize_pool"
+                        value="{{ game.prize_pool or '' }}"
+                        placeholder="e.g. ₹5,000"
+                    >
+
+                </div>
+
+
+                <div class="form-field full">
+
+                    <label for="requirements">
+                        Requirements
+                    </label>
+
+                    <textarea
+                        id="requirements"
+                        name="requirements"
+                        rows="5"
+                        placeholder="Eligibility, software, equipment, documents etc."
+                    >{{ game.requirements or '' }}</textarea>
+
+                </div>
+
+
+                <div class="form-field full">
+
+                    <label for="rules">
+                        Rules
+                    </label>
+
+                    <textarea
+                        id="rules"
+                        name="rules"
+                        rows="7"
+                        placeholder="Event rules and judging instructions..."
+                    >{{ game.rules or '' }}</textarea>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             REGISTRATION + CERTIFICATES
+        ====================================================== -->
+
+        <section class="edit-section">
+
+            <div class="edit-section-heading">
+                <div>
+                    <span class="edit-kicker">06 / ACCESS</span>
+                    <h2>Registration & Certificates</h2>
+                </div>
+
+                <span class="section-state">CONTROL</span>
+            </div>
+
+
+            <div class="toggle-grid">
+
+                <label class="toggle-card">
+
+                    <input
+                        type="checkbox"
+                        name="registration_open"
+                        value="1"
+                        {% if game.registration_open %}
+                        checked
+                        {% endif %}
+                    >
+
+                    <span class="toggle-content">
+                        <strong>Registration Open</strong>
+                        <small>
+                            Allow students to register for this event.
+                        </small>
+                    </span>
+
+                </label>
+
+
+                <label class="toggle-card">
+
+                    <input
+                        type="checkbox"
+                        name="winner_certificate"
+                        value="1"
+                        {% if game.winner_certificate %}
+                        checked
+                        {% endif %}
+                    >
+
+                    <span class="toggle-content">
+                        <strong>Winner Certificate</strong>
+                        <small>
+                            Enable certificate for the winner.
+                        </small>
+                    </span>
+
+                </label>
+
+
+                <label class="toggle-card">
+
+                    <input
+                        type="checkbox"
+                        name="runner_up_certificate"
+                        value="1"
+                        {% if game.runner_up_certificate %}
+                        checked
+                        {% endif %}
+                    >
+
+                    <span class="toggle-content">
+                        <strong>Runner-up Certificate</strong>
+                        <small>
+                            Enable certificate for runner-up.
+                        </small>
+                    </span>
+
+                </label>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             ACTION BAR
+        ====================================================== -->
+
+        <div class="edit-actions">
+
+            <a
+                href="{{ url_for('admin.events') }}"
+                class="secondary-action"
+            >
+                ← Back to Events
+            </a>
+
+            <button
+                type="submit"
+                class="primary-action"
+            >
+                Save Event Changes
+                <span>→</span>
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

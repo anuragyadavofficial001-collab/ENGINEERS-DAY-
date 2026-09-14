@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Events | Engineers Day 2026</title>
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <style>
+
+        :root {
+            --bg: #17100b;
+            --bg-2: #21150e;
+            --orange: #f4a66b;
+            --orange-light: #ffd0a8;
+            --cream: #fff4e9;
+            --muted: #bca99a;
+            --line: rgba(255, 196, 150, 0.15);
+            --card: rgba(255, 255, 255, 0.045);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            min-height: 100vh;
+
+            font-family: "Manrope", sans-serif;
+
+            color: var(--cream);
+
+            background:
+                radial-gradient(
+                    circle at 15% 20%,
+                    rgba(244, 166, 107, 0.14),
+                    transparent 28%
+                ),
+                radial-gradient(
+                    circle at 85% 70%,
+                    rgba(255, 196, 150, 0.08),
+                    transparent 30%
+                ),
+                linear-gradient(
+                    135deg,
+                    var(--bg),
+                    var(--bg-2)
+                );
+
+            overflow-x: hidden;
+
+            caret-color: transparent;
+        }
+
+        body::before {
+            content: "";
+
+            position: fixed;
+            inset: 0;
+
+            pointer-events: none;
+
+            opacity: 0.18;
+
+            background-image:
+                linear-gradient(
+                    rgba(255,255,255,0.035) 1px,
+                    transparent 1px
+                ),
+                linear-gradient(
+                    90deg,
+                    rgba(255,255,255,0.035) 1px,
+                    transparent 1px
+                );
+
+            background-size: 42px 42px;
+
+            mask-image:
+                linear-gradient(
+                    to bottom,
+                    black,
+                    transparent 90%
+                );
+        }
+
+        .page {
+            position: relative;
+            z-index: 1;
+
+            width: min(1400px, 92%);
+
+            margin: auto;
+
+            padding: 38px 0 70px;
+        }
+
+        /* =====================================================
+           TOP BAR
+        ===================================================== */
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding-bottom: 28px;
+
+            border-bottom: 1px solid var(--line);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-mark {
+            width: 11px;
+            height: 11px;
+
+            border-radius: 50%;
+
+            background: var(--orange);
+
+            box-shadow:
+                0 0 20px rgba(244,166,107,0.75);
+        }
+
+        .brand-text {
+            font-family: "DM Mono", monospace;
+
+            font-size: 11px;
+            letter-spacing: 0.16em;
+
+            color: var(--orange-light);
+        }
+
+        .date {
+            font-family: "DM Mono", monospace;
+
+            font-size: 10px;
+            letter-spacing: 0.14em;
+
+            color: var(--muted);
+        }
+
+        /* =====================================================
+           HERO
+        ===================================================== */
+
+        .hero {
+            padding: 90px 0 55px;
+
+            max-width: 900px;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+
+            margin-bottom: 22px;
+
+            font-family: "DM Mono", monospace;
+
+            font-size: 10px;
+            letter-spacing: 0.2em;
+
+            color: var(--orange);
+        }
+
+        .eyebrow::before {
+            content: "";
+
+            width: 30px;
+            height: 1px;
+
+            background: var(--orange);
+        }
+
+        h1 {
+            font-size: clamp(48px, 8vw, 104px);
+
+            line-height: 0.9;
+
+            letter-spacing: -0.065em;
+
+            font-weight: 800;
+        }
+
+        h1 span {
+            color: var(--orange);
+        }
+
+        .hero-description {
+            max-width: 620px;
+
+            margin-top: 30px;
+
+            color: var(--muted);
+
+            font-size: 15px;
+            line-height: 1.8;
+        }
+
+        /* =====================================================
+           EVENT GRID
+        ===================================================== */
+
+        .section-header {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+
+            margin-bottom: 20px;
+
+            padding-bottom: 14px;
+
+            border-bottom: 1px solid var(--line);
+        }
+
+        .section-title {
+            font-family: "DM Mono", monospace;
+
+            font-size: 11px;
+            letter-spacing: 0.16em;
+
+            color: var(--orange-light);
+        }
+
+        .event-count {
+            font-family: "DM Mono", monospace;
+
+            font-size: 10px;
+
+            color: var(--muted);
+        }
+
+        .events-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, minmax(0, 1fr));
+
+            gap: 16px;
+        }
+
+        /* =====================================================
+           EVENT CARD
+        ===================================================== */
+
+        .event-card {
+            position: relative;
+
+            min-height: 300px;
+
+            padding: 25px;
+
+            display: flex;
+            flex-direction: column;
+
+            text-decoration: none;
+
+            color: var(--cream);
+
+            border: 1px solid var(--line);
+
+            border-radius: 20px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(255,255,255,0.07),
+                    rgba(255,255,255,0.018)
+                );
+
+            backdrop-filter: blur(14px);
+
+            overflow: hidden;
+
+            transform-style: preserve-3d;
+
+            transition:
+                transform 0.4s cubic-bezier(.2,.8,.2,1),
+                border-color 0.3s ease,
+                box-shadow 0.3s ease;
+        }
+
+        .event-card::before {
+            content: "";
+
+            position: absolute;
+
+            width: 180px;
+            height: 180px;
+
+            top: -80px;
+            right: -70px;
+
+            border-radius: 50%;
+
+            background: rgba(244,166,107,0.10);
+
+            filter: blur(4px);
+
+            transition:
+                transform 0.5s ease,
+                opacity 0.5s ease;
+        }
+
+        .event-card::after {
+            content: "";
+
+            position: absolute;
+
+            inset: 0;
+
+            background:
+                linear-gradient(
+                    120deg,
+                    transparent 30%,
+                    rgba(255,255,255,0.07),
+                    transparent 70%
+                );
+
+            transform:
+                translateX(-120%);
+
+            transition:
+                transform 0.7s ease;
+
+            pointer-events: none;
+        }
+
+        .event-card:hover {
+            transform:
+                perspective(900px)
+                rotateX(2deg)
+                rotateY(-2deg)
+                translateY(-7px);
+
+            border-color:
+                rgba(244,166,107,0.42);
+
+            box-shadow:
+                0 25px 60px rgba(0,0,0,0.30),
+                0 0 35px rgba(244,166,107,0.08);
+        }
+
+        .event-card:hover::before {
+            transform: scale(1.5);
+
+            opacity: 0.8;
+        }
+
+        .event-card:hover::after {
+            transform: translateX(120%);
+        }
+
+        .event-number {
+            position: relative;
+            z-index: 2;
+
+            font-family: "DM Mono", monospace;
+
+            font-size: 10px;
+
+            color: var(--orange);
+        }
+
+        .event-main {
+            position: relative;
+            z-index: 2;
+
+            margin-top: auto;
+        }
+
+        .event-name {
+            font-size: 24px;
+
+            line-height: 1.1;
+
+            letter-spacing: -0.035em;
+
+            font-weight: 700;
+        }
+
+        .event-description {
+            margin-top: 12px;
+
+            color: var(--muted);
+
+            font-size: 11px;
+
+            line-height: 1.65;
+
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            line-clamp: 3;
+            -webkit-box-orient: vertical;
+
+            overflow: hidden;
+        }
+
+        .event-meta {
+            position: relative;
+            z-index: 2;
+
+            display: flex;
+            flex-wrap: wrap;
+
+            gap: 7px;
+
+            margin-top: 20px;
+        }
+
+        .meta-pill {
+            padding: 7px 10px;
+
+            border: 1px solid var(--line);
+
+            border-radius: 999px;
+
+            font-family: "DM Mono", monospace;
+
+            font-size: 8px;
+
+            letter-spacing: 0.05em;
+
+            color: var(--muted);
+
+            background: rgba(255,255,255,0.025);
+        }
+
+        .event-arrow {
+            position: absolute;
+
+            top: 22px;
+            right: 22px;
+
+            width: 32px;
+            height: 32px;
+
+            display: grid;
+            place-items: center;
+
+            border: 1px solid var(--line);
+
+            border-radius: 50%;
+
+            color: var(--orange);
+
+            font-size: 16px;
+
+            transition:
+                transform 0.3s ease,
+                background 0.3s ease;
+        }
+
+        .event-card:hover .event-arrow {
+            transform: translate(3px, -3px);
+
+            background: rgba(244,166,107,0.10);
+        }
+
+        /* =====================================================
+           FOOTER
+        ===================================================== */
+
+        .footer {
+            margin-top: 80px;
+
+            padding-top: 22px;
+
+            border-top: 1px solid var(--line);
+
+            display: flex;
+            justify-content: space-between;
+
+            font-family: "DM Mono", monospace;
+
+            font-size: 9px;
+
+            letter-spacing: 0.1em;
+
+            color: var(--muted);
+        }
+
+        .footer strong {
+            color: var(--orange-light);
+            font-weight: 500;
+        }
+
+        /* =====================================================
+           RESPONSIVE
+        ===================================================== */
+
+        @media (max-width: 950px) {
+
+            .events-grid {
+                grid-template-columns:
+                    repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 620px) {
+
+            .page {
+                width: min(92%, 500px);
+            }
+
+            .topbar {
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .date {
+                text-align: right;
+            }
+
+            .hero {
+                padding-top: 65px;
+            }
+
+            .events-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .event-card {
+                min-height: 270px;
+            }
+
+            .footer {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="page">
+
+    <!-- =====================================================
+         TOP BAR
+    ====================================================== -->
+
+    <header class="topbar">
+
+        <div class="brand">
+
+            <span class="brand-mark"></span>
+
+            <span class="brand-text">
+                SR GROUP OF INSTITUTION
+            </span>
+
+        </div>
+
+        <div class="date">
+            ENGINEERS DAY / 16 SEP 2026
+        </div>
+
+    </header>
+
+
+    <!-- =====================================================
+         HERO
+    ====================================================== -->
+
+    <section class="hero">
+
+        <div class="eyebrow">
+            EVENT ARENA
+        </div>
+
+        <h1>
+            CHOOSE YOUR<br>
+            <span>CHALLENGE.</span>
+        </h1>
+
+        <p class="hero-description">
+            Explore the Engineers Day 2026 event arena.
+            Select an event to view its schedule, venue,
+            participation mode, rules, requirements and prizes.
+        </p>
+
+    </section>
+
+
+    <!-- =====================================================
+         EVENTS
+    ====================================================== -->
+
+    <div class="section-header">
+
+        <div class="section-title">
+            AVAILABLE EVENTS
+        </div>
+
+        <div class="event-count">
+            {{ games|length }} EVENTS
+        </div>
+
+    </div>
+
+
+    <main class="events-grid">
+
+        {% for game in games %}
+
+        <a
+            href="{{ url_for('games.game_details', game_id=game.id) }}"
+            class="event-card"
+        >
+
+            <span class="event-number">
+                {{ "%02d"|format(loop.index) }}
+            </span>
+
+            <span class="event-arrow">
+                ↗
+            </span>
+
+            <div class="event-main">
+
+                <h2 class="event-name">
+                    {{ game.name }}
+                </h2>
+
+                <p class="event-description">
+                    {{ game.description or "Event information will be announced soon." }}
+                </p>
+
+
+                <div class="event-meta">
+
+                    {% if game.registration_mode == "TEAM" %}
+
+                    <span class="meta-pill">
+                        TEAM
+                    </span>
+
+                    {% if game.team_min_size and game.team_max_size %}
+
+                    <span class="meta-pill">
+                        {{ game.team_min_size }}–{{ game.team_max_size }} PLAYERS
+                    </span>
+
+                    {% endif %}
+
+                    {% else %}
+
+                    <span class="meta-pill">
+                        INDIVIDUAL
+                    </span>
+
+                    {% endif %}
+
+
+                    {% if game.registration_open %}
+
+                    <span class="meta-pill">
+                        REGISTRATION OPEN
+                    </span>
+
+                    {% else %}
+
+                    <span class="meta-pill">
+                        REGISTRATION CLOSED
+                    </span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </a>
+
+        {% else %}
+
+        <div
+            style="
+                grid-column: 1 / -1;
+                padding: 70px 20px;
+                text-align: center;
+                border: 1px solid var(--line);
+                border-radius: 20px;
+                color: var(--muted);
+            "
+        >
+            No events are currently available.
+        </div>
+
+        {% endfor %}
+
+    </main>
+
+
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
+
+    <footer class="footer">
+
+        <span>
+            ENGINEERS DAY 2026
+        </span>
+
+        <span>
+            POWERED BY
+            <strong>ANURAG YADAV</strong>
+        </span>
+
+    </footer>
+
+</div>
+
+
+<script>
+
+    /*
+     * Subtle 3D card movement
+     * No external library required.
+     */
+
+    document.querySelectorAll(".event-card").forEach((card) => {
+
+        card.addEventListener("mousemove", (event) => {
+
+            const rect = card.getBoundingClientRect();
+
+            const x =
+                event.clientX - rect.left;
+
+            const y =
+                event.clientY - rect.top;
+
+            const centerX =
+                rect.width / 2;
+
+            const centerY =
+                rect.height / 2;
+
+            const rotateY =
+                ((x - centerX) / centerX) * 3;
+
+            const rotateX =
+                ((centerY - y) / centerY) * 3;
+
+            card.style.transform =
+                `perspective(900px)
+                 rotateX(${rotateX}deg)
+                 rotateY(${rotateY}deg)
+                 translateY(-7px)`;
+        });
+
+
+        card.addEventListener("mouseleave", () => {
+
+            card.style.transform = "";
+        });
+
+    });
+
+</script>
+
+</body>
+</html>

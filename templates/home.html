@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Engineers Day 2026</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #0a0f1c;
+            color: white;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            height: 70px;
+            padding: 0 6%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            background: rgba(10,15,28,0.95);
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .logo span {
+            color: #00e5ff;
+        }
+
+        .logout {
+            text-decoration: none;
+            color: white;
+            padding: 10px 18px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+        }
+
+        .container {
+            width: 88%;
+            max-width: 1200px;
+            margin: 60px auto;
+        }
+
+        .welcome {
+            margin-bottom: 35px;
+        }
+
+        .welcome small {
+            color: #00e5ff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .welcome h1 {
+            margin-top: 10px;
+            font-size: clamp(38px, 6vw, 72px);
+        }
+
+        .welcome p {
+            margin-top: 15px;
+            color: #9ba7bd;
+            font-size: 18px;
+        }
+
+        .profile-card {
+            background: linear-gradient(
+                145deg,
+                rgba(255,255,255,0.08),
+                rgba(255,255,255,0.02)
+            );
+
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 35px;
+        }
+
+        .profile-card h2 {
+            margin-bottom: 20px;
+        }
+
+       .profile-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.info {
+    background: rgba(0,0,0,0.18);
+    padding: 18px;
+    border-radius: 12px;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.info label {
+    display: block;
+    font-size: 12px;
+    color: #7f8ba3;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+}
+
+.info strong {
+    display: block;
+    font-size: 16px;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+        .events {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .event-card {
+            padding: 28px;
+            border-radius: 18px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: 0.25s ease;
+        }
+
+        .event-card:hover {
+            transform: translateY(-5px);
+            border-color: #00e5ff;
+        }
+
+        .event-card h3 {
+            margin-bottom: 10px;
+        }
+
+        .event-card p {
+            color: #8e9ab0;
+            line-height: 1.6;
+        }
+
+       @media (max-width: 900px) {
+    .profile-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 600px) {
+    .profile-grid {
+        grid-template-columns: 1fr;
+    }
+}
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+
+        <div class="logo">
+            ENGINEERS <span>DAY</span>
+        </div>
+
+        <a href="{{ url_for('auth.logout') }}" class="logout">
+            Logout
+        </a>
+
+    </nav>
+
+
+    <main class="container">
+
+        <section class="welcome">
+
+            <small>SR Group of Institution • Engineers Day 2026</small>
+
+            <h1>
+                Welcome, {{ student.name }}
+            </h1>
+
+            <p>
+                Your secure event dashboard is ready.
+            </p>
+
+        </section>
+
+
+        <section class="profile-card">
+
+            <h2>Student Profile</h2>
+
+            <div class="profile-grid">
+
+                <div class="info">
+                    <label>Name</label>
+                    <strong>{{ student.name }}</strong>
+                </div>
+
+                <div class="info">
+                    <label>Email</label>
+                    <strong>{{ student.email }}</strong>
+                </div>
+
+                <div class="info">
+                    <label>Mobile</label>
+                    <strong>{{ student.phone }}</strong>
+                </div>
+
+                <div class="info">
+                    <label>Student ID</label>
+                    <strong>
+                        {{ student.student_id or "Not assigned" }}
+                    </strong>
+                </div>
+
+                <div class="info">
+                    <label>Branch</label>
+                    <strong>
+                        {{ student.branch or "Not updated" }}
+                    </strong>
+                </div>
+
+                <div class="info">
+                    <label>Year</label>
+                    <strong>
+                        {{ student.year or "Not updated" }}
+                    </strong>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <section>
+
+            <div class="events">
+
+                <div class="event-card">
+                    <h3>27 Events</h3>
+                    <p>
+                        Explore the complete Engineers Day event lineup.
+                    </p>
+                </div>
+
+                <div class="event-card">
+                    <h3>Registrations</h3>
+                    <p>
+                        Register for upcoming technical and creative events.
+                    </p>
+                </div>
+
+                <div class="event-card">
+                    <h3>Results</h3>
+                    <p>
+                        View published winners and event results.
+                    </p>
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</body>
+</html>

@@ -1,0 +1,10 @@
+Flask
+Flask-Cors
+PyMySQL
+python-dotenv
+Flask-WTF
+Flask-Limiter
+email-validator
+openpyxl
+pypdf
+Werkzeug

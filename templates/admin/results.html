@@ -1,0 +1,789 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Results | Admin{% endblock %}
+
+{% block content %}
+
+<div class="admin-page results-page">
+
+    <!-- =========================================================
+         PAGE HEADER
+    ========================================================== -->
+
+    <header class="results-hero">
+
+        <div class="results-hero-copy">
+
+            <div class="page-eyebrow">
+                <span class="eyebrow-dot"></span>
+                RESULT CONTROL
+            </div>
+
+            <h1 class="page-title">
+                Results
+            </h1>
+
+            <p class="page-subtitle">
+                Create, review and publish official Engineers Day event results.
+            </p>
+
+        </div>
+
+
+        <div class="results-hero-actions">
+
+            <div class="results-live-indicator">
+                <span></span>
+                RESULT SYSTEM
+            </div>
+
+            <a
+                href="{{ url_for('admin.dashboard') }}"
+                class="admin-btn admin-btn-secondary"
+            >
+                <span>←</span>
+                Dashboard
+            </a>
+
+        </div>
+
+    </header>
+
+
+    <!-- =========================================================
+         CRYSTAL STATS
+    ========================================================== -->
+
+    <section class="results-stats-grid">
+
+        <!-- TOTAL -->
+
+        <article class="crystal-stat-card">
+
+            <div class="crystal-card-refraction"></div>
+
+            <div class="stat-card-top">
+
+                <span class="crystal-stat-label">
+                    TOTAL RESULTS
+                </span>
+
+                <span class="crystal-stat-symbol">
+                    ◎
+                </span>
+
+            </div>
+
+            <div class="crystal-stat-value">
+                {{ total_results|default(0) }}
+            </div>
+
+            <div class="crystal-stat-footer">
+                <span class="stat-status-dot"></span>
+                Result records
+            </div>
+
+        </article>
+
+
+        <!-- PUBLISHED -->
+
+        <article class="crystal-stat-card crystal-stat-published">
+
+            <div class="crystal-card-refraction"></div>
+
+            <div class="stat-card-top">
+
+                <span class="crystal-stat-label">
+                    PUBLISHED
+                </span>
+
+                <span class="crystal-stat-symbol">
+                    ✓
+                </span>
+
+            </div>
+
+            <div class="crystal-stat-value">
+                {{ published_results|default(0) }}
+            </div>
+
+            <div class="crystal-stat-footer">
+                <span class="stat-status-dot"></span>
+                Visible results
+            </div>
+
+        </article>
+
+
+        <!-- DRAFT -->
+
+        <article class="crystal-stat-card crystal-stat-draft">
+
+            <div class="crystal-card-refraction"></div>
+
+            <div class="stat-card-top">
+
+                <span class="crystal-stat-label">
+                    DRAFT
+                </span>
+
+                <span class="crystal-stat-symbol">
+                    ◷
+                </span>
+
+            </div>
+
+            <div class="crystal-stat-value">
+                {{ draft_results|default(0) }}
+            </div>
+
+            <div class="crystal-stat-footer">
+                <span class="stat-status-dot"></span>
+                Awaiting publication
+            </div>
+
+        </article>
+
+
+        <!-- EVENTS -->
+
+        <article class="crystal-stat-card crystal-stat-events">
+
+            <div class="crystal-card-refraction"></div>
+
+            <div class="stat-card-top">
+
+                <span class="crystal-stat-label">
+                    EVENTS
+                </span>
+
+                <span class="crystal-stat-symbol">
+                    ◆
+                </span>
+
+            </div>
+
+            <div class="crystal-stat-value">
+                {{ total_events|default(0) }}
+            </div>
+
+            <div class="crystal-stat-footer">
+                <span class="stat-status-dot"></span>
+                Event catalogue
+            </div>
+
+        </article>
+
+    </section>
+
+
+    <!-- =========================================================
+         FILTER / EXPLORER
+    ========================================================== -->
+
+    <section class="crystal-panel results-explorer">
+
+        <div class="crystal-panel-glow"></div>
+
+        <div class="crystal-panel-header">
+
+            <div>
+
+                <div class="panel-kicker">
+                    <span>◇</span>
+                    EXPLORER
+                </div>
+
+                <h2>
+                    Result Explorer
+                </h2>
+
+                <p>
+                    Narrow the result control surface by event or publication state.
+                </p>
+
+            </div>
+
+
+            <div class="explorer-index">
+                FILTER
+                <strong>01</strong>
+            </div>
+
+        </div>
+
+
+        <form
+            method="GET"
+            action="{{ url_for('admin.results') }}"
+            class="results-filter-form"
+        >
+
+            <!-- EVENT -->
+
+            <div class="crystal-field">
+
+                <label for="game_id">
+                    Event
+                </label>
+
+                <div class="crystal-select-wrap">
+
+                    <select
+                        id="game_id"
+                        name="game_id"
+                        class="crystal-input"
+                    >
+
+                        <option value="">
+                            All Events
+                        </option>
+
+                        {% for game in games %}
+
+                            <option
+                                value="{{ game.id }}"
+                                {% if selected_game_id|string == game.id|string %}
+                                    selected
+                                {% endif %}
+                            >
+                                {{ game.game_name }}
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                    <span class="select-arrow">
+                        ↓
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- PUBLICATION -->
+
+            <div class="crystal-field">
+
+                <label for="published">
+                    Publication
+                </label>
+
+                <div class="crystal-select-wrap">
+
+                    <select
+                        id="published"
+                        name="published"
+                        class="crystal-input"
+                    >
+
+                        <option value="">
+                            All Results
+                        </option>
+
+                        <option
+                            value="1"
+                            {% if selected_published == '1' %}
+                                selected
+                            {% endif %}
+                        >
+                            Published
+                        </option>
+
+                        <option
+                            value="0"
+                            {% if selected_published == '0' %}
+                                selected
+                            {% endif %}
+                        >
+                            Draft
+                        </option>
+
+                    </select>
+
+                    <span class="select-arrow">
+                        ↓
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- ACTIONS -->
+
+            <div class="results-filter-actions">
+
+                <button
+                    type="submit"
+                    class="crystal-action crystal-action-primary"
+                >
+                    <span>⌕</span>
+                    Apply Filter
+                </button>
+
+
+                <a
+                    href="{{ url_for('admin.results') }}"
+                    class="crystal-action crystal-action-secondary"
+                >
+                    Reset
+                </a>
+
+            </div>
+
+        </form>
+
+    </section>
+
+
+    <!-- =========================================================
+         OFFICIAL RESULTS
+    ========================================================== -->
+
+    <section class="crystal-panel results-table-panel">
+
+        <div class="crystal-panel-header results-table-header">
+
+            <div>
+
+                <div class="panel-kicker">
+                    <span>◇</span>
+                    RESULT REGISTER
+                </div>
+
+                <h2>
+                    Official Results
+                </h2>
+
+                <p>
+                    Manage winners, runner-ups, prizes and publication status.
+                </p>
+
+            </div>
+
+
+            <div class="results-register-meta">
+
+                <span>
+                    RECORDS
+                </span>
+
+                <strong>
+                    {{ results|length }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        {% if results %}
+
+            <div class="results-table-shell">
+
+                <table class="crystal-results-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                #
+                            </th>
+
+                            <th>
+                                EVENT
+                            </th>
+
+                            <th>
+                                WINNER
+                            </th>
+
+                            <th>
+                                RUNNER-UP
+                            </th>
+
+                            <th>
+                                PRIZE
+                            </th>
+
+                            <th>
+                                CERTIFICATES
+                            </th>
+
+                            <th>
+                                STATUS
+                            </th>
+
+                            <th>
+                                ACTION
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for result in results %}
+
+                            <tr class="result-row">
+
+                                <!-- INDEX -->
+
+                                <td>
+
+                                    <span class="result-index">
+                                        {{ "%02d"|format(loop.index) }}
+                                    </span>
+
+                                </td>
+
+
+                                <!-- EVENT -->
+
+                                <td>
+
+                                    <div class="result-event">
+
+                                        <div class="event-crystal-icon">
+                                            EV
+                                        </div>
+
+                                        <div class="result-event-copy">
+
+                                            <strong>
+                                                {{ result.game_name }}
+                                            </strong>
+
+                                            <span>
+                                                EVENT #{{ result.game_id }}
+                                            </span>
+
+                                            {% if result.event_date %}
+
+                                                <small>
+                                                    {{ result.event_date }}
+                                                </small>
+
+                                            {% endif %}
+
+                                        </div>
+
+                                    </div>
+
+                                </td>
+
+
+                                <!-- WINNER -->
+
+                                <td>
+
+                                    <div class="placement-cell winner-placement">
+
+                                        <span class="placement-number">
+                                            01
+                                        </span>
+
+                                        <div class="placement-copy">
+
+                                            <strong>
+                                                {{ result.winner or 'Not assigned' }}
+                                            </strong>
+
+                                            {% if result.winner_student_id %}
+
+                                                <span>
+                                                    Student #{{ result.winner_student_id }}
+                                                </span>
+
+                                            {% elif result.winner_team_id %}
+
+                                                <span>
+                                                    Team #{{ result.winner_team_id }}
+                                                </span>
+
+                                            {% else %}
+
+                                                <span>
+                                                    Awaiting winner
+                                                </span>
+
+                                            {% endif %}
+
+                                        </div>
+
+                                    </div>
+
+                                </td>
+
+
+                                <!-- RUNNER-UP -->
+
+                                <td>
+
+                                    <div class="placement-cell runner-placement">
+
+                                        <span class="placement-number">
+                                            02
+                                        </span>
+
+                                        <div class="placement-copy">
+
+                                            <strong>
+                                                {{ result.runner_up or 'Not assigned' }}
+                                            </strong>
+
+                                            {% if result.runner_up_student_id %}
+
+                                                <span>
+                                                    Student #{{ result.runner_up_student_id }}
+                                                </span>
+
+                                            {% elif result.runner_up_team_id %}
+
+                                                <span>
+                                                    Team #{{ result.runner_up_team_id }}
+                                                </span>
+
+                                            {% else %}
+
+                                                <span>
+                                                    Awaiting runner-up
+                                                </span>
+
+                                            {% endif %}
+
+                                        </div>
+
+                                    </div>
+
+                                </td>
+
+
+                                <!-- PRIZE -->
+
+                                <td>
+
+                                    <div class="result-prizes">
+
+                                        {% if result.winner_prize %}
+
+                                            <span>
+                                                <b>W</b>
+                                                {{ result.winner_prize }}
+                                            </span>
+
+                                        {% endif %}
+
+
+                                        {% if result.runner_up_prize %}
+
+                                            <span>
+                                                <b>R</b>
+                                                {{ result.runner_up_prize }}
+                                            </span>
+
+                                        {% endif %}
+
+
+                                        {% if not result.winner_prize
+                                              and not result.runner_up_prize %}
+
+                                            <span class="result-muted">
+                                                Not specified
+                                            </span>
+
+                                        {% endif %}
+
+                                    </div>
+
+                                </td>
+
+
+                                <!-- CERTIFICATES -->
+
+                                <td>
+
+                                    <div class="result-certificates">
+
+                                        {% if result.winner_certificate %}
+
+                                            <span
+                                                class="certificate-chip certificate-winner"
+                                                title="Winner certificate enabled"
+                                            >
+                                                W ✓
+                                            </span>
+
+                                        {% endif %}
+
+
+                                        {% if result.runner_up_certificate %}
+
+                                            <span
+                                                class="certificate-chip"
+                                                title="Runner-up certificate enabled"
+                                            >
+                                                R ✓
+                                            </span>
+
+                                        {% endif %}
+
+
+                                        {% if not result.winner_certificate
+                                              and not result.runner_up_certificate %}
+
+                                            <span class="result-muted">
+                                                —
+                                            </span>
+
+                                        {% endif %}
+
+                                    </div>
+
+                                </td>
+
+
+                                <!-- STATUS -->
+
+                                <td>
+
+                                    {% if result.result_id and result.is_published %}
+
+                                        <span class="crystal-status status-published">
+                                            <i></i>
+                                            Published
+                                        </span>
+
+                                    {% elif result.result_id %}
+
+                                        <span class="crystal-status status-draft">
+                                            <i></i>
+                                            Draft
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="crystal-status status-empty">
+                                            <i></i>
+                                            Not Created
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+
+                                <!-- ACTION -->
+
+                                <td>
+
+                                    {% if result.result_id %}
+
+                                        <a
+                                            href="{{ url_for(
+                                                'admin.result_edit',
+                                                game_id=result.game_id,
+                                               
+                                            ) }}"
+                                            class="result-manage-btn"
+                                        >
+                                            <span>
+                                                Manage
+                                            </span>
+
+                                            <b>
+                                                →
+                                            </b>
+                                        </a>
+
+                                    {% else %}
+
+                                        <a
+                                            href="{{ url_for(
+                                                'admin.result_create',
+                                                game_id=result.game_id
+                                            ) }}"
+                                            class="result-manage-btn result-create-btn"
+                                        >
+                                            <span>
+                                                Add Result
+                                            </span>
+
+                                            <b>
+                                                ＋
+                                            </b>
+                                        </a>
+
+                                    {% endif %}
+
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+        {% else %}
+
+            <!-- =================================================
+                 EMPTY STATE
+            ================================================== -->
+
+            <div class="crystal-empty-state">
+
+                <div class="empty-crystal">
+
+                    <span>
+                        ◇
+                    </span>
+
+                </div>
+
+
+                <div>
+
+                    <div class="panel-kicker">
+                        RESULT REGISTER
+                    </div>
+
+                    <h3>
+                        No results found
+                    </h3>
+
+                    <p>
+                        No result records match the current filters.
+                        Create a result from an event to begin publishing winners.
+                    </p>
+
+                    <a
+                        href="{{ url_for('admin.events') }}"
+                        class="crystal-action crystal-action-secondary"
+                    >
+                        Manage Events
+                        <span>→</span>
+                    </a>
+
+                </div>
+
+            </div>
+
+        {% endif %}
+
+    </section>
+
+</div>
+
+{% endblock %}

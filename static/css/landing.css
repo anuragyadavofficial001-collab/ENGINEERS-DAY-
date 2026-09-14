@@ -1,0 +1,1993 @@
+/* Disable text caret on landing page */
+.hero,
+.hero * {
+    caret-color: transparent;
+}
+:root {
+  --cream: #fbdbaf;
+  --cream-soft: rgba(251, 219, 175, 0.72);
+  --cream-muted: rgba(251, 219, 175, 0.48);
+
+  --orange: #e07020;
+  --orange-light: #ff9b4a;
+
+  --dark: #110a07;
+  --glass: rgba(15, 9, 6, 0.52);
+  --glass-heavy: rgba(10, 7, 5, 0.72);
+
+  --line: rgba(251, 219, 175, 0.14);
+}
+
+
+/* =========================================================
+   RESET
+   ========================================================= */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+
+  width: 100%;
+  min-height: 100%;
+
+  background: #c45a18;
+  color: var(--cream);
+
+  overflow-x: hidden;
+}
+
+body {
+  font-family:
+    "Inter",
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+
+/* =========================================================
+   HEADINGS
+   ========================================================= */
+
+h1,
+h2,
+h3 {
+  font-family:
+    "Orbitron-Medium",
+    "Arial Narrow",
+    sans-serif;
+
+  font-weight: 400;
+}
+
+
+/* =========================================================
+   HERO
+   ========================================================= */
+
+.hero {
+  position: relative;
+
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+
+  overflow: hidden;
+
+  background: #c45a18;
+
+  isolation: isolate;
+}
+
+
+/* =========================================================
+   IMAGE LAYERS
+   ========================================================= */
+
+.hero-base-img,
+.hero-reveal-img {
+  position: absolute;
+
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.hero-base-img {
+  z-index: 1;
+}
+
+.hero-reveal-img {
+  z-index: 2;
+
+  pointer-events: none;
+
+  -webkit-mask-image:
+    radial-gradient(
+      circle 0px at -999px -999px,
+      #fff,
+      transparent
+    );
+
+  mask-image:
+    radial-gradient(
+      circle 0px at -999px -999px,
+      #fff,
+      transparent
+    );
+
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+
+
+/* =========================================================
+   IMAGE ANIMATION
+   ========================================================= */
+
+@keyframes heroImageIn {
+  from {
+    opacity: 0;
+    transform: scale(1.12);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.hero-image-animate {
+  animation:
+    heroImageIn 
+    1.3s
+    cubic-bezier(0.25, 0.46, 0.45, 0.94)
+    forwards;
+}
+
+
+/* =========================================================
+   CINEMATIC OVERLAY
+   ========================================================= */
+
+.cinematic-overlay {
+  position: absolute;
+
+  inset: 0;
+
+  z-index: 3;
+
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(7, 5, 4, 0.72) 0%,
+      rgba(7, 5, 4, 0.38) 34%,
+      rgba(7, 5, 4, 0.08) 70%,
+      rgba(7, 5, 4, 0.3) 100%
+    );
+
+  mix-blend-mode: multiply;
+}
+
+
+/* =========================================================
+   GRAIN
+   ========================================================= */
+
+.grain-layer {
+  position: absolute;
+
+  inset: 0;
+
+  z-index: 7;
+
+  pointer-events: none;
+
+  opacity: 0.075;
+
+  background-image:
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
+}
+
+
+/* =========================================================
+   TOPBAR
+   ========================================================= */
+
+.topbar {
+  position: absolute;
+
+  top: 0;
+  left: 0;
+  right: 0;
+
+  z-index: 10;
+
+  height: 70px;
+
+  padding:
+    0 32px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  border-bottom:
+    1px solid rgba(251, 219, 175, 0.12);
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(10, 7, 5, 0.3),
+      transparent
+    );
+
+  backdrop-filter: blur(5px);
+
+  pointer-events: none;
+}
+
+
+/* =========================================================
+   BRAND
+   ========================================================= */
+
+.brand {
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+}
+
+.brand-mark {
+  width: 40px;
+  height: 40px;
+
+  border:
+    1px solid rgba(251, 219, 175, 0.7);
+
+  border-radius: 50%;
+
+  display: grid;
+  place-items: center;
+
+  position: relative;
+}
+
+.brand-mark::before {
+  content: "";
+
+  position: absolute;
+
+  inset: 4px;
+
+  border:
+    1px dashed rgba(251, 219, 175, 0.4);
+
+  border-radius: 50%;
+}
+
+.brand-mark span {
+  position: relative;
+
+  font-family: "Orbitron-Medium";
+
+  font-size: 10px;
+}
+
+.brand-copy {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 3px;
+}
+
+.brand-copy strong {
+  font-size: 12px;
+
+  letter-spacing: 0.06em;
+}
+
+.brand-copy small {
+  font-size: 9px;
+
+  color: var(--cream-soft);
+
+  letter-spacing: 0.12em;
+}
+
+
+/* =========================================================
+   TOP EVENT
+   ========================================================= */
+
+.top-event {
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  font-size: 10px;
+
+  color: var(--cream-soft);
+
+  letter-spacing: 0.05em;
+}
+
+.script-text {
+  font-family: cursive;
+
+  font-size: 16px;
+
+  color: var(--cream);
+}
+
+.separator {
+  opacity: 0.35;
+}
+
+
+/* =========================================================
+   HERO UI
+   ========================================================= */
+
+.hero-ui {
+  position: absolute;
+
+  inset: 0;
+
+  z-index: 8;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(420px, 0.9fr)
+    minmax(380px, 1.1fr);
+
+  grid-template-rows:
+    1fr auto;
+
+  padding:
+    108px 44px 60px;
+
+  pointer-events: none;
+}
+
+
+/* =========================================================
+   LEFT
+   ========================================================= */
+
+.hero-left {
+  grid-column: 1;
+  grid-row: 1 / -1;
+
+  display: flex;
+
+  flex-direction: column;
+
+  justify-content: space-between;
+
+  align-items: flex-start;
+
+  min-width: 0;
+
+  padding-bottom: 28px;
+}
+
+
+/* =========================================================
+   HERO COPY
+   ========================================================= */
+
+.hero-copy {
+  max-width: 510px;
+
+  pointer-events: auto;
+}
+
+.eyebrow {
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  margin-bottom: 20px;
+
+  font-size: 9px;
+
+  letter-spacing: 0.17em;
+
+  color: var(--cream-muted);
+}
+
+.eyebrow span {
+  width: 24px;
+  height: 1px;
+
+  background: var(--cream);
+
+  opacity: 0.55;
+}
+
+
+.hero-copy h1 {
+  margin: 0;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 4px;
+
+  font-size:
+    clamp(2.2rem, 5vw, 4.8rem);
+
+  line-height: 0.98;
+
+  letter-spacing: -0.025em;
+
+  text-shadow:
+    0 4px 35px rgba(0, 0, 0, 0.3);
+}
+
+.hero-copy h1 span {
+  display: block;
+}
+
+.hero-copy h1 .accent-line {
+  color: var(--cream);
+}
+
+.hero-copy h1 em {
+  color: var(--orange-light);
+
+  font-style: normal;
+
+  text-shadow:
+    0 0 30px rgba(224, 112, 32, 0.5);
+}
+
+
+.hero-description {
+  max-width: 390px;
+
+  margin:
+    22px 0 0;
+
+  font-size: 13px;
+
+  line-height: 1.65;
+
+  color: var(--cream-soft);
+}
+
+
+/* =========================================================
+   DATE
+   ========================================================= */
+
+.event-date {
+  display: flex;
+
+  align-items: center;
+
+  gap: 13px;
+
+  margin-top: 25px;
+}
+
+.date-number {
+  font-family: "Orbitron-Medium";
+
+  font-size: 32px;
+
+  line-height: 1;
+
+  color: var(--cream);
+}
+
+.date-info {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 3px;
+
+  padding-left: 13px;
+
+  border-left:
+    1px solid rgba(251, 219, 175, 0.3);
+}
+
+.date-info strong {
+  font-size: 10px;
+
+  letter-spacing: 0.14em;
+}
+
+.date-info span {
+  font-size: 10px;
+
+  color: var(--cream-muted);
+}
+
+
+/* =========================================================
+   ACCESS PANEL
+   ========================================================= */
+
+.access-panel {
+  width: min(440px, 100%);
+
+  margin-top: 30px;
+
+  padding: 15px;
+
+  border:
+    1px solid rgba(251, 219, 175, 0.16);
+
+  border-radius: 18px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(18, 10, 6, 0.66),
+      rgba(10, 7, 5, 0.43)
+    );
+
+  backdrop-filter: blur(18px);
+
+  box-shadow:
+    0 25px 70px rgba(0, 0, 0, 0.25);
+}
+
+.access-label {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  margin-bottom: 11px;
+
+  font-size: 8px;
+
+  letter-spacing: 0.16em;
+
+  color: var(--cream-muted);
+}
+
+.status-dot {
+  width: 5px;
+  height: 5px;
+
+  border-radius: 50%;
+
+  background: #8ee7a4;
+
+  box-shadow:
+    0 0 10px #8ee7a4;
+}
+
+
+/* ============================================================
+   ACCESS PANEL
+   ============================================================ */
+
+.access-panel {
+  margin-top: 34px;
+  width: min(100%, 620px);
+}
+
+.access-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  margin-bottom: 14px;
+
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+
+  color: var(--muted);
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+
+  background: #ff9b5a;
+
+  box-shadow:
+    0 0 0 4px rgba(255, 155, 90, 0.10),
+    0 0 14px rgba(255, 155, 90, 0.45);
+}
+
+
+/* ============================================================
+   BUTTON CONTAINER
+   ============================================================ */
+
+.access-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+
+/* ============================================================
+   MAIN ACCESS BUTTON
+   ============================================================ */
+
+.access-btn {
+  position: relative;
+
+  min-height: 82px;
+  padding: 16px 18px;
+
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  text-decoration: none;
+
+  border-radius: 16px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255, 196, 146, 0.96),
+      rgba(244, 161, 101, 0.92)
+    );
+
+  border: 1px solid rgba(255, 225, 201, 0.70);
+
+  color: #24140d;
+
+  box-shadow:
+    0 12px 30px rgba(100, 45, 15, 0.16),
+    inset 0 1px 0 rgba(255,255,255,0.55);
+
+  overflow: hidden;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.28s ease,
+    box-shadow 0.28s ease,
+    border-color 0.28s ease;
+}
+
+
+/* subtle shine */
+
+.access-btn::before {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  left: -120%;
+
+  width: 70%;
+  height: 100%;
+
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255,255,255,0.28),
+    transparent
+  );
+
+  transform: skewX(-20deg);
+
+  transition: left 0.6s ease;
+
+  pointer-events: none;
+}
+
+
+.access-btn:hover::before {
+  left: 150%;
+}
+
+
+.access-btn:hover {
+  transform: translateY(-4px);
+
+  border-color: rgba(255, 238, 221, 0.95);
+
+  box-shadow:
+    0 18px 38px rgba(90, 40, 12, 0.22),
+    0 0 0 1px rgba(255, 181, 126, 0.15),
+    inset 0 1px 0 rgba(255,255,255,0.65);
+}
+
+
+.access-btn:active {
+  transform: translateY(-1px) scale(0.99);
+}
+
+
+/* ============================================================
+   ICON
+   ============================================================ */
+
+.access-icon {
+  flex: 0 0 42px;
+
+  width: 42px;
+  height: 42px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 12px;
+
+  background: rgba(255, 239, 225, 0.48);
+
+  border: 1px solid rgba(255,255,255,0.42);
+
+  color: #382016;
+
+  transition:
+    transform 0.28s ease,
+    background 0.28s ease;
+}
+
+
+.access-icon svg {
+  width: 23px;
+  height: 23px;
+}
+
+
+.access-btn:hover .access-icon {
+  transform: rotate(-4deg) scale(1.06);
+
+  background: rgba(255, 247, 239, 0.72);
+}
+
+
+/* ============================================================
+   TEXT
+   ============================================================ */
+
+.access-content {
+  min-width: 0;
+
+  flex: 1;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 5px;
+}
+
+
+.access-content strong {
+  font-size: 14px;
+  font-weight: 800;
+
+  letter-spacing: 0.02em;
+
+  color: #25150e;
+}
+
+
+.access-content span {
+  font-size: 10px;
+  line-height: 1.4;
+
+  color: rgba(45, 27, 18, 0.68);
+}
+
+
+/* ============================================================
+   ARROW
+   ============================================================ */
+
+.access-arrow {
+  flex: 0 0 auto;
+
+  width: 30px;
+  height: 30px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 50%;
+
+  background: rgba(255, 239, 225, 0.48);
+
+  color: #2c170d;
+
+  font-size: 19px;
+  line-height: 1;
+
+  transition:
+    transform 0.28s ease,
+    background 0.28s ease;
+}
+
+
+.access-btn:hover .access-arrow {
+  transform: translateX(4px);
+
+  background: rgba(255, 247, 239, 0.78);
+}
+
+
+/* ============================================================
+   STUDENT / ADMIN — subtle distinction
+   ============================================================ */
+
+.student-access {
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255, 203, 159, 0.98),
+      rgba(247, 169, 108, 0.94)
+    );
+}
+
+
+.admin-access {
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255, 190, 139, 0.98),
+      rgba(235, 149, 91, 0.94)
+    );
+}
+
+
+/* ============================================================
+   REMOVE TEXT CARET / TYPING LINE FROM LANDING PAGE
+   ============================================================ */
+
+.hero,
+.hero * {
+  caret-color: transparent;
+}
+
+
+/* ============================================================
+   MOBILE
+   ============================================================ */
+
+@media (max-width: 700px) {
+
+  .access-buttons {
+    grid-template-columns: 1fr;
+  }
+
+  .access-btn {
+    min-height: 76px;
+  }
+
+}
+
+
+@media (max-width: 420px) {
+
+  .access-btn {
+    padding: 14px;
+    gap: 11px;
+  }
+
+  .access-content strong {
+    font-size: 13px;
+  }
+
+  .access-content span {
+    font-size: 9px;
+  }
+
+}
+
+/* =========================================================
+   COLLEGE CARD
+   ========================================================= */
+
+.college-card {
+  width: min(420px, 100%);
+
+  display: grid;
+
+  grid-template-columns: 62px 1fr auto;
+
+  align-items: center;
+
+  gap: 13px;
+
+  padding: 12px;
+
+  border:
+    1px solid rgba(251, 219, 175, 0.13);
+
+  border-radius: 15px;
+
+  background:
+    rgba(10, 8, 6, 0.55);
+
+  backdrop-filter: blur(14px);
+
+  pointer-events: auto;
+}
+
+
+.college-symbol {
+  width: 58px;
+  height: 58px;
+
+  position: relative;
+
+  display: grid;
+  place-items: center;
+
+  border:
+    1px solid rgba(251, 219, 175, 0.42);
+
+  border-radius: 50%;
+
+  font-family: "Orbitron-Medium";
+
+  font-size: 12px;
+}
+
+.symbol-ring {
+  position: absolute;
+
+  inset: 5px;
+
+  border:
+    1px dashed rgba(251, 219, 175, 0.35);
+
+  border-radius: 50%;
+}
+
+
+.college-body {
+  min-width: 0;
+}
+
+.mini-label {
+  margin-bottom: 4px;
+
+  font-size: 7px;
+
+  letter-spacing: 0.16em;
+
+  color: var(--cream-muted);
+}
+
+.college-body h2 {
+  margin: 0;
+
+  font-size: 10px;
+
+  letter-spacing: 0.08em;
+}
+
+.college-body p {
+  margin: 5px 0 0;
+
+  font-size: 9px;
+
+  line-height: 1.4;
+
+  color: var(--cream-muted);
+}
+
+
+.college-corner {
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  gap: 2px;
+
+  padding-right: 7px;
+}
+
+.college-corner span {
+  font-family: "Orbitron-Medium";
+
+  font-size: 15px;
+}
+
+.college-corner small {
+  font-size: 7px;
+
+  color: var(--cream-muted);
+}
+
+
+/* =========================================================
+   HERO VISUAL
+   ========================================================= */
+
+.hero-visual {
+  position: relative;
+
+  grid-column: 2;
+  grid-row: 1;
+
+  min-width: 0;
+
+  pointer-events: none;
+}
+
+
+/* =========================================================
+   VISUAL TITLE
+   ========================================================= */
+
+.visual-title {
+  position: absolute;
+
+  top: 9%;
+  right: 7%;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: flex-end;
+
+  font-family: "Orbitron-Medium";
+
+  text-align: right;
+
+  line-height: 0.94;
+
+  opacity: 0.92;
+}
+
+.visual-word {
+  font-size:
+    clamp(1.7rem, 4vw, 4rem);
+
+  letter-spacing: -0.035em;
+
+  text-shadow:
+    0 3px 25px rgba(0, 0, 0, 0.3);
+}
+
+.word-one {
+  transform: translateX(-35px);
+}
+
+.word-two {
+  font-size:
+    clamp(1.2rem, 2.8vw, 2.5rem);
+
+  color: var(--orange-light);
+}
+
+.word-three {
+  transform: translateX(22px);
+}
+
+
+/* =========================================================
+   ORBIT
+   ========================================================= */
+
+.event-orbit {
+  position: absolute;
+
+  top: 25%;
+  left: 38%;
+
+  width:
+    clamp(210px, 25vw, 350px);
+
+  aspect-ratio: 1;
+
+  transform:
+    translate(-50%, -50%);
+
+  display: grid;
+
+  place-items: center;
+}
+
+.orbit-ring {
+  position: absolute;
+
+  border:
+    1px solid rgba(251, 219, 175, 0.25);
+
+  border-radius: 50%;
+}
+
+.orbit-ring-one {
+  inset: 0;
+
+  animation:
+    orbitSpin 24s linear infinite;
+}
+
+.orbit-ring-two {
+  inset: 11%;
+
+  border-style: dashed;
+
+  opacity: 0.5;
+
+  animation:
+    orbitSpinReverse 18s linear infinite;
+}
+
+.orbit-ring-three {
+  inset: 27%;
+
+  border-color:
+    rgba(224, 112, 32, 0.42);
+
+  animation:
+    orbitPulse 3s ease-in-out infinite;
+}
+
+
+@keyframes orbitSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes orbitSpinReverse {
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+@keyframes orbitPulse {
+  0%,
+  100% {
+    transform: scale(0.97);
+    opacity: 0.45;
+  }
+
+  50% {
+    transform: scale(1.03);
+    opacity: 0.9;
+  }
+}
+
+
+.orbit-core {
+  width: 100px;
+  height: 100px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  justify-content: center;
+
+  align-items: center;
+
+  border:
+    1px solid rgba(251, 219, 175, 0.5);
+
+  border-radius: 50%;
+
+  background:
+    rgba(10, 7, 5, 0.34);
+
+  backdrop-filter: blur(8px);
+
+  box-shadow:
+    0 0 45px rgba(224, 112, 32, 0.18);
+}
+
+.core-small,
+.core-year {
+  font-size: 7px;
+
+  letter-spacing: 0.18em;
+
+  color: var(--cream-muted);
+}
+
+.orbit-core strong {
+  margin: 3px 0;
+
+  font-family: "Orbitron-Medium";
+
+  font-size: 29px;
+
+  font-weight: 400;
+}
+
+
+/* =========================================================
+   ORBIT MARKERS
+   ========================================================= */
+
+.orbit-marker {
+  position: absolute;
+
+  width: 12px;
+  height: 12px;
+
+  display: grid;
+  place-items: center;
+
+  border:
+    1px solid rgba(251, 219, 175, 0.55);
+
+  border-radius: 50%;
+
+  background: #1a0e08;
+}
+
+.orbit-marker span {
+  width: 3px;
+  height: 3px;
+
+  border-radius: 50%;
+
+  background: var(--orange-light);
+
+  box-shadow:
+    0 0 8px var(--orange-light);
+}
+
+.marker-one {
+  top: 4%;
+  left: 50%;
+}
+
+.marker-two {
+  right: 4%;
+  bottom: 30%;
+}
+
+.marker-three {
+  left: 11%;
+  bottom: 16%;
+}
+
+
+/* =========================================================
+   COORDINATES
+   ========================================================= */
+
+.coordinate {
+  position: absolute;
+
+  font-family: "Orbitron-Medium";
+
+  font-size: 7px;
+
+  letter-spacing: 0.1em;
+
+  color: rgba(251, 219, 175, 0.48);
+}
+
+.coord-one {
+  top: 17%;
+  left: 8%;
+}
+
+.coord-two {
+  top: 21%;
+  right: 3%;
+}
+
+
+/* =========================================================
+   VISUAL INFO
+   ========================================================= */
+
+.visual-info {
+  position: absolute;
+
+  right: 3%;
+  bottom: 10%;
+
+  display: flex;
+
+  align-items: flex-end;
+
+  gap: 18px;
+
+  font-size: 8px;
+
+  text-align: right;
+}
+
+.visual-info .info-line {
+  width: 55px;
+  height: 1px;
+
+  margin-bottom: 7px;
+
+  background:
+    rgba(251, 219, 175, 0.45);
+}
+
+.visual-info div:not(.info-line) {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 4px;
+}
+
+.visual-info small {
+  font-size: 7px;
+
+  letter-spacing: 0.14em;
+
+  color: var(--cream-muted);
+}
+
+.visual-info strong {
+  font-size: 8px;
+
+  font-weight: 500;
+}
+
+
+/* =========================================================
+   BLUEPRINT LINES
+   ========================================================= */
+
+.blueprint-line {
+  position: absolute;
+
+  height: 1px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(251, 219, 175, 0.35),
+      transparent
+    );
+
+  opacity: 0.5;
+}
+
+.blueprint-one {
+  width: 230px;
+
+  top: 46%;
+  right: 0;
+
+  transform: rotate(-24deg);
+}
+
+.blueprint-two {
+  width: 180px;
+
+  top: 66%;
+  left: 7%;
+
+  transform: rotate(19deg);
+}
+
+
+/* =========================================================
+   PAGE INDICATOR
+   ========================================================= */
+
+.hero-page {
+  position: absolute;
+
+  top: 91px;
+  right: 44px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  font-size: 8px;
+
+  letter-spacing: 0.14em;
+
+  color: var(--cream-muted);
+}
+
+.hero-page span:first-child {
+  font-family: "Orbitron-Medium";
+
+  font-size: 14px;
+
+  color: var(--cream);
+}
+
+.hero-page i {
+  width: 30px;
+  height: 1px;
+
+  background:
+    rgba(251, 219, 175, 0.3);
+}
+
+
+/* =========================================================
+   BOTTOM INFO
+   ========================================================= */
+
+.bottom-info {
+  position: absolute;
+
+  right: 44px;
+  bottom: 58px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 17px;
+
+  pointer-events: auto;
+}
+
+.bottom-item {
+  display: flex;
+
+  align-items: center;
+
+  gap: 9px;
+}
+
+.bottom-number {
+  font-family: "Orbitron-Medium";
+
+  font-size: 18px;
+}
+
+.bottom-item div {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 2px;
+}
+
+.bottom-item small {
+  font-size: 7px;
+
+  letter-spacing: 0.13em;
+
+  color: var(--cream-muted);
+}
+
+.bottom-item strong {
+  font-size: 8px;
+
+  font-weight: 500;
+}
+
+.bottom-divider {
+  width: 1px;
+  height: 30px;
+
+  background:
+    rgba(251, 219, 175, 0.18);
+}
+
+.live-dot {
+  width: 5px;
+  height: 5px;
+
+  border-radius: 50%;
+
+  background: #8ee7a4;
+
+  box-shadow:
+    0 0 10px #8ee7a4;
+}
+
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.site-footer {
+  position: absolute;
+
+  left: 44px;
+  right: 44px;
+  bottom: 18px;
+
+  z-index: 11;
+
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  padding-top: 11px;
+
+  border-top:
+    1px solid rgba(251, 219, 175, 0.1);
+
+  font-size: 7px;
+
+  letter-spacing: 0.08em;
+
+  color: rgba(251, 219, 175, 0.43);
+
+  pointer-events: none;
+}
+
+.site-footer strong {
+  color: var(--cream-soft);
+
+  font-weight: 500;
+}
+
+
+/* =========================================================
+   FADE ANIMATION
+   ========================================================= */
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(16px);
+
+    filter: blur(7px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+
+    filter: blur(0);
+  }
+}
+
+.fade-up {
+  opacity: 0;
+
+  animation:
+    fadeUp
+    0.8s
+    ease
+    forwards;
+}
+
+.hero-copy .fade-up:nth-of-type(1) {
+  animation-delay: 0.3s;
+}
+
+.hero-copy .fade-up:nth-of-type(2) {
+  animation-delay: 0.5s;
+}
+
+.hero-copy .fade-up:nth-of-type(3) {
+  animation-delay: 0.7s;
+}
+
+.access-panel {
+  animation-delay: 0.85s;
+}
+
+.college-card {
+  animation-delay: 1.05s;
+}
+
+.hero-page {
+  animation-delay: 0.8s;
+}
+
+.bottom-info {
+  animation-delay: 1.15s;
+}
+
+
+/* =========================================================
+   CURSOR
+   ========================================================= */
+
+.cursor-dot,
+.cursor-ring {
+  position: fixed;
+
+  top: 0;
+  left: 0;
+
+  z-index: 20;
+
+  pointer-events: none;
+
+  opacity: 0;
+}
+
+.cursor-dot {
+  width: 5px;
+  height: 5px;
+
+  margin:
+    -2.5px 0 0 -2.5px;
+
+  border-radius: 50%;
+
+  background: var(--cream);
+
+  box-shadow:
+    0 0 12px rgba(251, 219, 175, 0.8);
+}
+
+.cursor-ring {
+  width: 30px;
+  height: 30px;
+
+  margin:
+    -15px 0 0 -15px;
+
+  border:
+    1px solid rgba(251, 219, 175, 0.5);
+
+  border-radius: 50%;
+
+  transition:
+    width 0.25s ease,
+    height 0.25s ease,
+    margin 0.25s ease,
+    border-color 0.25s ease;
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 1024px) {
+
+  .hero-ui {
+    padding:
+      100px 28px 60px;
+
+    grid-template-columns:
+      minmax(370px, 0.95fr)
+      minmax(320px, 1.05fr);
+  }
+
+  .hero-copy h1 {
+    font-size:
+      clamp(2rem, 5.2vw, 4rem);
+  }
+
+  .hero-page {
+    right: 28px;
+  }
+
+  .site-footer {
+    left: 28px;
+    right: 28px;
+  }
+
+  .bottom-info {
+    right: 28px;
+  }
+
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 780px) {
+
+  .hero {
+    min-height: 100vh;
+
+    overflow-y: auto;
+  }
+
+  .topbar {
+    height: 62px;
+
+    padding:
+      0 18px;
+  }
+
+  .brand-mark {
+    width: 34px;
+    height: 34px;
+  }
+
+  .brand-copy strong {
+    font-size: 9px;
+  }
+
+  .brand-copy small {
+    font-size: 7px;
+  }
+
+  .top-event {
+    display: none;
+  }
+
+
+  .hero-ui {
+    position: relative;
+
+    inset: auto;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 45px;
+
+    min-height: 100vh;
+
+    padding:
+      95px 18px 80px;
+  }
+
+
+  .hero-left {
+    width: 100%;
+
+    padding: 0;
+  }
+
+  .hero-copy {
+    width: 100%;
+  }
+
+  .hero-copy h1 {
+    font-size:
+      clamp(2.1rem, 12vw, 4rem);
+  }
+
+  .hero-description {
+    font-size: 12px;
+  }
+
+
+  .access-panel {
+    width: 100%;
+  }
+
+  .access-buttons {
+    grid-template-columns: 1fr;
+  }
+
+
+  .college-card {
+    width: 100%;
+  }
+
+
+  .hero-visual {
+    width: 100%;
+
+    min-height: 350px;
+  }
+
+  .visual-title {
+    top: 0;
+    right: 2%;
+  }
+
+  .event-orbit {
+    top: 47%;
+    left: 50%;
+
+    width: min(310px, 75vw);
+  }
+
+  .visual-info {
+    bottom: 0;
+    right: 0;
+  }
+
+  .coordinate {
+    display: none;
+  }
+
+  .blueprint-one,
+  .blueprint-two {
+    opacity: 0.25;
+  }
+
+
+  .hero-page {
+    top: 75px;
+    right: 18px;
+  }
+
+
+  .bottom-info {
+    position: relative;
+
+    right: auto;
+    bottom: auto;
+
+    align-self: flex-end;
+  }
+
+
+  .site-footer {
+    position: absolute;
+
+    left: 18px;
+    right: 18px;
+    bottom: 18px;
+
+    font-size: 6px;
+  }
+
+  .cursor-dot,
+  .cursor-ring {
+    display: none;
+  }
+
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 480px) {
+
+  .hero-ui {
+    gap: 32px;
+
+    padding:
+      90px 16px 75px;
+  }
+
+  .eyebrow {
+    font-size: 7px;
+  }
+
+  .hero-copy h1 {
+    font-size: 2rem;
+  }
+
+  .hero-description {
+    margin-top: 17px;
+
+    font-size: 11px;
+  }
+
+  .event-date {
+    margin-top: 20px;
+  }
+
+  .date-number {
+    font-size: 27px;
+  }
+
+  .access-panel {
+    margin-top: 23px;
+
+    padding: 11px;
+  }
+
+  .access-btn {
+    min-height: 64px;
+  }
+
+  .college-card {
+    grid-template-columns: 52px 1fr auto;
+  }
+
+  .college-symbol {
+    width: 50px;
+    height: 50px;
+  }
+
+  .college-body h2 {
+    font-size: 8px;
+  }
+
+  .college-body p {
+    font-size: 8px;
+  }
+
+  .hero-visual {
+    min-height: 310px;
+  }
+
+  .visual-word {
+    font-size: 1.8rem;
+  }
+
+  .orbit-core {
+    width: 82px;
+    height: 82px;
+  }
+
+  .orbit-core strong {
+    font-size: 24px;
+  }
+
+  .visual-info {
+    gap: 9px;
+  }
+
+  .visual-info .info-line {
+    width: 25px;
+  }
+
+  .visual-info strong {
+    font-size: 7px;
+  }
+
+  .bottom-info {
+    gap: 10px;
+  }
+
+  .bottom-number {
+    font-size: 15px;
+  }
+
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+
+    scroll-behavior: auto !important;
+  }
+
+}

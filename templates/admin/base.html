@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Engineers Day 2026 Administration Console"
+    >
+
+    <title>
+        {% block title %}Admin{% endblock %} · Engineers Day 2026
+    </title>
+
+
+    <!-- =========================================================
+         GLOBAL ADMIN CSS
+    ========================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/admin.css') }}"
+    >
+
+
+    <!-- =========================================================
+         PAGE-SPECIFIC CSS
+    ========================================================== -->
+
+    {% if request.endpoint == 'admin.dashboard' %}
+
+        <!-- DASHBOARD -->
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='css/admin/dashboard.css') }}"
+        >
+
+
+    {% elif request.endpoint == 'admin.events' %}
+
+        <!-- EVENT MANAGEMENT -->
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='css/admin/events.css') }}"
+        >
+
+
+    {% elif request.endpoint == 'admin.edit_event' %}
+
+        <!-- EVENT EDIT -->
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='css/admin/event-edit.css') }}"
+        >
+
+
+    {% elif request.endpoint in ['admin.registrations', 'admin.registration_details'] %}
+
+        <!-- REGISTRATIONS -->
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='css/admin/registrations.css') }}"
+        >
+
+
+    {% elif request.endpoint == 'admin.results' %}
+
+        <!-- RESULTS LIST -->
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='css/admin/results.css') }}"
+        >
+
+
+    {% elif request.endpoint in ['admin.result_create', 'admin.result_edit'] %}
+
+        <!-- CREATE / EDIT RESULT -->
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='css/admin/result-edit.css') }}"
+        >
+
+
+    {% elif request.endpoint in ['admin.notifications', 'admin.notification_create'] %}
+
+        <!-- NOTIFICATIONS -->
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='css/admin/notifications.css') }}"
+        >
+
+    {% endif %}
+
+
+    <!-- =========================================================
+         SYSTEM VARIABLES
+    ========================================================== -->
+
+    <style>
+
+        :root {
+            --admin-sidebar-width: 248px;
+            --admin-topbar-height: 72px;
+        }
+
+        body {
+            margin: 0;
+        }
+
+        .admin-shell {
+            min-height: 100vh;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="admin-shell">
+
+
+    <!-- =========================================================
+         SIDEBAR
+    ========================================================== -->
+
+    <aside
+        class="admin-sidebar"
+        id="adminSidebar"
+    >
+
+
+        <!-- =====================================================
+             BRAND
+        ====================================================== -->
+
+        <div class="sidebar-brand">
+
+            <a
+                href="{{ url_for('admin.dashboard') }}"
+                class="brand-link"
+            >
+
+                <div class="brand-mark">
+
+                    <span class="brand-mark-line"></span>
+                    <span class="brand-mark-line"></span>
+                    <span class="brand-mark-line"></span>
+
+                </div>
+
+                <div class="brand-copy">
+
+                    <strong>
+                        ENGINEERS
+                    </strong>
+
+                    <span>
+                        DAY / 2026
+                    </span>
+
+                </div>
+
+            </a>
+
+        </div>
+
+
+        <!-- =====================================================
+             EVENT CONTEXT
+        ====================================================== -->
+
+        <div class="sidebar-event-context">
+
+            <span class="context-label">
+                EVENT CONTROL
+            </span>
+
+            <div class="context-status">
+
+                <span class="context-live-dot"></span>
+
+                <span>
+                    SYSTEM ONLINE
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             NAVIGATION
+        ====================================================== -->
+
+        <nav class="admin-nav">
+
+
+            <!-- =================================================
+                 OVERVIEW
+            ================================================== -->
+
+            <div class="nav-section">
+
+                <div class="nav-section-label">
+                    OVERVIEW
+                </div>
+
+                <a
+                    href="{{ url_for('admin.dashboard') }}"
+                    class="nav-item {% if request.endpoint == 'admin.dashboard' %}active{% endif %}"
+                >
+
+                    <span class="nav-icon">
+
+                        <svg
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                        >
+
+                            <rect
+                                x="4"
+                                y="4"
+                                width="6"
+                                height="6"
+                                rx="1"
+                            ></rect>
+
+                            <rect
+                                x="14"
+                                y="4"
+                                width="6"
+                                height="6"
+                                rx="1"
+                            ></rect>
+
+                            <rect
+                                x="4"
+                                y="14"
+                                width="6"
+                                height="6"
+                                rx="1"
+                            ></rect>
+
+                            <rect
+                                x="14"
+                                y="14"
+                                width="6"
+                                height="6"
+                                rx="1"
+                            ></rect>
+
+                        </svg>
+
+                    </span>
+
+                    <span class="nav-text">
+                        Command Center
+                    </span>
+
+                    <span class="nav-active-indicator"></span>
+
+                </a>
+
+            </div>
+
+
+            <!-- =================================================
+                 EVENT OPERATIONS
+            ================================================== -->
+
+            <div class="nav-section">
+
+                <div class="nav-section-label">
+                    EVENT OPERATIONS
+                </div>
+
+
+                <!-- EVENT MANAGEMENT -->
+
+                <a
+                    href="{{ url_for('admin.events') }}"
+                    class="nav-item {% if request.endpoint in ['admin.events', 'admin.edit_event'] %}active{% endif %}"
+                >
+
+                    <span class="nav-icon">
+
+                        <svg
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                        >
+
+                            <rect
+                                x="4"
+                                y="5"
+                                width="16"
+                                height="15"
+                                rx="2"
+                            ></rect>
+
+                            <path d="M8 3v4"></path>
+                            <path d="M16 3v4"></path>
+                            <path d="M4 10h16"></path>
+
+                        </svg>
+
+                    </span>
+
+                    <span class="nav-text">
+                        Event Management
+                    </span>
+
+                    <span class="nav-arrow">
+                        →
+                    </span>
+
+                </a>
+
+
+                <!-- REGISTRATIONS -->
+
+                <a
+                    href="{{ url_for('admin.registrations') }}"
+                    class="nav-item {% if request.endpoint in ['admin.registrations', 'admin.registration_details'] %}active{% endif %}"
+                >
+
+                    <span class="nav-icon">
+
+                        <svg
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                        >
+
+                            <rect
+                                x="5"
+                                y="4"
+                                width="14"
+                                height="17"
+                                rx="2"
+                            ></rect>
+
+                            <path d="M8 9h8"></path>
+                            <path d="M8 13h6"></path>
+                            <path d="M8 17h4"></path>
+
+                        </svg>
+
+                    </span>
+
+                    <span class="nav-text">
+                        Registrations
+                    </span>
+
+                    <span class="nav-arrow">
+                        →
+                    </span>
+
+                </a>
+
+
+                <!-- RESULTS -->
+
+                <a
+                    href="{{ url_for('admin.results') }}"
+                    class="nav-item {% if request.endpoint in ['admin.results', 'admin.result_create', 'admin.result_edit'] %}active{% endif %}"
+                >
+
+                    <span class="nav-icon">
+
+                        <svg
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                        >
+
+                            <path d="M6 20V10"></path>
+                            <path d="M12 20V4"></path>
+                            <path d="M18 20v-7"></path>
+
+                        </svg>
+
+                    </span>
+
+                    <span class="nav-text">
+                        Results
+                    </span>
+
+                    <span class="nav-arrow">
+                        →
+                    </span>
+
+                </a>
+
+
+                <!-- NOTIFICATIONS -->
+
+                <a
+                    href="{{ url_for('admin.notifications') }}"
+                    class="nav-item {% if request.endpoint in ['admin.notifications', 'admin.notification_create'] %}active{% endif %}"
+                >
+
+                    <span class="nav-icon">
+
+                        <svg
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                        >
+
+                            <path
+                                d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"
+                            ></path>
+
+                            <path d="M10 21h4"></path>
+
+                        </svg>
+
+                    </span>
+
+                    <span class="nav-text">
+                        Notifications
+                    </span>
+
+                    <span class="nav-arrow">
+                        →
+                    </span>
+
+                </a>
+
+            </div>
+
+
+            <!-- =================================================
+                 STUDENT DATA
+            ================================================== -->
+
+            <div class="nav-section">
+
+                <div class="nav-section-label">
+                    STUDENT DATA
+                </div>
+
+
+                <!-- STUDENT REGISTRY -->
+
+                <a
+                    href="{{ url_for('admin.students') }}"
+                    class="nav-item {% if request.endpoint in ['admin.students', 'admin.student_detail'] %}active{% endif %}"
+                >
+
+                    <span class="nav-icon">
+
+                        <svg
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                        >
+
+                            <circle
+                                cx="12"
+                                cy="8"
+                                r="3.5"
+                            ></circle>
+
+                            <path
+                                d="M5 20c.8-3.4 3.1-5 7-5s6.2 1.6 7 5"
+                            ></path>
+
+                        </svg>
+
+                    </span>
+
+                    <span class="nav-text">
+                        Student Registry
+                    </span>
+
+                    <span class="nav-arrow">
+                        →
+                    </span>
+
+                </a>
+
+
+                <!-- IMPORT STUDENTS -->
+
+                <a
+                    href="{{ url_for('admin.upload_students') }}"
+                    class="nav-item {% if request.endpoint in ['admin.upload_students', 'admin.upload_preview'] %}active{% endif %}"
+                >
+
+                    <span class="nav-icon">
+
+                        <svg
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                        >
+
+                            <path d="M12 16V4"></path>
+                            <path d="m7 9 5-5 5 5"></path>
+                            <path d="M5 20h14"></path>
+
+                        </svg>
+
+                    </span>
+
+                    <span class="nav-text">
+                        Import Students
+                    </span>
+
+                    <span class="nav-arrow">
+                        →
+                    </span>
+
+                </a>
+
+            </div>
+
+
+            <!-- =================================================
+                 SYSTEM
+            ================================================== -->
+
+            <div class="nav-section">
+
+                <div class="nav-section-label">
+                    SYSTEM
+                </div>
+
+
+                <!-- SETTINGS -->
+
+                <a
+                    href="{{ url_for('admin.settings') }}"
+                    class="nav-item {% if request.endpoint == 'admin.settings' %}active{% endif %}"
+                >
+
+                    <span class="nav-icon">
+
+                        <svg
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                        >
+
+                            <circle
+                                cx="12"
+                                cy="12"
+                                r="3"
+                            ></circle>
+
+                            <path
+                                d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-1.7 1.7-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5v.2h-2.4v-.2a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1-1.7-1.7.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H6v-2.4h.2a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1L9 5.9l.1.1a1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.5v-.2h2.4v.2a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1 1.7 1.7-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.5 1h.2v2.4h-.2a1.7 1.7 0 0 0-1.5 1Z"
+                            ></path>
+
+                        </svg>
+
+                    </span>
+
+                    <span class="nav-text">
+                        Settings
+                    </span>
+
+                    <span class="nav-arrow">
+                        →
+                    </span>
+
+                </a>
+
+            </div>
+
+        </nav>
+
+
+        <!-- =====================================================
+             SIDEBAR FOOTER
+        ====================================================== -->
+
+        <div class="sidebar-footer">
+
+            <div class="sidebar-system">
+
+                <div class="system-ring">
+                    <span></span>
+                </div>
+
+                <div>
+
+                    <strong>
+                        CONTROL SYSTEM
+                    </strong>
+
+                    <span>
+                        Operational
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            {% if session.get("admin_authenticated") %}
+
+            <a
+                href="{{ url_for('admin.logout') }}"
+                class="admin-logout"
+            >
+
+                <span class="logout-icon">
+
+                    <svg
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                    >
+
+                        <path d="M10 17l5-5-5-5"></path>
+                        <path d="M15 12H3"></path>
+                        <path d="M21 4v16"></path>
+
+                    </svg>
+
+                </span>
+
+                <span>
+                    Sign Out
+                </span>
+
+            </a>
+
+            {% endif %}
+
+        </div>
+
+    </aside>
+
+
+    <!-- =========================================================
+         MAIN AREA
+    ========================================================== -->
+
+    <main class="admin-main">
+
+
+        <!-- =====================================================
+             TOP BAR
+        ====================================================== -->
+
+        <header class="admin-topbar">
+
+            <div class="topbar-left">
+
+                <button
+                    type="button"
+                    class="sidebar-toggle"
+                    id="sidebarToggle"
+                    aria-label="Toggle navigation"
+                >
+
+                    <span></span>
+                    <span></span>
+                    <span></span>
+
+                </button>
+
+
+                <div class="breadcrumb">
+
+                    <span>
+                        ENGINEERS DAY
+                    </span>
+
+                    <span class="breadcrumb-separator">
+                        /
+                    </span>
+
+                    <strong>
+                        ADMIN
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="topbar-right">
+
+                <div class="topbar-date">
+
+                    <span>
+                        EVENT
+                    </span>
+
+                    <strong>
+                        15 SEP 2026
+                    </strong>
+
+                </div>
+
+
+                <div class="topbar-divider"></div>
+
+
+                <div class="topbar-clock">
+
+                    <span
+                        class="topbar-clock-value"
+                        data-admin-clock
+                    >
+                        --:--:--
+                    </span>
+
+                    <span>
+                        IST
+                    </span>
+
+                </div>
+
+
+                <div class="admin-profile">
+
+                    <div class="profile-avatar">
+                        A
+                    </div>
+
+                    <div class="profile-info">
+
+                        <strong>
+                            Administrator
+                        </strong>
+
+                        <span>
+                            Event Control
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- =====================================================
+             PAGE CONTENT
+        ====================================================== -->
+
+        <div class="admin-content">
+
+            {% block content %}{% endblock %}
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<!-- =========================================================
+     MOBILE OVERLAY
+========================================================= -->
+
+<div
+    class="sidebar-overlay"
+    id="sidebarOverlay"
+></div>
+
+
+<!-- =========================================================
+     GLOBAL ADMIN JAVASCRIPT
+========================================================= -->
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+
+    /* =========================================================
+       SIDEBAR
+    ========================================================== */
+
+    const sidebar =
+        document.getElementById("adminSidebar");
+
+    const toggle =
+        document.getElementById("sidebarToggle");
+
+    const overlay =
+        document.getElementById("sidebarOverlay");
+
+
+    function openSidebar() {
+
+        if (!sidebar) return;
+
+        sidebar.classList.add("mobile-open");
+
+        if (overlay) {
+            overlay.classList.add("visible");
+        }
+
+        document.body.classList.add("sidebar-open");
+
+    }
+
+
+    function closeSidebar() {
+
+        if (!sidebar) return;
+
+        sidebar.classList.remove("mobile-open");
+
+        if (overlay) {
+            overlay.classList.remove("visible");
+        }
+
+        document.body.classList.remove("sidebar-open");
+
+    }
+
+
+    if (toggle) {
+
+        toggle.addEventListener(
+            "click",
+            function () {
+
+                if (
+                    sidebar &&
+                    sidebar.classList.contains("mobile-open")
+                ) {
+
+                    closeSidebar();
+
+                } else {
+
+                    openSidebar();
+
+                }
+
+            }
+        );
+
+    }
+
+
+    if (overlay) {
+
+        overlay.addEventListener(
+            "click",
+            closeSidebar
+        );
+
+    }
+
+
+    /* =========================================================
+       ADMIN CLOCK — IST
+    ========================================================== */
+
+    const clock =
+        document.querySelector("[data-admin-clock]");
+
+
+    function updateAdminClock() {
+
+        if (!clock) return;
+
+        const now = new Date();
+
+        const formatter =
+            new Intl.DateTimeFormat(
+                "en-IN",
+                {
+                    timeZone: "Asia/Kolkata",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+                    hour12: false
+                }
+            );
+
+        clock.textContent =
+            formatter.format(now);
+
+    }
+
+
+    updateAdminClock();
+
+    setInterval(
+        updateAdminClock,
+        1000
+    );
+
+
+    /* =========================================================
+       ESCAPE — CLOSE MOBILE SIDEBAR
+    ========================================================== */
+
+    document.addEventListener(
+        "keydown",
+        function (event) {
+
+            if (event.key === "Escape") {
+                closeSidebar();
+            }
+
+        }
+    );
+
+
+    /* =========================================================
+       NAVIGATION HOVER STATE
+    ========================================================== */
+
+    const navItems =
+        document.querySelectorAll(".nav-item");
+
+
+    navItems.forEach(function (item) {
+
+        item.addEventListener(
+            "mouseenter",
+            function () {
+
+                item.classList.add("nav-hover");
+
+            }
+        );
+
+
+        item.addEventListener(
+            "mouseleave",
+            function () {
+
+                item.classList.remove("nav-hover");
+
+            }
+        );
+
+    });
+
+
+    /* =========================================================
+       MOBILE NAV — CLOSE AFTER NAVIGATION
+    ========================================================== */
+
+    navItems.forEach(function (item) {
+
+        item.addEventListener(
+            "click",
+            function () {
+
+                if (
+                    window.innerWidth <= 1100 &&
+                    sidebar &&
+                    sidebar.classList.contains("mobile-open")
+                ) {
+
+                    closeSidebar();
+
+                }
+
+            }
+        );
+
+    });
+
+});
+
+</script>
+
+
+</body>
+
+</html>
