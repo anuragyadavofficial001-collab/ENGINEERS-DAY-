@@ -1,27 +1,17 @@
-# ============================================================
-# DATABASE CONNECTION
-# ============================================================
-
-import pymysql
-
+import os
+import psycopg2
+from psycopg2.extras import RealDictCursor
 from flask import current_app
 
 
 def get_db_connection():
+    database_url = current_app.config.get("DATABASE_URL") or os.getenv("DATABASE_URL")
 
-    return pymysql.connect(
+    if not database_url:
+        raise RuntimeError("DATABASE_URL is not configured")
 
-        host=current_app.config["MYSQL_HOST"],
-
-        user=current_app.config["MYSQL_USER"],
-
-        password=current_app.config["MYSQL_PASSWORD"],
-
-        database=current_app.config["MYSQL_DATABASE"],
-
-        port=current_app.config["MYSQL_PORT"],
-
-        cursorclass=pymysql.cursors.DictCursor,
-
-        autocommit=False
+    return psycopg2.connect(
+        database_url,
+        sslmode="require",
+        cursor_factory=RealDictCursor
     )

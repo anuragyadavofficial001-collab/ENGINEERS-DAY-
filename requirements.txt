@@ -8,3 +8,4 @@ email-validator
 openpyxl
 pypdf
 Werkzeug
+psycopg2-binary
