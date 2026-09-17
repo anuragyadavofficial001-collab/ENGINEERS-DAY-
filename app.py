@@ -1,19 +1,14 @@
 # ============================================================
 # ENGINEERS DAY - MAIN APPLICATION
+# Supabase PostgreSQL + Vercel Ready
 # ============================================================
 
 from datetime import timedelta
 
-from flask import Flask
-
 from flask import Flask, render_template
 
-import pymysql
-
 from config import Config
-
 from database.db import get_db_connection
-
 
 
 # ============================================================
@@ -30,12 +25,10 @@ app.config.from_object(Config)
 # ============================================================
 
 app.config["SESSION_COOKIE_HTTPONLY"] = True
-
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 
-app.config["SESSION_COOKIE_SECURE"] = False
-# False for local development.
-# Change to True when deployed with HTTPS.
+# Production is HTTPS on Vercel
+app.config["SESSION_COOKIE_SECURE"] = True
 
 app.permanent_session_lifetime = timedelta(
     hours=4
@@ -50,19 +43,16 @@ from routes.auth import auth_bp
 from routes.student import student_bp
 from routes.admin import admin_bp
 from routes.games import games_bp
-app.register_blueprint(
-    auth_bp
-)
 
-app.register_blueprint(
-    student_bp
-)
 
+app.register_blueprint(auth_bp)
+app.register_blueprint(student_bp)
 app.register_blueprint(admin_bp)
-
 app.register_blueprint(games_bp)
+
+
 # ============================================================
-# DEVELOPMENT HOME
+# HOME / LANDING PAGE
 # ============================================================
 
 @app.route("/")
@@ -73,6 +63,10 @@ def index():
 # ============================================================
 # DATABASE TEST
 # ============================================================
+#
+# Temporary route for checking Supabase PostgreSQL connection.
+# Remove this route after deployment/database testing is complete.
+#
 
 @app.route("/db-test")
 def db_test():
@@ -83,7 +77,6 @@ def db_test():
     try:
 
         connection = get_db_connection()
-
         cursor = connection.cursor()
 
         cursor.execute(
@@ -121,13 +114,13 @@ def db_test():
 
 
 # ============================================================
-# RUN APPLICATION
+# LOCAL DEVELOPMENT
 # ============================================================
 
 if __name__ == "__main__":
 
     app.run(
-        debug=True,
+        debug=False,
         host="127.0.0.1",
         port=5000
     )

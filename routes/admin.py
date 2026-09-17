@@ -1,5 +1,6 @@
 # ============================================================
 # ENGINEERS DAY 2026 - ADMIN CONTROL CENTER
+# PostgreSQL / Supabase Compatible
 # ============================================================
 
 import csv
@@ -16,10 +17,11 @@ from flask import (
     render_template,
     request,
     session,
+    send_file,
     url_for
 )
 
-from openpyxl import load_workbook
+from openpyxl import Workbook, load_workbook
 from pypdf import PdfReader
 from werkzeug.security import check_password_hash
 
@@ -38,6 +40,129 @@ admin_bp = Blueprint(
 
 
 # ============================================================
+# CONSTANTS
+# ============================================================
+
+ALLOWED_EXTENSIONS = {
+    ".csv",
+    ".xlsx",
+    ".pdf"
+}
+
+MAX_FILE_SIZE = 10 * 1024 * 1024
+
+ALLOWED_REGISTRATION_MODES = {
+    "INDIVIDUAL",
+    "TEAM"
+}
+
+ALLOWED_GAME_STATUSES = {
+    "UPCOMING",
+    "REGISTRATION_OPEN",
+    "REGISTRATION_CLOSED",
+    "LIVE",
+    "COMPLETED",
+    "CANCELLED"
+}
+
+ALLOWED_REGISTRATION_STATUSES = {
+    "REGISTERED",
+    "CANCELLED",
+    "APPROVED",
+    "REJECTED"
+}
+
+ALLOWED_NOTIFICATION_TYPES = {
+    "GENERAL",
+    "EVENT",
+    "RESULT",
+    "IMPORTANT"
+}
+
+ALLOWED_PORTAL_STATUSES = {
+    "ACTIVE",
+    "MAINTENANCE"
+}
+
+
+# ============================================================
+# SMALL HELPERS
+# ============================================================
+
+def close_db(connection=None, cursor=None):
+    """
+    Safely close cursor and database connection.
+    """
+
+    try:
+        if cursor:
+            cursor.close()
+    except Exception:
+        pass
+
+    try:
+        if connection:
+            connection.close()
+    except Exception:
+        pass
+
+
+def rollback_db(connection=None):
+    """
+    Safely rollback current transaction.
+    """
+
+    try:
+        if connection:
+            connection.rollback()
+    except Exception:
+        pass
+
+
+def clean_text(value):
+    """
+    Normalize text values.
+    """
+
+    if value is None:
+        return None
+
+    value = str(value).strip()
+
+    return value if value else None
+
+
+def clean_int(value, default=None):
+    """
+    Convert a value to integer safely.
+    """
+
+    if value is None:
+        return default
+
+    value = str(value).strip()
+
+    if not value:
+        return default
+
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def form_checkbox(name):
+    """
+    Convert an HTML checkbox into a Python boolean.
+
+    PostgreSQL boolean columns should receive True/False,
+    not MySQL-style 1/0.
+    """
+
+    return bool(request.form.get(name))
+
+
+# ============================================================
 # ADMIN AUTH
 # ============================================================
 
@@ -47,7 +172,9 @@ def admin_required(view_function):
     def wrapped_view(*args, **kwargs):
 
         if not session.get("admin_authenticated"):
-            return redirect(url_for("admin.login"))
+            return redirect(
+                url_for("admin.login")
+            )
 
         return view_function(*args, **kwargs)
 
@@ -58,11 +185,16 @@ def admin_required(view_function):
 # ADMIN LOGIN
 # ============================================================
 
-@admin_bp.route("/login", methods=["GET", "POST"])
+@admin_bp.route(
+    "/login",
+    methods=["GET", "POST"]
+)
 def login():
 
     if session.get("admin_authenticated"):
-        return redirect(url_for("admin.dashboard"))
+        return redirect(
+            url_for("admin.dashboard")
+        )
 
     if request.method == "POST":
 
@@ -83,7 +215,9 @@ def login():
                 "error"
             )
 
-            return render_template("admin/login.html")
+            return render_template(
+                "admin/login.html"
+            )
 
         connection = None
         cursor = None
@@ -116,28 +250,48 @@ def login():
                     "error"
                 )
 
-                return render_template("admin/login.html")
+                return render_template(
+                    "admin/login.html"
+                )
 
-            if not admin["is_active"]:
+            if not bool(admin["is_active"]):
 
                 flash(
                     "This admin account is disabled.",
                     "error"
                 )
 
-                return render_template("admin/login.html")
+                return render_template(
+                    "admin/login.html"
+                )
 
-            if not check_password_hash(
-                admin["password_hash"],
-                password
-            ):
+            try:
+                password_valid = check_password_hash(
+                    admin["password_hash"],
+                    password
+                )
+            except Exception:
+
+                current_app.logger.exception(
+                    "Invalid admin password hash"
+                )
+
+                password_valid = False
+
+            if not password_valid:
 
                 flash(
                     "Invalid admin credentials.",
                     "error"
                 )
 
-                return render_template("admin/login.html")
+                return render_template(
+                    "admin/login.html"
+                )
+
+            # ------------------------------------------------
+            # New clean admin session
+            # ------------------------------------------------
 
             session.clear()
 
@@ -146,12 +300,13 @@ def login():
             session["admin_username"] = admin["username"]
             session.permanent = True
 
-            return redirect(url_for("admin.dashboard"))
+            return redirect(
+                url_for("admin.dashboard")
+            )
 
         except Exception:
 
-            if connection:
-                connection.rollback()
+            rollback_db(connection)
 
             current_app.logger.exception(
                 "Admin login error"
@@ -162,21 +317,24 @@ def login():
                 "error"
             )
 
-            return render_template("admin/login.html")
+            return render_template(
+                "admin/login.html"
+            )
 
         finally:
 
-            if cursor:
-                cursor.close()
+            close_db(
+                connection,
+                cursor
+            )
 
-            if connection:
-                connection.close()
-
-    return render_template("admin/login.html")
+    return render_template(
+        "admin/login.html"
+    )
 
 
 # ============================================================
-# LOGOUT
+# ADMIN LOGOUT
 # ============================================================
 
 @admin_bp.route("/logout")
@@ -184,11 +342,13 @@ def logout():
 
     session.clear()
 
-    return redirect(url_for("admin.login"))
+    return redirect(
+        url_for("admin.login")
+    )
 
 
 # ============================================================
-# DASHBOARD
+# ADMIN DASHBOARD
 # ============================================================
 
 @admin_bp.route("/dashboard")
@@ -203,6 +363,10 @@ def dashboard():
         connection = get_db_connection()
         cursor = connection.cursor()
 
+        # ----------------------------------------------------
+        # TOTAL ACTIVE STUDENT REGISTRY
+        # ----------------------------------------------------
+
         cursor.execute(
             """
             SELECT COUNT(*) AS total
@@ -212,6 +376,10 @@ def dashboard():
         )
 
         total_students = cursor.fetchone()["total"]
+
+        # ----------------------------------------------------
+        # ACTIVE STUDENT ACCOUNTS
+        # ----------------------------------------------------
 
         cursor.execute(
             """
@@ -223,6 +391,10 @@ def dashboard():
 
         active_accounts = cursor.fetchone()["total"]
 
+        # ----------------------------------------------------
+        # TOTAL EVENTS
+        # ----------------------------------------------------
+
         cursor.execute(
             """
             SELECT COUNT(*) AS total
@@ -231,6 +403,10 @@ def dashboard():
         )
 
         total_events = cursor.fetchone()["total"]
+
+        # ----------------------------------------------------
+        # TOTAL REGISTRATIONS
+        # ----------------------------------------------------
 
         cursor.execute(
             """
@@ -251,8 +427,7 @@ def dashboard():
 
     except Exception:
 
-        if connection:
-            connection.rollback()
+        rollback_db(connection)
 
         current_app.logger.exception(
             "Admin dashboard error"
@@ -263,15 +438,16 @@ def dashboard():
             "error"
         )
 
-        return redirect(url_for("admin.login"))
+        return redirect(
+            url_for("admin.login")
+        )
 
     finally:
 
-        if cursor:
-            cursor.close()
-
-        if connection:
-            connection.close()
+        close_db(
+            connection,
+            cursor
+        )
 
 
 # ============================================================
@@ -283,7 +459,12 @@ def dashboard():
 # ?q=email
 # ?q=phone
 #
-# Registry + actual student profile are joined together.
+# Filters:
+# ?status=all
+# ?status=active
+# ?status=disabled
+# ?status=claimed
+# ?status=unclaimed
 # ============================================================
 
 @admin_bp.route("/students")
@@ -309,7 +490,7 @@ def students():
         ).strip().lower()
 
         # ----------------------------------------------------
-        # Base query
+        # BASE QUERY
         # ----------------------------------------------------
 
         query = """
@@ -334,15 +515,18 @@ def students():
             FROM student_registry sr
 
             LEFT JOIN students s
-                ON s.id = sr.claimed_student_id
-                OR s.student_id = sr.student_id
+                ON (
+                    s.id = sr.claimed_student_id
+                    OR s.student_id = sr.student_id
+                )
         """
 
         conditions = []
         params = []
 
         # ----------------------------------------------------
-        # Search
+        # SEARCH
+        # PostgreSQL uses ILIKE for case-insensitive search.
         # ----------------------------------------------------
 
         if search:
@@ -350,13 +534,13 @@ def students():
             conditions.append(
                 """
                 (
-                    sr.student_id LIKE %s
-                    OR s.student_id LIKE %s
-                    OR s.name LIKE %s
-                    OR s.email LIKE %s
-                    OR s.phone LIKE %s
-                    OR s.branch LIKE %s
-                    OR s.section LIKE %s
+                    sr.student_id ILIKE %s
+                    OR s.student_id ILIKE %s
+                    OR s.name ILIKE %s
+                    OR s.email ILIKE %s
+                    OR s.phone ILIKE %s
+                    OR s.branch ILIKE %s
+                    OR s.section ILIKE %s
                 )
                 """
             )
@@ -374,7 +558,7 @@ def students():
             ])
 
         # ----------------------------------------------------
-        # Status filter
+        # STATUS
         # ----------------------------------------------------
 
         if status == "active":
@@ -403,8 +587,9 @@ def students():
 
         if conditions:
 
-            query += " WHERE " + " AND ".join(
-                conditions
+            query += (
+                " WHERE "
+                + " AND ".join(conditions)
             )
 
         query += """
@@ -420,7 +605,7 @@ def students():
         registry = cursor.fetchall()
 
         # ----------------------------------------------------
-        # Statistics
+        # STATISTICS
         # ----------------------------------------------------
 
         cursor.execute(
@@ -475,8 +660,7 @@ def students():
 
     except Exception:
 
-        if connection:
-            connection.rollback()
+        rollback_db(connection)
 
         current_app.logger.exception(
             "Student registry error"
@@ -487,15 +671,16 @@ def students():
             "error"
         )
 
-        return redirect(url_for("admin.dashboard"))
+        return redirect(
+            url_for("admin.dashboard")
+        )
 
     finally:
 
-        if cursor:
-            cursor.close()
-
-        if connection:
-            connection.close()
+        close_db(
+            connection,
+            cursor
+        )
 
 
 # ============================================================
@@ -540,8 +725,10 @@ def student_detail(registry_id):
             FROM student_registry sr
 
             LEFT JOIN students s
-                ON s.id = sr.claimed_student_id
-                OR s.student_id = sr.student_id
+                ON (
+                    s.id = sr.claimed_student_id
+                    OR s.student_id = sr.student_id
+                )
 
             WHERE sr.id = %s
 
@@ -570,8 +757,7 @@ def student_detail(registry_id):
 
     except Exception:
 
-        if connection:
-            connection.rollback()
+        rollback_db(connection)
 
         current_app.logger.exception(
             "Student detail error"
@@ -588,24 +774,10 @@ def student_detail(registry_id):
 
     finally:
 
-        if cursor:
-            cursor.close()
-
-        if connection:
-            connection.close()
-
-
-# ============================================================
-# FILE CONFIG
-# ============================================================
-
-ALLOWED_EXTENSIONS = {
-    ".csv",
-    ".xlsx",
-    ".pdf"
-}
-
-MAX_FILE_SIZE = 10 * 1024 * 1024
+        close_db(
+            connection,
+            cursor
+        )
 
 
 # ============================================================
@@ -634,20 +806,6 @@ def normalize_student_id(value):
 
 
 # ============================================================
-# NORMALIZE TEXT
-# ============================================================
-
-def clean_text(value):
-
-    if value is None:
-        return None
-
-    value = str(value).strip()
-
-    return value if value else None
-
-
-# ============================================================
 # NORMALIZE PHONE
 # ============================================================
 
@@ -670,7 +828,10 @@ def normalize_phone(value):
     if value.startswith("91") and len(value) == 12:
         value = value[2:]
 
-    if re.fullmatch(r"[6-9]\d{9}", value):
+    if re.fullmatch(
+        r"[6-9]\d{9}",
+        value
+    ):
         return value
 
     return None
@@ -698,7 +859,10 @@ def normalize_header(value):
 # FIND COLUMN
 # ============================================================
 
-def find_column(headers, possible_names):
+def find_column(
+    headers,
+    possible_names
+):
 
     normalized = {}
 
@@ -776,7 +940,10 @@ YEAR_COLUMNS = [
 # BUILD STUDENT RECORD
 # ============================================================
 
-def build_record(row, headers):
+def build_record(
+    row,
+    headers
+):
 
     id_column = find_column(
         headers,
@@ -826,13 +993,16 @@ def build_record(row, headers):
     )
 
     def get_value(column):
+
         if column is None:
             return None
 
         if column >= len(row):
             return None
 
-        return clean_text(row[column])
+        return clean_text(
+            row[column]
+        )
 
     phone = normalize_phone(
         get_value(phone_column)
@@ -871,7 +1041,10 @@ def extract_from_csv(file_bytes):
 
     headers = rows[0]
 
-    if find_column(headers, ID_COLUMNS) is None:
+    if find_column(
+        headers,
+        ID_COLUMNS
+    ) is None:
 
         raise ValueError(
             "Student ID / Roll Number column not found."
@@ -954,9 +1127,7 @@ def extract_from_excel(file_bytes):
 # ============================================================
 # EXTRACT PDF
 #
-# PDF is treated as ID-only because extracting structured
-# columns like Email/Phone/Branch from arbitrary PDFs is
-# unreliable.
+# PDF is ID-only.
 # ============================================================
 
 def extract_from_pdf(file_bytes):
@@ -1046,7 +1217,7 @@ def extract_student_records(
         records = []
 
     # --------------------------------------------------------
-    # Remove duplicate Student IDs
+    # REMOVE DUPLICATE STUDENT IDs
     # --------------------------------------------------------
 
     unique = {}
@@ -1061,7 +1232,6 @@ def extract_student_records(
 
         else:
 
-            # Prefer rows containing more information.
             old = unique[student_id]
 
             for field in [
@@ -1073,10 +1243,16 @@ def extract_student_records(
                 "year"
             ]:
 
-                if not old.get(field) and record.get(field):
+                if (
+                    not old.get(field)
+                    and record.get(field)
+                ):
+
                     old[field] = record[field]
 
-    return list(unique.values())
+    return list(
+        unique.values()
+    )
 
 
 # ============================================================
@@ -1084,6 +1260,9 @@ def extract_student_records(
 #
 # Registry = authorization
 # Students  = profile/account
+#
+# PostgreSQL FIX:
+# INSERT ... RETURNING id
 # ============================================================
 
 def save_student_record(
@@ -1094,14 +1273,15 @@ def save_student_record(
     student_id = record["student_id"]
 
     # --------------------------------------------------------
-    # Check registry
+    # CHECK REGISTRY
     # --------------------------------------------------------
 
     cursor.execute(
         """
         SELECT
             id,
-            claimed
+            claimed,
+            is_active
         FROM student_registry
         WHERE student_id = %s
         LIMIT 1
@@ -1131,14 +1311,23 @@ def save_student_record(
                 TRUE,
                 FALSE
             )
+            RETURNING id
             """,
             (student_id,)
         )
 
-        registry_id = cursor.lastrowid
+        inserted_registry = cursor.fetchone()
+
+        if not inserted_registry:
+
+            raise RuntimeError(
+                "Unable to create student registry record."
+            )
+
+        registry_id = inserted_registry["id"]
 
     # --------------------------------------------------------
-    # Check student profile
+    # CHECK STUDENT PROFILE
     # --------------------------------------------------------
 
     cursor.execute(
@@ -1163,11 +1352,11 @@ def save_student_record(
         "year": record.get("year")
     }
 
-    if existing_student:
+    # --------------------------------------------------------
+    # UPDATE EXISTING PROFILE
+    # --------------------------------------------------------
 
-        # ----------------------------------------------------
-        # Update only values actually supplied by import.
-        # ----------------------------------------------------
+    if existing_student:
 
         updates = []
         values = []
@@ -1200,7 +1389,7 @@ def save_student_record(
         return "updated"
 
     # --------------------------------------------------------
-    # New student profile
+    # CREATE NEW PROFILE
     # --------------------------------------------------------
 
     cursor.execute(
@@ -1357,8 +1546,7 @@ def upload_students():
 
     except ValueError as error:
 
-        if connection:
-            connection.rollback()
+        rollback_db(connection)
 
         flash(
             str(error),
@@ -1371,8 +1559,7 @@ def upload_students():
 
     except Exception:
 
-        if connection:
-            connection.rollback()
+        rollback_db(connection)
 
         current_app.logger.exception(
             "Student import error"
@@ -1390,15 +1577,14 @@ def upload_students():
 
     finally:
 
-        if cursor:
-            cursor.close()
-
-        if connection:
-            connection.close()
+        close_db(
+            connection,
+            cursor
+        )
 
 
 # ============================================================
-# MANUAL IMPORT
+# MANUAL STUDENT ID IMPORT
 # ============================================================
 
 @admin_bp.route(
@@ -1492,8 +1678,7 @@ def import_students():
 
     except Exception:
 
-        if connection:
-            connection.rollback()
+        rollback_db(connection)
 
         current_app.logger.exception(
             "Manual student import error"
@@ -1506,11 +1691,10 @@ def import_students():
 
     finally:
 
-        if cursor:
-            cursor.close()
-
-        if connection:
-            connection.close()
+        close_db(
+            connection,
+            cursor
+        )
 
     return redirect(
         url_for("admin.students")
@@ -1519,10 +1703,8 @@ def import_students():
 
 # ============================================================
 # TOGGLE STUDENT
-# ============================================================
-
-# ============================================================
-# TOGGLE STUDENT
+#
+# Registry and student account remain synchronized.
 # ============================================================
 
 @admin_bp.route(
@@ -1540,23 +1722,24 @@ def toggle_student(registry_id):
         connection = get_db_connection()
         cursor = connection.cursor()
 
-        # ----------------------------------------------------
-        # Get registry record + linked student
-        # ----------------------------------------------------
-
         cursor.execute(
             """
             SELECT
                 sr.id,
                 sr.student_id,
                 sr.is_active,
+                sr.claimed_student_id,
                 s.id AS account_id
             FROM student_registry sr
 
             LEFT JOIN students s
-                ON s.student_id = sr.student_id
+                ON (
+                    s.id = sr.claimed_student_id
+                    OR s.student_id = sr.student_id
+                )
 
             WHERE sr.id = %s
+
             LIMIT 1
             """,
             (registry_id,)
@@ -1576,7 +1759,7 @@ def toggle_student(registry_id):
             )
 
         # ----------------------------------------------------
-        # Calculate new status
+        # PostgreSQL boolean handling
         # ----------------------------------------------------
 
         new_status = not bool(
@@ -1584,7 +1767,7 @@ def toggle_student(registry_id):
         )
 
         # ----------------------------------------------------
-        # Update registry
+        # UPDATE REGISTRY
         # ----------------------------------------------------
 
         cursor.execute(
@@ -1600,7 +1783,7 @@ def toggle_student(registry_id):
         )
 
         # ----------------------------------------------------
-        # Keep actual student account synchronized
+        # UPDATE ACTUAL STUDENT ACCOUNT
         # ----------------------------------------------------
 
         if student["account_id"]:
@@ -1616,10 +1799,6 @@ def toggle_student(registry_id):
                     student["account_id"]
                 )
             )
-
-        # ----------------------------------------------------
-        # Commit
-        # ----------------------------------------------------
 
         connection.commit()
 
@@ -1639,8 +1818,7 @@ def toggle_student(registry_id):
 
     except Exception:
 
-        if connection:
-            connection.rollback()
+        rollback_db(connection)
 
         current_app.logger.exception(
             "Student toggle error"
@@ -1653,96 +1831,10 @@ def toggle_student(registry_id):
 
     finally:
 
-        if cursor:
-            cursor.close()
-
-        if connection:
-            connection.close()
-
-    return redirect(
-        url_for("admin.students")
-    )
-
-    connection = None
-    cursor = None
-
-    try:
-
-        connection = get_db_connection()
-        cursor = connection.cursor()
-
-        cursor.execute(
-            """
-            SELECT
-                id,
-                student_id,
-                is_active
-            FROM student_registry
-            WHERE id = %s
-            LIMIT 1
-            """,
-            (registry_id,)
+        close_db(
+            connection,
+            cursor
         )
-
-        student = cursor.fetchone()
-
-        if not student:
-
-            flash(
-                "Student record not found.",
-                "error"
-            )
-
-            return redirect(
-                url_for("admin.students")
-            )
-
-        cursor.execute(
-            """
-            UPDATE student_registry
-            SET is_active = NOT is_active
-            WHERE id = %s
-            """,
-            (registry_id,)
-        )
-
-        connection.commit()
-
-        if student["is_active"]:
-
-            flash(
-                f"{student['student_id']} has been disabled.",
-                "success"
-            )
-
-        else:
-
-            flash(
-                f"{student['student_id']} has been enabled.",
-                "success"
-            )
-
-    except Exception:
-
-        if connection:
-            connection.rollback()
-
-        current_app.logger.exception(
-            "Student toggle error"
-        )
-
-        flash(
-            "Unable to update student status.",
-            "error"
-        )
-
-    finally:
-
-        if cursor:
-            cursor.close()
-
-        if connection:
-            connection.close()
 
     return redirect(
         url_for("admin.students")
@@ -1797,7 +1889,7 @@ def delete_student(registry_id):
                 url_for("admin.students")
             )
 
-        if student["claimed"]:
+        if bool(student["claimed"]):
 
             flash(
                 f"{student['student_id']} is already claimed. "
@@ -1813,23 +1905,33 @@ def delete_student(registry_id):
             """
             DELETE FROM student_registry
             WHERE id = %s
-            AND claimed = FALSE
+              AND claimed = FALSE
             """,
             (registry_id,)
         )
 
+        deleted_rows = cursor.rowcount
+
         connection.commit()
 
-        flash(
-            f"Student ID {student['student_id']} "
-            f"was deleted successfully.",
-            "success"
-        )
+        if deleted_rows == 0:
+
+            flash(
+                "Student record could not be deleted.",
+                "error"
+            )
+
+        else:
+
+            flash(
+                f"Student ID {student['student_id']} "
+                f"was deleted successfully.",
+                "success"
+            )
 
     except Exception:
 
-        if connection:
-            connection.rollback()
+        rollback_db(connection)
 
         current_app.logger.exception(
             "Student deletion error"
@@ -1842,26 +1944,34 @@ def delete_student(registry_id):
 
     finally:
 
-        if cursor:
-            cursor.close()
+        close_db(
+            connection,
+            cursor
+        )
 
-        if connection:
-            connection.close()
-            # ============================================================
+    return redirect(
+        url_for("admin.students")
+    )
+
+
+# ============================================================
 # EVENT MANAGEMENT
 # ============================================================
 
 @admin_bp.route("/events")
 @admin_required
 def events():
+
     connection = None
     cursor = None
 
     try:
+
         connection = get_db_connection()
         cursor = connection.cursor()
 
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT
                 id,
                 game_name,
@@ -1869,9 +1979,21 @@ def events():
                 registration_mode,
                 team_min_size,
                 team_max_size,
-                event_date AS event_date,
-                start_time AS start_time,
-                CONCAT_WS(', ', block, floor, room) AS venue,
+                event_date,
+                start_time,
+                end_time,
+
+                CONCAT_WS(
+                    ', ',
+                    NULLIF(block, ''),
+                    NULLIF(floor, ''),
+                    NULLIF(room, '')
+                ) AS venue,
+
+                block,
+                floor,
+                room,
+
                 prize_pool,
                 rules,
                 requirements,
@@ -1879,9 +2001,12 @@ def events():
                 status,
                 winner_certificate,
                 runner_up_certificate
+
             FROM games
+
             ORDER BY id ASC
-        """)
+            """
+        )
 
         games = cursor.fetchall()
 
@@ -1890,21 +2015,39 @@ def events():
             games=games
         )
 
-    except Exception as e:
-        if connection:
-            connection.rollback()
+    except Exception:
 
-        return f"Event management error: {e}"
+        rollback_db(connection)
+
+        current_app.logger.exception(
+            "Admin event management error"
+        )
+
+        flash(
+            "Unable to load event management.",
+            "error"
+        )
+
+        return redirect(
+            url_for("admin.dashboard")
+        )
 
     finally:
-        if cursor:
-            cursor.close()
 
-        if connection:
-            connection.close()
+        close_db(
+            connection,
+            cursor
+        )
 
 
-@admin_bp.route("/events/<int:game_id>/edit", methods=["GET", "POST"])
+# ============================================================
+# EDIT EVENT
+# ============================================================
+
+@admin_bp.route(
+    "/events/<int:game_id>/edit",
+    methods=["GET", "POST"]
+)
 @admin_required
 def edit_event(game_id):
 
@@ -1912,99 +2055,132 @@ def edit_event(game_id):
     cursor = None
 
     try:
+
         connection = get_db_connection()
         cursor = connection.cursor()
 
         # ----------------------------------------------------
-        # GET EVENT
+        # LOAD EVENT
         # ----------------------------------------------------
 
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT *
             FROM games
             WHERE id = %s
             LIMIT 1
-        """, (game_id,))
+            """,
+            (game_id,)
+        )
 
         game = cursor.fetchone()
 
         if not game:
-            return "Event not found.", 404
+
+            flash(
+                "Event not found.",
+                "error"
+            )
+
+            return redirect(
+                url_for("admin.events")
+            )
 
         # ----------------------------------------------------
-        # UPDATE EVENT
+        # POST
         # ----------------------------------------------------
 
         if request.method == "POST":
 
-            game_name = request.form.get("game_name", "").strip()
-            description = request.form.get("description", "").strip()
+            game_name = request.form.get(
+                "game_name",
+                ""
+            ).strip()
+
+            description = request.form.get(
+                "description",
+                ""
+            ).strip() or None
+
             registration_mode = request.form.get(
                 "registration_mode",
                 "INDIVIDUAL"
+            ).strip().upper()
+
+            team_min_size = clean_int(
+                request.form.get(
+                    "team_min_size"
+                ),
+                0
             )
 
-            team_min_size = request.form.get(
-                "team_min_size",
-                "0"
-            )
-
-            team_max_size = request.form.get(
-                "team_max_size",
-                "0"
+            team_max_size = clean_int(
+                request.form.get(
+                    "team_max_size"
+                ),
+                0
             )
 
             event_date = request.form.get(
-                "event_date"
-            ) or None
+                "event_date",
+                ""
+            ).strip() or None
 
             start_time = request.form.get(
-                "start_time"
-            ) or None
+                "start_time",
+                ""
+            ).strip() or None
+
             end_time = request.form.get(
-                "end_time"
-                ) or None
-            block = request.form.get("block", "").strip()
+                "end_time",
+                ""
+            ).strip() or None
 
-            floor = request.form.get("floor", "").strip()
+            block = request.form.get(
+                "block",
+                ""
+            ).strip() or None
 
-            room = request.form.get("room", "").strip()
+            floor = request.form.get(
+                "floor",
+                ""
+            ).strip() or None
+
+            room = request.form.get(
+                "room",
+                ""
+            ).strip() or None
+
             prize_pool = request.form.get(
                 "prize_pool",
                 ""
-            ).strip()
+            ).strip() or None
 
             rules = request.form.get(
                 "rules",
                 ""
-            ).strip()
+            ).strip() or None
 
             requirements = request.form.get(
                 "requirements",
                 ""
-            ).strip()
+            ).strip() or None
 
-            registration_open = (
-                1
-                if request.form.get("registration_open")
-                else 0
+            registration_open = form_checkbox(
+                "registration_open"
             )
 
             status = request.form.get(
                 "status",
                 "UPCOMING"
+            ).strip().upper()
+
+            winner_certificate = form_checkbox(
+                "winner_certificate"
             )
 
-            winner_certificate = (
-                1
-                if request.form.get("winner_certificate")
-                else 0
-            )
-
-            runner_up_certificate = (
-                1
-                if request.form.get("runner_up_certificate")
-                else 0
+            runner_up_certificate = form_checkbox(
+                "runner_up_certificate"
             )
 
             # ------------------------------------------------
@@ -2012,36 +2188,94 @@ def edit_event(game_id):
             # ------------------------------------------------
 
             if not game_name:
-                return "Event name is required.", 400
 
-            if registration_mode not in (
-                "INDIVIDUAL",
-                "TEAM"
-            ):
-                return "Invalid registration mode.", 400
+                flash(
+                    "Event name is required.",
+                    "error"
+                )
 
-            try:
-                team_min_size = int(team_min_size)
-                team_max_size = int(team_max_size)
-            except ValueError:
-                return "Invalid team size.", 400
+                return redirect(
+                    url_for(
+                        "admin.edit_event",
+                        game_id=game_id
+                    )
+                )
+
+            if registration_mode not in ALLOWED_REGISTRATION_MODES:
+
+                flash(
+                    "Invalid registration mode.",
+                    "error"
+                )
+
+                return redirect(
+                    url_for(
+                        "admin.edit_event",
+                        game_id=game_id
+                    )
+                )
+
+            if status not in ALLOWED_GAME_STATUSES:
+
+                flash(
+                    "Invalid event status.",
+                    "error"
+                )
+
+                return redirect(
+                    url_for(
+                        "admin.edit_event",
+                        game_id=game_id
+                    )
+                )
+
+            if team_min_size is None:
+                team_min_size = 0
+
+            if team_max_size is None:
+                team_max_size = 0
 
             if registration_mode == "INDIVIDUAL":
+
                 team_min_size = 0
                 team_max_size = 0
 
             else:
+
                 if team_min_size < 1:
-                    return "Team minimum size must be at least 1.", 400
+
+                    flash(
+                        "Team minimum size must be at least 1.",
+                        "error"
+                    )
+
+                    return redirect(
+                        url_for(
+                            "admin.edit_event",
+                            game_id=game_id
+                        )
+                    )
 
                 if team_max_size < team_min_size:
-                    return "Maximum team size cannot be smaller than minimum.", 400
+
+                    flash(
+                        "Maximum team size cannot be smaller than minimum.",
+                        "error"
+                    )
+
+                    return redirect(
+                        url_for(
+                            "admin.edit_event",
+                            game_id=game_id
+                        )
+                    )
 
             # ------------------------------------------------
-            # UPDATE DATABASE
+            # UPDATE EVENT
             # ------------------------------------------------
 
-            cursor.execute("""
+            cursor.execute(
+                """
                 UPDATE games
                 SET
                     game_name = %s,
@@ -2061,38 +2295,46 @@ def edit_event(game_id):
                     registration_open = %s,
                     status = %s,
                     winner_certificate = %s,
-                    runner_up_certificate = %s
+                    runner_up_certificate = %s,
+                    updated_at = CURRENT_TIMESTAMP
                 WHERE id = %s
-            """, (
-                game_name,
-                description,
-                registration_mode,
-                team_min_size,
-                team_max_size,
-                event_date,
-                start_time,
-                end_time,
-                block,
-                floor,
-                room,
-                prize_pool,
-                rules,
-                requirements,
-                registration_open,
-                status,
-                winner_certificate,
-                runner_up_certificate,
-                game_id
-            ))
+                """,
+                (
+                    game_name,
+                    description,
+                    registration_mode,
+                    team_min_size,
+                    team_max_size,
+                    event_date,
+                    start_time,
+                    end_time,
+                    block,
+                    floor,
+                    room,
+                    prize_pool,
+                    rules,
+                    requirements,
+                    registration_open,
+                    status,
+                    winner_certificate,
+                    runner_up_certificate,
+                    game_id
+                )
+            )
 
             connection.commit()
+
+            flash(
+                "Event updated successfully.",
+                "success"
+            )
 
             return redirect(
                 url_for("admin.events")
             )
 
         # ----------------------------------------------------
-        # DISPLAY EDIT PAGE
+        # GET
         # ----------------------------------------------------
 
         return render_template(
@@ -2102,22 +2344,29 @@ def edit_event(game_id):
 
     except Exception:
 
-        if connection:
-            connection.rollback()
+        rollback_db(connection)
 
-        return "Unable to update event.", 500
+        current_app.logger.exception(
+            "Event update error"
+        )
+
+        flash(
+            "Unable to update event.",
+            "error"
+        )
+
+        return redirect(
+            url_for("admin.events")
+        )
 
     finally:
 
-        if cursor:
-            cursor.close()
+        close_db(
+            connection,
+            cursor
+        )
 
-        if connection:
-            connection.close()
 
-    return redirect(
-        url_for("admin.students")
-    )
 # ============================================================
 # REGISTRATION MANAGEMENT
 # ============================================================
@@ -2130,12 +2379,24 @@ def registrations():
     cursor = None
 
     try:
+
         connection = get_db_connection()
         cursor = connection.cursor()
 
-        search = request.args.get("q", "").strip()
-        status = request.args.get("status", "all").strip().upper()
-        game_id = request.args.get("game_id", "").strip()
+        search = request.args.get(
+            "q",
+            ""
+        ).strip()
+
+        status = request.args.get(
+            "status",
+            "all"
+        ).strip().upper()
+
+        game_id = request.args.get(
+            "game_id",
+            ""
+        ).strip()
 
         query = """
             SELECT
@@ -2145,6 +2406,7 @@ def registrations():
                 r.status,
                 r.registered_at,
                 r.updated_at,
+
                 s.name AS student_name,
                 s.student_id AS student_roll,
                 s.email AS student_email,
@@ -2152,77 +2414,165 @@ def registrations():
                 s.branch,
                 s.section,
                 s.year,
+
                 g.game_name,
                 g.registration_mode,
                 g.event_date,
                 g.start_time,
-                CONCAT_WS(', ', g.block, g.floor, g.room) AS venue
+
+                CONCAT_WS(
+                    ', ',
+                    NULLIF(g.block, ''),
+                    NULLIF(g.floor, ''),
+                    NULLIF(g.room, '')
+                ) AS venue
+
             FROM registrations r
-            INNER JOIN students s ON s.id = r.student_id
-            INNER JOIN games g ON g.id = r.game_id
+
+            INNER JOIN students s
+                ON s.id = r.student_id
+
+            INNER JOIN games g
+                ON g.id = r.game_id
         """
 
         conditions = []
         params = []
 
-        if search:
-            value = f"%{search}%"
-            conditions.append("""
-                (
-                    s.name LIKE %s
-                    OR s.student_id LIKE %s
-                    OR s.email LIKE %s
-                    OR s.phone LIKE %s
-                    OR g.game_name LIKE %s
-                )
-            """)
-            params.extend([value, value, value, value, value])
+        # ----------------------------------------------------
+        # SEARCH
+        # ----------------------------------------------------
 
-        if status in ("REGISTERED", "CANCELLED", "APPROVED", "REJECTED"):
-            conditions.append("r.status = %s")
-            params.append(status)
+        if search:
+
+            value = f"%{search}%"
+
+            conditions.append(
+                """
+                (
+                    s.name ILIKE %s
+                    OR s.student_id ILIKE %s
+                    OR s.email ILIKE %s
+                    OR s.phone ILIKE %s
+                    OR g.game_name ILIKE %s
+                )
+                """
+            )
+
+            params.extend([
+                value,
+                value,
+                value,
+                value,
+                value
+            ])
+
+        # ----------------------------------------------------
+        # STATUS
+        # ----------------------------------------------------
+
+        if status in ALLOWED_REGISTRATION_STATUSES:
+
+            conditions.append(
+                "r.status = %s"
+            )
+
+            params.append(
+                status
+            )
+
+        # ----------------------------------------------------
+        # EVENT
+        # ----------------------------------------------------
 
         if game_id.isdigit():
-            conditions.append("r.game_id = %s")
-            params.append(int(game_id))
+
+            conditions.append(
+                "r.game_id = %s"
+            )
+
+            params.append(
+                int(game_id)
+            )
 
         if conditions:
-            query += " WHERE " + " AND ".join(conditions)
 
-        query += " ORDER BY r.registered_at DESC, r.id DESC LIMIT 2000"
+            query += (
+                " WHERE "
+                + " AND ".join(conditions)
+            )
 
-        cursor.execute(query, tuple(params))
+        query += """
+            ORDER BY
+                r.registered_at DESC,
+                r.id DESC
+            LIMIT 2000
+        """
+
+        cursor.execute(
+            query,
+            tuple(params)
+        )
+
         registration_rows = cursor.fetchall()
 
-        cursor.execute("""
-            SELECT id, game_name
+        # ----------------------------------------------------
+        # EVENTS
+        # ----------------------------------------------------
+
+        cursor.execute(
+            """
+            SELECT
+                id,
+                game_name
             FROM games
             ORDER BY game_name ASC
-        """)
+            """
+        )
+
         games = cursor.fetchall()
 
-        cursor.execute("SELECT COUNT(*) AS total FROM registrations")
+        # ----------------------------------------------------
+        # STATISTICS
+        # ----------------------------------------------------
+
+        cursor.execute(
+            """
+            SELECT COUNT(*) AS total
+            FROM registrations
+            """
+        )
+
         total = cursor.fetchone()["total"]
 
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT COUNT(*) AS total
             FROM registrations
             WHERE status = 'REGISTERED'
-        """)
+            """
+        )
+
         registered = cursor.fetchone()["total"]
 
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT COUNT(*) AS total
             FROM registrations
             WHERE status = 'APPROVED'
-        """)
+            """
+        )
+
         approved = cursor.fetchone()["total"]
 
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT COUNT(*) AS total
             FROM registrations
             WHERE status = 'CANCELLED'
-        """)
+            """
+        )
+
         cancelled = cursor.fetchone()["total"]
 
         return render_template(
@@ -2239,8 +2589,8 @@ def registrations():
         )
 
     except Exception:
-        if connection:
-            connection.rollback()
+
+        rollback_db(connection)
 
         current_app.logger.exception(
             "Admin registrations error"
@@ -2251,23 +2601,25 @@ def registrations():
             "error"
         )
 
-        return redirect(url_for("admin.dashboard"))
+        return redirect(
+            url_for("admin.dashboard")
+        )
 
     finally:
-        if cursor:
-            cursor.close()
 
-        if connection:
-            connection.close()
-
-
+        close_db(
+            connection,
+            cursor
+        )
 # ============================================================
-# REGISTRATION DETAILS
+# EXPORT GAME REGISTRATIONS TO EXCEL
 # ============================================================
 
-@admin_bp.route("/registrations/<int:registration_id>")
+@admin_bp.route(
+    "/registrations/game/<int:game_id>/export"
+)
 @admin_required
-def registration_details(registration_id):
+def export_game_registrations(game_id):
 
     connection = None
     cursor = None
@@ -2276,7 +2628,328 @@ def registration_details(registration_id):
         connection = get_db_connection()
         cursor = connection.cursor()
 
-        cursor.execute("""
+        # ----------------------------------------------------
+        # GAME + REGISTRATION + STUDENT DATA
+        # ----------------------------------------------------
+
+        cursor.execute(
+            """
+            SELECT
+                r.id AS registration_id,
+                r.status AS registration_status,
+                r.registered_at,
+                r.updated_at,
+
+                s.student_id,
+                s.name AS student_name,
+                s.email,
+                s.phone,
+                s.branch,
+                s.section,
+                s.year,
+
+                g.id AS game_id,
+                g.game_name,
+                g.registration_mode,
+                g.team_min_size,
+                g.team_max_size,
+                g.event_date,
+                g.start_time,
+                g.end_time,
+                g.block,
+                g.floor,
+                g.room,
+                g.prize_pool,
+                g.status AS game_status
+
+            FROM registrations r
+
+            INNER JOIN students s
+                ON s.id = r.student_id
+
+            INNER JOIN games g
+                ON g.id = r.game_id
+
+            WHERE g.id = %s
+
+            ORDER BY
+                r.registered_at ASC,
+                r.id ASC
+            """,
+            (game_id,)
+        )
+
+        registrations = cursor.fetchall()
+
+        # ----------------------------------------------------
+        # CHECK GAME EXISTS
+        # ----------------------------------------------------
+
+        cursor.execute(
+            """
+            SELECT
+                id,
+                game_name,
+                registration_mode
+            FROM games
+            WHERE id = %s
+            LIMIT 1
+            """,
+            (game_id,)
+        )
+
+        game = cursor.fetchone()
+
+        if not game:
+            flash(
+                "Game not found.",
+                "error"
+            )
+
+            return redirect(
+                url_for("admin.events")
+            )
+
+        # ----------------------------------------------------
+        # CREATE EXCEL WORKBOOK
+        # ----------------------------------------------------
+
+        workbook = Workbook()
+        worksheet = workbook.active
+
+        worksheet.title = "Registrations"
+
+        # ----------------------------------------------------
+        # GAME TITLE
+        # ----------------------------------------------------
+
+        worksheet["A1"] = "ENGINEERS DAY 2026"
+        worksheet["A2"] = "GAME"
+        worksheet["B2"] = game["game_name"]
+        worksheet["A3"] = "TOTAL REGISTRATIONS"
+        worksheet["B3"] = len(registrations)
+
+        # ----------------------------------------------------
+        # HEADERS
+        # ----------------------------------------------------
+
+        headers = [
+            "Registration ID",
+            "Registration Status",
+            "Registered At",
+            "Updated At",
+
+            "Student ID",
+            "Student Name",
+            "Email",
+            "Phone",
+            "Branch",
+            "Section",
+            "Year",
+
+            "Game ID",
+            "Game Name",
+            "Registration Mode",
+            "Team Min Size",
+            "Team Max Size",
+
+            "Event Date",
+            "Start Time",
+            "End Time",
+
+            "Block",
+            "Floor",
+            "Room",
+
+            "Prize Pool",
+            "Game Status"
+        ]
+
+        header_row = 5
+
+        for column_number, header in enumerate(
+            headers,
+            start=1
+        ):
+            worksheet.cell(
+                row=header_row,
+                column=column_number,
+                value=header
+            )
+
+        # ----------------------------------------------------
+        # DATA
+        # ----------------------------------------------------
+
+        for row_number, registration in enumerate(
+            registrations,
+            start=header_row + 1
+        ):
+
+            values = [
+                registration["registration_id"],
+                registration["registration_status"],
+                registration["registered_at"],
+                registration["updated_at"],
+
+                registration["student_id"],
+                registration["student_name"],
+                registration["email"],
+                registration["phone"],
+                registration["branch"],
+                registration["section"],
+                registration["year"],
+
+                registration["game_id"],
+                registration["game_name"],
+                registration["registration_mode"],
+                registration["team_min_size"],
+                registration["team_max_size"],
+
+                registration["event_date"],
+                registration["start_time"],
+                registration["end_time"],
+
+                registration["block"],
+                registration["floor"],
+                registration["room"],
+
+                registration["prize_pool"],
+                registration["game_status"]
+            ]
+
+            for column_number, value in enumerate(
+                values,
+                start=1
+            ):
+                worksheet.cell(
+                    row=row_number,
+                    column=column_number,
+                    value=value
+                )
+
+        # ----------------------------------------------------
+        # COLUMN WIDTHS
+        # ----------------------------------------------------
+
+        widths = {
+            "A": 18,
+            "B": 20,
+            "C": 24,
+            "D": 24,
+            "E": 18,
+            "F": 24,
+            "G": 32,
+            "H": 18,
+            "I": 18,
+            "J": 12,
+            "K": 10,
+            "L": 12,
+            "M": 30,
+            "N": 20,
+            "O": 16,
+            "P": 16,
+            "Q": 15,
+            "R": 15,
+            "S": 15,
+            "T": 15,
+            "U": 12,
+            "V": 12,
+            "W": 18,
+            "X": 18
+        }
+
+        for column, width in widths.items():
+            worksheet.column_dimensions[column].width = width
+
+        # ----------------------------------------------------
+        # FREEZE HEADER
+        # ----------------------------------------------------
+
+        worksheet.freeze_panes = "A6"
+
+        # ----------------------------------------------------
+        # SAVE TO MEMORY
+        # ----------------------------------------------------
+
+        output = io.BytesIO()
+
+        workbook.save(output)
+
+        output.seek(0)
+
+        # ----------------------------------------------------
+        # SAFE FILE NAME
+        # ----------------------------------------------------
+
+        safe_game_name = re.sub(
+            r"[^A-Za-z0-9_-]+",
+            "_",
+            game["game_name"]
+        ).strip("_")
+
+        filename = (
+            f"{safe_game_name}_Registrations.xlsx"
+        )
+
+        return send_file(
+            output,
+            as_attachment=True,
+            download_name=filename,
+            mimetype=(
+                "application/vnd.openxmlformats-officedocument."
+                "spreadsheetml.sheet"
+            )
+        )
+
+    except Exception:
+
+        if connection:
+            connection.rollback()
+
+        current_app.logger.exception(
+            "Game registration Excel export error"
+        )
+
+        flash(
+            "Unable to export registrations.",
+            "error"
+        )
+
+        return redirect(
+            url_for("admin.events")
+        )
+
+    finally:
+
+        if cursor:
+            cursor.close()
+
+        if connection:
+            connection.close()
+
+# ============================================================
+# REGISTRATION DETAILS
+# ============================================================
+
+@admin_bp.route(
+    "/registrations/<int:registration_id>"
+)
+@admin_required
+def registration_details(
+    registration_id
+):
+
+    connection = None
+    cursor = None
+
+    try:
+
+        connection = get_db_connection()
+        cursor = connection.cursor()
+
+        cursor.execute(
+            """
             SELECT
                 r.id,
                 r.student_id,
@@ -2300,7 +2973,14 @@ def registration_details(registration_id):
                 g.team_max_size,
                 g.event_date,
                 g.start_time,
-                CONCAT_WS(', ', g.block, g.floor, g.room) AS venue,
+
+                CONCAT_WS(
+                    ', ',
+                    NULLIF(g.block, ''),
+                    NULLIF(g.floor, ''),
+                    NULLIF(g.room, '')
+                ) AS venue,
+
                 g.prize_pool,
                 g.rules,
                 g.requirements,
@@ -2316,17 +2996,24 @@ def registration_details(registration_id):
                 ON g.id = r.game_id
 
             WHERE r.id = %s
+
             LIMIT 1
-        """, (registration_id,))
+            """,
+            (registration_id,)
+        )
 
         registration = cursor.fetchone()
 
         if not registration:
+
             flash(
                 "Registration not found.",
                 "error"
             )
-            return redirect(url_for("admin.registrations"))
+
+            return redirect(
+                url_for("admin.registrations")
+            )
 
         return render_template(
             "admin/registration_details.html",
@@ -2334,8 +3021,8 @@ def registration_details(registration_id):
         )
 
     except Exception:
-        if connection:
-            connection.rollback()
+
+        rollback_db(connection)
 
         current_app.logger.exception(
             "Registration details error"
@@ -2346,22 +3033,20 @@ def registration_details(registration_id):
             "error"
         )
 
-        return redirect(url_for("admin.registrations"))
+        return redirect(
+            url_for("admin.registrations")
+        )
 
     finally:
-        if cursor:
-            cursor.close()
 
-        if connection:
-            connection.close()
+        close_db(
+            connection,
+            cursor
+        )
 
 
 # ============================================================
 # REGISTRATION STATUS UPDATE
-#
-# This endpoint is intentionally simple and server-side
-# validated. It is useful for admin actions from the details
-# page or future AJAX controls.
 # ============================================================
 
 @admin_bp.route(
@@ -2369,25 +3054,22 @@ def registration_details(registration_id):
     methods=["POST"]
 )
 @admin_required
-def update_registration_status(registration_id):
+def update_registration_status(
+    registration_id
+):
 
     new_status = request.form.get(
         "status",
         ""
     ).strip().upper()
 
-    allowed = {
-        "REGISTERED",
-        "CANCELLED",
-        "APPROVED",
-        "REJECTED"
-    }
+    if new_status not in ALLOWED_REGISTRATION_STATUSES:
 
-    if new_status not in allowed:
         flash(
             "Invalid registration status.",
             "error"
         )
+
         return redirect(
             url_for(
                 "admin.registration_details",
@@ -2399,30 +3081,44 @@ def update_registration_status(registration_id):
     cursor = None
 
     try:
+
         connection = get_db_connection()
         cursor = connection.cursor()
 
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT id
             FROM registrations
             WHERE id = %s
             LIMIT 1
-        """, (registration_id,))
+            """,
+            (registration_id,)
+        )
 
         if not cursor.fetchone():
+
             flash(
                 "Registration not found.",
                 "error"
             )
+
             return redirect(
                 url_for("admin.registrations")
             )
 
-        cursor.execute("""
+        cursor.execute(
+            """
             UPDATE registrations
-            SET status = %s
+            SET
+                status = %s,
+                updated_at = CURRENT_TIMESTAMP
             WHERE id = %s
-        """, (new_status, registration_id))
+            """,
+            (
+                new_status,
+                registration_id
+            )
+        )
 
         connection.commit()
 
@@ -2432,8 +3128,8 @@ def update_registration_status(registration_id):
         )
 
     except Exception:
-        if connection:
-            connection.rollback()
+
+        rollback_db(connection)
 
         current_app.logger.exception(
             "Registration status update error"
@@ -2445,11 +3141,11 @@ def update_registration_status(registration_id):
         )
 
     finally:
-        if cursor:
-            cursor.close()
 
-        if connection:
-            connection.close()
+        close_db(
+            connection,
+            cursor
+        )
 
     return redirect(
         url_for(
@@ -2457,7 +3153,6 @@ def update_registration_status(registration_id):
             registration_id=registration_id
         )
     )
-
 
 
 # ============================================================
@@ -2476,10 +3171,6 @@ def results():
         connection = get_db_connection()
         cursor = connection.cursor()
 
-        # ----------------------------------------------------
-        # FILTERS
-        # ----------------------------------------------------
-
         selected_game_id = request.args.get(
             "game_id",
             ""
@@ -2489,13 +3180,6 @@ def results():
             "status",
             ""
         ).strip().lower()
-
-        # ----------------------------------------------------
-        # MAIN QUERY
-        #
-        # LEFT JOIN keeps events visible even when a result
-        # has not been created yet.
-        # ----------------------------------------------------
 
         query = """
             SELECT
@@ -2519,6 +3203,8 @@ def results():
                 r.winner_certificate,
                 r.runner_up_certificate,
                 r.result_details,
+                r.is_published,
+                r.published_at,
                 r.created_at
 
             FROM games g
@@ -2536,11 +3222,11 @@ def results():
 
         if selected_game_id:
 
-            try:
+            game_id_value = clean_int(
+                selected_game_id
+            )
 
-                game_id_value = int(
-                    selected_game_id
-                )
+            if game_id_value is not None:
 
                 conditions.append(
                     "g.id = %s"
@@ -2550,21 +3236,18 @@ def results():
                     game_id_value
                 )
 
-            except ValueError:
+            else:
 
                 selected_game_id = ""
 
         # ----------------------------------------------------
         # RESULT STATUS FILTER
-        #
-        # "published" = result exists
-        # "pending"   = event has no result yet
         # ----------------------------------------------------
 
         if selected_status == "published":
 
             conditions.append(
-                "r.id IS NOT NULL"
+                "r.id IS NOT NULL AND r.is_published = TRUE"
             )
 
         elif selected_status == "pending":
@@ -2573,18 +3256,21 @@ def results():
                 "r.id IS NULL"
             )
 
+        elif selected_status == "draft":
+
+            conditions.append(
+                "r.id IS NOT NULL AND r.is_published = FALSE"
+            )
+
         # ----------------------------------------------------
         # WHERE
         # ----------------------------------------------------
 
         if conditions:
 
-            query += """
-                WHERE
-            """
-
-            query += " AND ".join(
-                conditions
+            query += (
+                " WHERE "
+                + " AND ".join(conditions)
             )
 
         # ----------------------------------------------------
@@ -2616,7 +3302,7 @@ def results():
             tuple(params)
         )
 
-        results = cursor.fetchall()
+        result_rows = cursor.fetchall()
 
         # ----------------------------------------------------
         # EVENTS FOR FILTER
@@ -2628,21 +3314,19 @@ def results():
                 id,
                 game_name
             FROM games
-            ORDER BY
-                game_name ASC
+            ORDER BY game_name ASC
             """
         )
 
         games = cursor.fetchall()
 
         # ----------------------------------------------------
-        # OVERALL RESULT STATISTICS
+        # TOTAL RESULTS
         # ----------------------------------------------------
 
         cursor.execute(
             """
-            SELECT
-                COUNT(*) AS total
+            SELECT COUNT(*) AS total
             FROM results
             """
         )
@@ -2655,8 +3339,7 @@ def results():
 
         cursor.execute(
             """
-            SELECT
-                COUNT(DISTINCT game_id) AS total
+            SELECT COUNT(DISTINCT game_id) AS total
             FROM results
             """
         )
@@ -2669,8 +3352,7 @@ def results():
 
         cursor.execute(
             """
-            SELECT
-                COUNT(*) AS total
+            SELECT COUNT(*) AS total
             FROM games g
             LEFT JOIN results r
                 ON r.game_id = g.id
@@ -2686,22 +3368,17 @@ def results():
 
         cursor.execute(
             """
-            SELECT
-                COUNT(*) AS total
+            SELECT COUNT(*) AS total
             FROM games
             """
         )
 
         total_events = cursor.fetchone()["total"]
 
-        # ----------------------------------------------------
-        # RENDER
-        # ----------------------------------------------------
-
         return render_template(
             "admin/results.html",
 
-            results=results,
+            results=result_rows,
             games=games,
 
             total_results=total_results,
@@ -2715,8 +3392,7 @@ def results():
 
     except Exception:
 
-        if connection:
-            connection.rollback()
+        rollback_db(connection)
 
         current_app.logger.exception(
             "Admin results error"
@@ -2733,11 +3409,10 @@ def results():
 
     finally:
 
-        if cursor:
-            cursor.close()
-
-        if connection:
-            connection.close()
+        close_db(
+            connection,
+            cursor
+        )
 
 
 # ============================================================
@@ -2755,8 +3430,13 @@ def result_create():
     cursor = None
 
     try:
+
         connection = get_db_connection()
         cursor = connection.cursor()
+
+        # ----------------------------------------------------
+        # POST
+        # ----------------------------------------------------
 
         if request.method == "POST":
 
@@ -2765,18 +3445,27 @@ def result_create():
                 ""
             ).strip()
 
-            try:
-                game_id = int(raw_game_id)
-            except (TypeError, ValueError):
+            game_id = clean_int(
+                raw_game_id
+            )
+
+            if game_id is None:
+
                 flash(
                     "Please select a valid event.",
                     "error"
                 )
+
                 return redirect(
                     url_for("admin.result_create")
                 )
 
-            cursor.execute("""
+            # ------------------------------------------------
+            # GET GAME
+            # ------------------------------------------------
+
+            cursor.execute(
+                """
                 SELECT
                     id,
                     game_name,
@@ -2784,98 +3473,127 @@ def result_create():
                 FROM games
                 WHERE id = %s
                 LIMIT 1
-            """, (game_id,))
+                """,
+                (game_id,)
+            )
 
             game = cursor.fetchone()
 
             if not game:
+
                 flash(
                     "Event not found.",
                     "error"
                 )
+
                 return redirect(
                     url_for("admin.result_create")
                 )
 
-            winner = request.form.get(
-                "winner",
-                ""
-            ).strip() or None
+            # ------------------------------------------------
+            # FORM DATA
+            # ------------------------------------------------
 
-            runner_up = request.form.get(
-                "runner_up",
-                ""
-            ).strip() or None
-
-            winner_student_id = request.form.get(
-                "winner_student_id",
-                ""
-            ).strip() or None
-
-            winner_team_id = request.form.get(
-                "winner_team_id",
-                ""
-            ).strip() or None
-
-            runner_up_student_id = request.form.get(
-                "runner_up_student_id",
-                ""
-            ).strip() or None
-
-            runner_up_team_id = request.form.get(
-                "runner_up_team_id",
-                ""
-            ).strip() or None
-
-            winner_prize = request.form.get(
-                "winner_prize",
-                ""
-            ).strip() or None
-
-            runner_up_prize = request.form.get(
-                "runner_up_prize",
-                ""
-            ).strip() or None
-
-            winner_certificate = (
-                1 if request.form.get("winner_certificate")
-                else 0
+            winner = (
+                request.form.get(
+                    "winner",
+                    ""
+                ).strip()
+                or None
             )
 
-            runner_up_certificate = (
-                1 if request.form.get("runner_up_certificate")
-                else 0
+            runner_up = (
+                request.form.get(
+                    "runner_up",
+                    ""
+                ).strip()
+                or None
             )
 
-            result_details = request.form.get(
-                "result_details",
-                ""
-            ).strip() or None
-
-            is_published = (
-                1 if request.form.get("is_published")
-                else 0
+            winner_student_id = clean_int(
+                request.form.get(
+                    "winner_student_id"
+                )
             )
 
-            published_at = (
-                "NOW()" if is_published else None
+            winner_team_id = clean_int(
+                request.form.get(
+                    "winner_team_id"
+                )
             )
 
-            cursor.execute("""
+            runner_up_student_id = clean_int(
+                request.form.get(
+                    "runner_up_student_id"
+                )
+            )
+
+            runner_up_team_id = clean_int(
+                request.form.get(
+                    "runner_up_team_id"
+                )
+            )
+
+            winner_prize = (
+                request.form.get(
+                    "winner_prize",
+                    ""
+                ).strip()
+                or None
+            )
+
+            runner_up_prize = (
+                request.form.get(
+                    "runner_up_prize",
+                    ""
+                ).strip()
+                or None
+            )
+
+            winner_certificate = form_checkbox(
+                "winner_certificate"
+            )
+
+            runner_up_certificate = form_checkbox(
+                "runner_up_certificate"
+            )
+
+            result_details = (
+                request.form.get(
+                    "result_details",
+                    ""
+                ).strip()
+                or None
+            )
+
+            is_published = form_checkbox(
+                "is_published"
+            )
+
+            # ------------------------------------------------
+            # CHECK EXISTING RESULT
+            # ------------------------------------------------
+
+            cursor.execute(
+                """
                 SELECT id
                 FROM results
                 WHERE game_id = %s
                 LIMIT 1
-            """, (game_id,))
+                """,
+                (game_id,)
+            )
 
             existing = cursor.fetchone()
 
             if existing:
+
                 flash(
                     "A result already exists for this event. "
                     "Use Edit instead.",
                     "error"
                 )
+
                 return redirect(
                     url_for(
                         "admin.result_edit",
@@ -2883,8 +3601,18 @@ def result_create():
                     )
                 )
 
+            # ------------------------------------------------
+            # INSERT RESULT
+            #
+            # PostgreSQL:
+            # TRUE/FALSE
+            # CURRENT_TIMESTAMP / NOW()
+            # ------------------------------------------------
+
             if is_published:
-                cursor.execute("""
+
+                cursor.execute(
+                    """
                     INSERT INTO results
                     (
                         game_id,
@@ -2905,28 +3633,44 @@ def result_create():
                     )
                     VALUES
                     (
-                        %s, %s, %s, %s, %s, %s, %s,
-                        %s, %s, %s, %s, %s, %s,
-                        NOW(), %s
+                        %s,
+                        %s,
+                        %s,
+                        %s,
+                        %s,
+                        %s,
+                        %s,
+                        %s,
+                        %s,
+                        %s,
+                        %s,
+                        %s,
+                        TRUE,
+                        CURRENT_TIMESTAMP,
+                        %s
                     )
-                """, (
-                    game_id,
-                    winner,
-                    winner_student_id,
-                    winner_team_id,
-                    runner_up,
-                    runner_up_student_id,
-                    runner_up_team_id,
-                    winner_prize,
-                    runner_up_prize,
-                    winner_certificate,
-                    runner_up_certificate,
-                    result_details,
-                    is_published,
-                    session.get("admin_id")
-                ))
+                    """,
+                    (
+                        game_id,
+                        winner,
+                        winner_student_id,
+                        winner_team_id,
+                        runner_up,
+                        runner_up_student_id,
+                        runner_up_team_id,
+                        winner_prize,
+                        runner_up_prize,
+                        winner_certificate,
+                        runner_up_certificate,
+                        result_details,
+                        session.get("admin_id")
+                    )
+                )
+
             else:
-                cursor.execute("""
+
+                cursor.execute(
+                    """
                     INSERT INTO results
                     (
                         game_id,
@@ -2947,52 +3691,86 @@ def result_create():
                     )
                     VALUES
                     (
-                        %s, %s, %s, %s, %s, %s, %s,
-                        %s, %s, %s, %s, %s, %s,
-                        NULL, NULL
+                        %s,
+                        %s,
+                        %s,
+                        %s,
+                        %s,
+                        %s,
+                        %s,
+                        %s,
+                        %s,
+                        %s,
+                        %s,
+                        %s,
+                        FALSE,
+                        NULL,
+                        NULL
                     )
-                """, (
-                    game_id,
-                    winner,
-                    winner_student_id,
-                    winner_team_id,
-                    runner_up,
-                    runner_up_student_id,
-                    runner_up_team_id,
-                    winner_prize,
-                    runner_up_prize,
-                    winner_certificate,
-                    runner_up_certificate,
-                    result_details,
-                    is_published
-                ))
+                    """,
+                    (
+                        game_id,
+                        winner,
+                        winner_student_id,
+                        winner_team_id,
+                        runner_up,
+                        runner_up_student_id,
+                        runner_up_team_id,
+                        winner_prize,
+                        runner_up_prize,
+                        winner_certificate,
+                        runner_up_certificate,
+                        result_details
+                    )
+                )
 
             connection.commit()
 
-            flash(
-                "Result created successfully.",
-                "success"
-            )
+            if is_published:
+
+                flash(
+                    "Result published successfully.",
+                    "success"
+                )
+
+            else:
+
+                flash(
+                    "Result saved as draft.",
+                    "success"
+                )
 
             return redirect(
                 url_for("admin.results")
             )
 
-        cursor.execute("""
+        # ----------------------------------------------------
+        # GET
+        # ----------------------------------------------------
+
+        cursor.execute(
+            """
             SELECT
                 g.id,
                 g.game_name,
                 g.registration_mode,
                 g.event_date
             FROM games g
+
             LEFT JOIN results r
                 ON r.game_id = g.id
+
             WHERE r.id IS NULL
+
             ORDER BY
-                CASE WHEN g.event_date IS NULL THEN 1 ELSE 0 END,
+                CASE
+                    WHEN g.event_date IS NULL THEN 1
+                    ELSE 0
+                END,
                 g.event_date ASC,
                 g.game_name ASC
-        """)
+            """
+        )
 
         games = cursor.fetchall()
 
@@ -3005,8 +3783,8 @@ def result_create():
         )
 
     except Exception:
-        if connection:
-            connection.rollback()
+
+        rollback_db(connection)
 
         current_app.logger.exception(
             "Result creation error"
@@ -3022,11 +3800,11 @@ def result_create():
         )
 
     finally:
-        if cursor:
-            cursor.close()
 
-        if connection:
-            connection.close()
+        close_db(
+            connection,
+            cursor
+        )
 
 
 # ============================================================
@@ -3044,14 +3822,16 @@ def result_edit(game_id):
     cursor = None
 
     try:
+
         connection = get_db_connection()
         cursor = connection.cursor()
 
-        # --------------------------------------------------------
+        # ----------------------------------------------------
         # LOAD EVENT
-        # --------------------------------------------------------
+        # ----------------------------------------------------
 
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT
                 id,
                 game_name,
@@ -3060,124 +3840,123 @@ def result_edit(game_id):
             FROM games
             WHERE id = %s
             LIMIT 1
-        """, (game_id,))
+            """,
+            (game_id,)
+        )
 
         game = cursor.fetchone()
 
         if not game:
-            flash("Event not found.", "error")
-            return redirect(url_for("admin.results"))
 
-        # --------------------------------------------------------
+            flash(
+                "Event not found.",
+                "error"
+            )
+
+            return redirect(
+                url_for("admin.results")
+            )
+
+        # ----------------------------------------------------
         # POST
-        # --------------------------------------------------------
+        # ----------------------------------------------------
 
         if request.method == "POST":
 
             winner = (
-                request.form.get("winner", "").strip()
+                request.form.get(
+                    "winner",
+                    ""
+                ).strip()
                 or None
             )
 
             runner_up = (
-                request.form.get("runner_up", "").strip()
+                request.form.get(
+                    "runner_up",
+                    ""
+                ).strip()
                 or None
             )
 
-            # ----------------------------------------------------
-            # STUDENT / TEAM IDs
-            # ----------------------------------------------------
-
-            def clean_int(value):
-                value = (value or "").strip()
-
-                if not value:
-                    return None
-
-                try:
-                    return int(value)
-                except (TypeError, ValueError):
-                    return None
-
             winner_student_id = clean_int(
-                request.form.get("winner_student_id")
+                request.form.get(
+                    "winner_student_id"
+                )
             )
 
             winner_team_id = clean_int(
-                request.form.get("winner_team_id")
+                request.form.get(
+                    "winner_team_id"
+                )
             )
 
             runner_up_student_id = clean_int(
-                request.form.get("runner_up_student_id")
+                request.form.get(
+                    "runner_up_student_id"
+                )
             )
 
             runner_up_team_id = clean_int(
-                request.form.get("runner_up_team_id")
+                request.form.get(
+                    "runner_up_team_id"
+                )
             )
 
-            # ----------------------------------------------------
-            # PRIZES
-            # ----------------------------------------------------
-
             winner_prize = (
-                request.form.get("winner_prize", "").strip()
+                request.form.get(
+                    "winner_prize",
+                    ""
+                ).strip()
                 or None
             )
 
             runner_up_prize = (
-                request.form.get("runner_up_prize", "").strip()
+                request.form.get(
+                    "runner_up_prize",
+                    ""
+                ).strip()
                 or None
             )
 
-            # ----------------------------------------------------
-            # CERTIFICATES
-            # ----------------------------------------------------
-
-            winner_certificate = (
-                1
-                if request.form.get("winner_certificate")
-                else 0
+            winner_certificate = form_checkbox(
+                "winner_certificate"
             )
 
-            runner_up_certificate = (
-                1
-                if request.form.get("runner_up_certificate")
-                else 0
+            runner_up_certificate = form_checkbox(
+                "runner_up_certificate"
             )
-
-            # ----------------------------------------------------
-            # DETAILS
-            # ----------------------------------------------------
 
             result_details = (
-                request.form.get("result_details", "").strip()
+                request.form.get(
+                    "result_details",
+                    ""
+                ).strip()
                 or None
             )
 
-            # ----------------------------------------------------
-            # PUBLICATION
-            # ----------------------------------------------------
-
-            is_published = (
-                1
-                if request.form.get("is_published")
-                else 0
+            is_published = form_checkbox(
+                "is_published"
             )
 
-            # ----------------------------------------------------
-            # CHECK RESULT EXISTS
-            # ----------------------------------------------------
+            # ------------------------------------------------
+            # CHECK RESULT
+            # ------------------------------------------------
 
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT id
                 FROM results
                 WHERE game_id = %s
                 LIMIT 1
-            """, (game_id,))
+                """,
+                (game_id,)
+            )
 
             existing_result = cursor.fetchone()
 
             if not existing_result:
+
                 flash(
                     "No result exists for this event.",
                     "error"
@@ -3187,13 +3966,14 @@ def result_edit(game_id):
                     url_for("admin.results")
                 )
 
-            # ----------------------------------------------------
-            # PUBLISHED RESULT
-            # ----------------------------------------------------
+            # ------------------------------------------------
+            # PUBLISHED
+            # ------------------------------------------------
 
             if is_published:
 
-                cursor.execute("""
+                cursor.execute(
+                    """
                     UPDATE results
                     SET
                         winner = %s,
@@ -3212,45 +3992,50 @@ def result_edit(game_id):
 
                         result_details = %s,
 
-                        is_published = 1,
+                        is_published = TRUE,
 
                         published_at = COALESCE(
                             published_at,
-                            NOW()
+                            CURRENT_TIMESTAMP
                         ),
 
                         published_by = %s
 
                     WHERE game_id = %s
-                """, (
-                    winner,
-                    winner_student_id,
-                    winner_team_id,
+                    """,
+                    (
+                        winner,
+                        winner_student_id,
+                        winner_team_id,
 
-                    runner_up,
-                    runner_up_student_id,
-                    runner_up_team_id,
+                        runner_up,
+                        runner_up_student_id,
+                        runner_up_team_id,
 
-                    winner_prize,
-                    runner_up_prize,
+                        winner_prize,
+                        runner_up_prize,
 
-                    winner_certificate,
-                    runner_up_certificate,
+                        winner_certificate,
+                        runner_up_certificate,
 
-                    result_details,
+                        result_details,
 
-                    session.get("admin_id"),
+                        session.get(
+                            "admin_id"
+                        ),
 
-                    game_id
-                ))
+                        game_id
+                    )
+                )
 
-            # ----------------------------------------------------
-            # SAVE AS DRAFT
-            # ----------------------------------------------------
+            # ------------------------------------------------
+            # DRAFT
+            # ------------------------------------------------
 
             else:
 
-                cursor.execute("""
+                cursor.execute(
+                    """
                     UPDATE results
                     SET
                         winner = %s,
@@ -3269,43 +4054,44 @@ def result_edit(game_id):
 
                         result_details = %s,
 
-                        is_published = 0,
+                        is_published = FALSE,
                         published_at = NULL,
                         published_by = NULL
 
                     WHERE game_id = %s
-                """, (
-                    winner,
-                    winner_student_id,
-                    winner_team_id,
+                    """,
+                    (
+                        winner,
+                        winner_student_id,
+                        winner_team_id,
 
-                    runner_up,
-                    runner_up_student_id,
-                    runner_up_team_id,
+                        runner_up,
+                        runner_up_student_id,
+                        runner_up_team_id,
 
-                    winner_prize,
-                    runner_up_prize,
+                        winner_prize,
+                        runner_up_prize,
 
-                    winner_certificate,
-                    runner_up_certificate,
+                        winner_certificate,
+                        runner_up_certificate,
 
-                    result_details,
+                        result_details,
 
-                    game_id
-                ))
-
-            # ----------------------------------------------------
-            # COMMIT
-            # ----------------------------------------------------
+                        game_id
+                    )
+                )
 
             connection.commit()
 
             if is_published:
+
                 flash(
                     "Result published successfully.",
                     "success"
                 )
+
             else:
+
                 flash(
                     "Result saved as draft.",
                     "success"
@@ -3315,32 +4101,35 @@ def result_edit(game_id):
                 url_for("admin.results")
             )
 
-        # --------------------------------------------------------
-        # GET → LOAD RESULT
-        # --------------------------------------------------------
+        # ----------------------------------------------------
+        # GET RESULT
+        # ----------------------------------------------------
 
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT *
             FROM results
             WHERE game_id = %s
             LIMIT 1
-        """, (game_id,))
+            """,
+            (game_id,)
+        )
 
         result = cursor.fetchone()
 
         if not result:
+
             flash(
                 "No result exists for this event yet.",
                 "error"
             )
 
             return redirect(
-                url_for("admin.result_create", game_id=game_id)
+                url_for(
+                    "admin.result_create",
+                    game_id=game_id
+                )
             )
-
-        # --------------------------------------------------------
-        # RENDER
-        # --------------------------------------------------------
 
         return render_template(
             "admin/result_edit.html",
@@ -3352,8 +4141,7 @@ def result_edit(game_id):
 
     except Exception:
 
-        if connection:
-            connection.rollback()
+        rollback_db(connection)
 
         current_app.logger.exception(
             "Result edit error"
@@ -3370,11 +4158,12 @@ def result_edit(game_id):
 
     finally:
 
-        if cursor:
-            cursor.close()
+        close_db(
+            connection,
+            cursor
+        )
 
-        if connection:
-            connection.close()
+
 # ============================================================
 # NOTIFICATION MANAGEMENT
 # ============================================================
@@ -3387,6 +4176,7 @@ def notifications():
     cursor = None
 
     try:
+
         connection = get_db_connection()
         cursor = connection.cursor()
 
@@ -3413,8 +4203,11 @@ def notifications():
                 n.created_by,
                 n.created_at,
                 n.updated_at,
+
                 g.game_name
+
             FROM notifications n
+
             LEFT JOIN games g
                 ON g.id = n.game_id
         """
@@ -3422,48 +4215,78 @@ def notifications():
         conditions = []
         params = []
 
+        # ----------------------------------------------------
+        # SEARCH
+        # ----------------------------------------------------
+
         if search:
+
             value = f"%{search}%"
-            conditions.append("""
+
+            conditions.append(
+                """
                 (
-                    n.title LIKE %s
-                    OR n.message LIKE %s
-                    OR g.game_name LIKE %s
+                    n.title ILIKE %s
+                    OR n.message ILIKE %s
+                    OR g.game_name ILIKE %s
                 )
-            """)
-            params.extend([value, value, value])
+                """
+            )
 
-        allowed_types = {
-            "GENERAL",
-            "EVENT",
-            "RESULT",
-            "IMPORTANT"
-        }
+            params.extend([
+                value,
+                value,
+                value
+            ])
 
-        if notification_type in allowed_types:
+        # ----------------------------------------------------
+        # TYPE
+        # ----------------------------------------------------
+
+        if notification_type in ALLOWED_NOTIFICATION_TYPES:
+
             conditions.append(
                 "n.notification_type = %s"
             )
-            params.append(notification_type)
+
+            params.append(
+                notification_type
+            )
 
         if conditions:
-            query += " WHERE " + " AND ".join(conditions)
+
+            query += (
+                " WHERE "
+                + " AND ".join(conditions)
+            )
 
         query += """
-            ORDER BY n.created_at DESC, n.id DESC
+            ORDER BY
+                n.created_at DESC,
+                n.id DESC
             LIMIT 1000
         """
 
-        cursor.execute(query, tuple(params))
+        cursor.execute(
+            query,
+            tuple(params)
+        )
+
         notification_rows = cursor.fetchall()
 
-        cursor.execute("""
+        # ----------------------------------------------------
+        # EVENTS
+        # ----------------------------------------------------
+
+        cursor.execute(
+            """
             SELECT
                 id,
                 game_name
             FROM games
             ORDER BY game_name ASC
-        """)
+            """
+        )
 
         games = cursor.fetchall()
 
@@ -3476,8 +4299,8 @@ def notifications():
         )
 
     except Exception:
-        if connection:
-            connection.rollback()
+
+        rollback_db(connection)
 
         current_app.logger.exception(
             "Admin notifications error"
@@ -3493,11 +4316,11 @@ def notifications():
         )
 
     finally:
-        if cursor:
-            cursor.close()
 
-        if connection:
-            connection.close()
+        close_db(
+            connection,
+            cursor
+        )
 
 
 # ============================================================
@@ -3515,6 +4338,7 @@ def notification_create():
     cursor = None
 
     try:
+
         connection = get_db_connection()
         cursor = connection.cursor()
 
@@ -3551,47 +4375,90 @@ def notification_create():
                 ""
             ).strip() or None
 
-            is_published = (
-                1 if request.form.get("is_published")
-                else 0
+            is_published = form_checkbox(
+                "is_published"
             )
 
-            allowed_types = {
-                "GENERAL",
-                "EVENT",
-                "RESULT",
-                "IMPORTANT"
-            }
+            # ------------------------------------------------
+            # VALIDATION
+            # ------------------------------------------------
 
             if not title:
+
                 flash(
                     "Notification title is required.",
                     "error"
                 )
+
                 return redirect(
-                    url_for("admin.notification_create")
+                    url_for(
+                        "admin.notification_create"
+                    )
                 )
 
             if not message:
+
                 flash(
                     "Notification message is required.",
                     "error"
                 )
+
                 return redirect(
-                    url_for("admin.notification_create")
+                    url_for(
+                        "admin.notification_create"
+                    )
                 )
 
-            if notification_type not in allowed_types:
+            if notification_type not in ALLOWED_NOTIFICATION_TYPES:
+
                 flash(
                     "Invalid notification type.",
                     "error"
                 )
+
                 return redirect(
-                    url_for("admin.notification_create")
+                    url_for(
+                        "admin.notification_create"
+                    )
                 )
 
+            # ------------------------------------------------
+            # OPTIONAL GAME VALIDATION
+            # ------------------------------------------------
+
+            if game_id is not None:
+
+                cursor.execute(
+                    """
+                    SELECT id
+                    FROM games
+                    WHERE id = %s
+                    LIMIT 1
+                    """,
+                    (game_id,)
+                )
+
+                if not cursor.fetchone():
+
+                    flash(
+                        "Selected event was not found.",
+                        "error"
+                    )
+
+                    return redirect(
+                        url_for(
+                            "admin.notification_create"
+                        )
+                    )
+
+            # ------------------------------------------------
+            # INSERT
+            # ------------------------------------------------
+
             if is_published:
-                cursor.execute("""
+
+                cursor.execute(
+                    """
                     INSERT INTO notifications
                     (
                         game_id,
@@ -3605,19 +4472,30 @@ def notification_create():
                     )
                     VALUES
                     (
-                        %s, %s, %s, %s,
-                        1, NOW(), %s, %s
+                        %s,
+                        %s,
+                        %s,
+                        %s,
+                        TRUE,
+                        CURRENT_TIMESTAMP,
+                        %s,
+                        %s
                     )
-                """, (
-                    game_id,
-                    title,
-                    message,
-                    notification_type,
-                    expires_at,
-                    session.get("admin_id")
-                ))
+                    """,
+                    (
+                        game_id,
+                        title,
+                        message,
+                        notification_type,
+                        expires_at,
+                        session.get("admin_id")
+                    )
+                )
+
             else:
-                cursor.execute("""
+
+                cursor.execute(
+                    """
                     INSERT INTO notifications
                     (
                         game_id,
@@ -3631,17 +4509,25 @@ def notification_create():
                     )
                     VALUES
                     (
-                        %s, %s, %s, %s,
-                        0, NULL, %s, %s
+                        %s,
+                        %s,
+                        %s,
+                        %s,
+                        FALSE,
+                        NULL,
+                        %s,
+                        %s
                     )
-                """, (
-                    game_id,
-                    title,
-                    message,
-                    notification_type,
-                    expires_at,
-                    session.get("admin_id")
-                ))
+                    """,
+                    (
+                        game_id,
+                        title,
+                        message,
+                        notification_type,
+                        expires_at,
+                        session.get("admin_id")
+                    )
+                )
 
             connection.commit()
 
@@ -3654,11 +4540,19 @@ def notification_create():
                 url_for("admin.notifications")
             )
 
-        cursor.execute("""
-            SELECT id, game_name
+        # ----------------------------------------------------
+        # GET
+        # ----------------------------------------------------
+
+        cursor.execute(
+            """
+            SELECT
+                id,
+                game_name
             FROM games
             ORDER BY game_name ASC
-        """)
+            """
+        )
 
         games = cursor.fetchall()
 
@@ -3672,8 +4566,8 @@ def notification_create():
         )
 
     except Exception:
-        if connection:
-            connection.rollback()
+
+        rollback_db(connection)
 
         current_app.logger.exception(
             "Notification creation error"
@@ -3689,11 +4583,11 @@ def notification_create():
         )
 
     finally:
-        if cursor:
-            cursor.close()
 
-        if connection:
-            connection.close()
+        close_db(
+            connection,
+            cursor
+        )
 
 
 # ============================================================
@@ -3705,16 +4599,20 @@ def notification_create():
     methods=["POST"]
 )
 @admin_required
-def notification_toggle(notification_id):
+def notification_toggle(
+    notification_id
+):
 
     connection = None
     cursor = None
 
     try:
+
         connection = get_db_connection()
         cursor = connection.cursor()
 
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT
                 id,
                 title,
@@ -3722,46 +4620,73 @@ def notification_toggle(notification_id):
             FROM notifications
             WHERE id = %s
             LIMIT 1
-        """, (notification_id,))
+            """,
+            (notification_id,)
+        )
 
         notification = cursor.fetchone()
 
         if not notification:
+
             flash(
                 "Notification not found.",
                 "error"
             )
+
             return redirect(
                 url_for("admin.notifications")
             )
 
-        if notification["is_published"]:
-            cursor.execute("""
-                UPDATE notifications
-                SET
-                    is_published = 0,
-                    published_at = NULL
-                WHERE id = %s
-            """, (notification_id,))
+        # ----------------------------------------------------
+        # UNPUBLISH
+        # ----------------------------------------------------
 
-            message = "Notification unpublished."
-        else:
-            cursor.execute("""
+        if bool(notification["is_published"]):
+
+            cursor.execute(
+                """
                 UPDATE notifications
                 SET
-                    is_published = 1,
-                    published_at = NOW(),
+                    is_published = FALSE,
+                    published_at = NULL,
+                    updated_at = CURRENT_TIMESTAMP
+                WHERE id = %s
+                """,
+                (notification_id,)
+            )
+
+            message = (
+                "Notification unpublished."
+            )
+
+        # ----------------------------------------------------
+        # PUBLISH
+        # ----------------------------------------------------
+
+        else:
+
+            cursor.execute(
+                """
+                UPDATE notifications
+                SET
+                    is_published = TRUE,
+                    published_at = CURRENT_TIMESTAMP,
                     created_by = COALESCE(
                         created_by,
                         %s
-                    )
+                    ),
+                    updated_at = CURRENT_TIMESTAMP
                 WHERE id = %s
-            """, (
-                session.get("admin_id"),
-                notification_id
-            ))
+                """,
+                (
+                    session.get("admin_id"),
+                    notification_id
+                )
+            )
 
-            message = "Notification published."
+            message = (
+                "Notification published."
+            )
 
         connection.commit()
 
@@ -3771,8 +4696,8 @@ def notification_toggle(notification_id):
         )
 
     except Exception:
-        if connection:
-            connection.rollback()
+
+        rollback_db(connection)
 
         current_app.logger.exception(
             "Notification toggle error"
@@ -3784,11 +4709,11 @@ def notification_toggle(notification_id):
         )
 
     finally:
-        if cursor:
-            cursor.close()
 
-        if connection:
-            connection.close()
+        close_db(
+            connection,
+            cursor
+        )
 
     return redirect(
         url_for("admin.notifications")
@@ -3804,35 +4729,46 @@ def notification_toggle(notification_id):
     methods=["POST"]
 )
 @admin_required
-def notification_delete(notification_id):
+def notification_delete(
+    notification_id
+):
 
     connection = None
     cursor = None
 
     try:
+
         connection = get_db_connection()
         cursor = connection.cursor()
 
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT id
             FROM notifications
             WHERE id = %s
             LIMIT 1
-        """, (notification_id,))
+            """,
+            (notification_id,)
+        )
 
         if not cursor.fetchone():
+
             flash(
                 "Notification not found.",
                 "error"
             )
+
             return redirect(
                 url_for("admin.notifications")
             )
 
-        cursor.execute("""
+        cursor.execute(
+            """
             DELETE FROM notifications
             WHERE id = %s
-        """, (notification_id,))
+            """,
+            (notification_id,)
+        )
 
         connection.commit()
 
@@ -3842,8 +4778,8 @@ def notification_delete(notification_id):
         )
 
     except Exception:
-        if connection:
-            connection.rollback()
+
+        rollback_db(connection)
 
         current_app.logger.exception(
             "Notification deletion error"
@@ -3855,23 +4791,31 @@ def notification_delete(notification_id):
         )
 
     finally:
-        if cursor:
-            cursor.close()
 
-        if connection:
-            connection.close()
+        close_db(
+            connection,
+            cursor
+        )
 
     return redirect(
         url_for("admin.notifications")
     )
 
 
-
 # ============================================================
 # ADMIN SETTINGS
+#
+# IMPORTANT:
+# The portal_settings table is already created by the
+# Supabase PostgreSQL schema.
+#
+# We DO NOT create the table inside a web request.
 # ============================================================
 
-@admin_bp.route("/settings", methods=["GET", "POST"])
+@admin_bp.route(
+    "/settings",
+    methods=["GET", "POST"]
+)
 @admin_required
 def settings():
 
@@ -3879,31 +4823,19 @@ def settings():
     cursor = None
 
     try:
+
         connection = get_db_connection()
         cursor = connection.cursor()
 
         # ----------------------------------------------------
-        # CREATE SETTINGS TABLE IF IT DOES NOT EXIST
+        # ENSURE DEFAULT SETTINGS ROW EXISTS
+        #
+        # PostgreSQL:
+        # ON CONFLICT DO NOTHING
         # ----------------------------------------------------
 
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS portal_settings (
-                id INT PRIMARY KEY,
-                portal_name VARCHAR(150) NOT NULL,
-                event_date DATE NULL,
-                portal_status VARCHAR(30) NOT NULL DEFAULT 'ACTIVE',
-                registration_enabled TINYINT(1) NOT NULL DEFAULT 1,
-                student_login_enabled TINYINT(1) NOT NULL DEFAULT 1,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                    ON UPDATE CURRENT_TIMESTAMP
-            )
-        """)
-
-        # ----------------------------------------------------
-        # CREATE DEFAULT SETTINGS RECORD
-        # ----------------------------------------------------
-
-        cursor.execute("""
+        cursor.execute(
+            """
             INSERT INTO portal_settings
             (
                 id,
@@ -3913,19 +4845,19 @@ def settings():
                 registration_enabled,
                 student_login_enabled
             )
-            SELECT
+            VALUES
+            (
                 1,
                 'Engineers Day 2026',
                 '2026-09-15',
                 'ACTIVE',
-                1,
-                1
-            WHERE NOT EXISTS (
-                SELECT 1
-                FROM portal_settings
-                WHERE id = 1
+                TRUE,
+                TRUE
             )
-        """)
+            ON CONFLICT (id)
+            DO NOTHING
+            """
+        )
 
         connection.commit()
 
@@ -3950,16 +4882,12 @@ def settings():
                 "ACTIVE"
             ).strip().upper()
 
-            registration_enabled = (
-                1
-                if request.form.get("registration_enabled")
-                else 0
+            registration_enabled = form_checkbox(
+                "registration_enabled"
             )
 
-            student_login_enabled = (
-                1
-                if request.form.get("student_login_enabled")
-                else 0
+            student_login_enabled = form_checkbox(
+                "student_login_enabled"
             )
 
             # ------------------------------------------------
@@ -3967,6 +4895,7 @@ def settings():
             # ------------------------------------------------
 
             if not portal_name:
+
                 flash(
                     "Portal name is required.",
                     "error"
@@ -3976,10 +4905,8 @@ def settings():
                     url_for("admin.settings")
                 )
 
-            if portal_status not in (
-                "ACTIVE",
-                "MAINTENANCE"
-            ):
+            if portal_status not in ALLOWED_PORTAL_STATUSES:
+
                 flash(
                     "Invalid portal status.",
                     "error"
@@ -3991,24 +4918,31 @@ def settings():
 
             # ------------------------------------------------
             # UPDATE
+            #
+            # PostgreSQL boolean values are Python True/False.
+            # updated_at is explicitly maintained here.
             # ------------------------------------------------
 
-            cursor.execute("""
+            cursor.execute(
+                """
                 UPDATE portal_settings
                 SET
                     portal_name = %s,
                     event_date = %s,
                     portal_status = %s,
                     registration_enabled = %s,
-                    student_login_enabled = %s
+                    student_login_enabled = %s,
+                    updated_at = CURRENT_TIMESTAMP
                 WHERE id = 1
-            """, (
-                portal_name,
-                event_date,
-                portal_status,
-                registration_enabled,
-                student_login_enabled
-            ))
+                """,
+                (
+                    portal_name,
+                    event_date,
+                    portal_status,
+                    registration_enabled,
+                    student_login_enabled
+                )
+            )
 
             connection.commit()
 
@@ -4025,7 +4959,8 @@ def settings():
         # LOAD SETTINGS
         # ----------------------------------------------------
 
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT
                 id,
                 portal_name,
@@ -4037,7 +4972,8 @@ def settings():
             FROM portal_settings
             WHERE id = 1
             LIMIT 1
-        """)
+            """
+        )
 
         settings_data = cursor.fetchone()
 
@@ -4045,10 +4981,12 @@ def settings():
         # EVENT COUNT
         # ----------------------------------------------------
 
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT COUNT(*) AS total
             FROM games
-        """)
+            """
+        )
 
         total_events = cursor.fetchone()["total"]
 
@@ -4060,8 +4998,7 @@ def settings():
 
     except Exception:
 
-        if connection:
-            connection.rollback()
+        rollback_db(connection)
 
         current_app.logger.exception(
             "Admin settings error"
@@ -4078,8 +5015,7 @@ def settings():
 
     finally:
 
-        if cursor:
-            cursor.close()
-
-        if connection:
-            connection.close()
+        close_db(
+            connection,
+            cursor
+        )
