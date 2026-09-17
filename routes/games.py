@@ -10,7 +10,6 @@ from flask import (
     flash,
     redirect,
     render_template,
-    request,
     session,
     url_for
 )
@@ -43,50 +42,6 @@ def student_login_required(view_function):
 
 
 # ============================================================
-# HELPER
-# ============================================================
-
-def get_current_student():
-
-    connection = None
-    cursor = None
-
-    try:
-
-        connection = get_db_connection()
-        cursor = connection.cursor()
-
-        cursor.execute(
-            """
-            SELECT
-                id,
-                name,
-                email,
-                phone,
-                student_id,
-                branch,
-                section,
-                year
-            FROM students
-            WHERE id = %s
-              AND is_active = TRUE
-            LIMIT 1
-            """,
-            (session["student_id"],)
-        )
-
-        return cursor.fetchone()
-
-    finally:
-
-        if cursor:
-            cursor.close()
-
-        if connection:
-            connection.close()
-
-
-# ============================================================
 # ALL EVENTS
 # ============================================================
 
@@ -98,7 +53,6 @@ def games():
     cursor = None
 
     try:
-
         connection = get_db_connection()
         cursor = connection.cursor()
 
@@ -106,23 +60,26 @@ def games():
             """
             SELECT
                 id,
-                name,
+                game_name,
                 description,
+                prize_pool,
+                requirements,
+                rules,
                 registration_mode,
                 team_min_size,
                 team_max_size,
                 event_date,
                 start_time,
                 end_time,
-                venue,
+                block,
+                floor,
+                room,
                 status,
                 registration_open,
-                prizes,
-                rules,
-                requirements
+                winner_certificate,
+                runner_up_certificate
             FROM games
-            WHERE status = 'UPCOMING'
-               OR status = 'ONGOING'
+            WHERE status IN ('UPCOMING', 'ONGOING')
                OR registration_open = TRUE
             ORDER BY
                 event_date IS NULL,
@@ -140,10 +97,16 @@ def games():
             games=games_list
         )
 
-    except Exception:
+    except Exception as error:
 
         if connection:
             connection.rollback()
+
+        print("\n==============================================")
+        print("STUDENT GAMES PAGE DATABASE ERROR")
+        print("==============================================")
+        print(repr(error))
+        print("==============================================\n")
 
         return render_template(
             "games.html",
@@ -172,7 +135,6 @@ def game_details(game_id):
     cursor = None
 
     try:
-
         connection = get_db_connection()
         cursor = connection.cursor()
 
@@ -184,21 +146,24 @@ def game_details(game_id):
             """
             SELECT
                 id,
-                name,
+                game_name,
                 description,
+                prize_pool,
+                requirements,
+                rules,
                 registration_mode,
                 team_min_size,
                 team_max_size,
                 event_date,
                 start_time,
                 end_time,
-                venue,
+                block,
+                floor,
+                room,
                 status,
                 registration_open,
-                prizes,
-                rules,
-                requirements,
-                certificate_enabled
+                winner_certificate,
+                runner_up_certificate
             FROM games
             WHERE id = %s
             LIMIT 1
@@ -210,7 +175,10 @@ def game_details(game_id):
 
         if not game:
             flash("Event not found.", "error")
-            return redirect(url_for("games.games"))
+
+            return redirect(
+                url_for("games.games")
+            )
 
         # ----------------------------------------------------
         # CURRENT STUDENT
@@ -238,7 +206,6 @@ def game_details(game_id):
         student = cursor.fetchone()
 
         if not student:
-
             session.clear()
 
             return redirect(
@@ -253,8 +220,11 @@ def game_details(game_id):
             """
             SELECT
                 id,
-                registration_status,
-                registered_at
+                student_id,
+                game_id,
+                status,
+                registered_at,
+                updated_at
             FROM registrations
             WHERE student_id = %s
               AND game_id = %s
@@ -293,25 +263,71 @@ def game_details(game_id):
                     t.team_name,
                     t.team_leader_id,
                     t.status
-                ORDER BY t.team_name ASC
+                ORDER BY
+                    t.team_name ASC
                 """,
                 (game_id,)
             )
 
             teams = cursor.fetchall()
 
+        # ----------------------------------------------------
+        # PUBLISHED RESULT
+        # ----------------------------------------------------
+
+        cursor.execute(
+            """
+            SELECT
+                id,
+                game_id,
+                winner,
+                winner_student_id,
+                winner_team_id,
+                runner_up,
+                runner_up_student_id,
+                runner_up_team_id,
+                winner_prize,
+                runner_up_prize,
+                winner_certificate,
+                runner_up_certificate,
+                result_details,
+                is_published,
+                published_at
+            FROM results
+            WHERE game_id = %s
+              AND is_published = TRUE
+            ORDER BY published_at DESC NULLS LAST, id DESC
+            LIMIT 1
+            """,
+            (game_id,)
+        )
+
+        result = cursor.fetchone()
+
+        # ----------------------------------------------------
+        # RENDER GAME DETAILS
+        # ----------------------------------------------------
+
         return render_template(
             "game_details.html",
             game=game,
             student=student,
             registration=registration,
-            teams=teams
+            teams=teams,
+            result=result
         )
 
-    except Exception:
+    except Exception as error:
 
         if connection:
             connection.rollback()
+
+        print("\n==============================================")
+        print("GAME DETAILS DATABASE ERROR")
+        print("==============================================")
+        print(f"GAME ID: {game_id}")
+        print(repr(error))
+        print("==============================================\n")
 
         flash(
             "Unable to load event details right now.",
@@ -346,7 +362,6 @@ def register(game_id):
     cursor = None
 
     try:
-
         connection = get_db_connection()
         cursor = connection.cursor()
 
@@ -391,7 +406,7 @@ def register(game_id):
             """
             SELECT
                 id,
-                name,
+                game_name,
                 registration_mode,
                 registration_open,
                 status
@@ -416,7 +431,7 @@ def register(game_id):
             )
 
         # ----------------------------------------------------
-        # REGISTRATION CHECK
+        # REGISTRATION OPEN CHECK
         # ----------------------------------------------------
 
         if not game["registration_open"]:
@@ -434,13 +449,13 @@ def register(game_id):
             )
 
         # ----------------------------------------------------
-        # TEAM EVENTS
+        # TEAM EVENT
         # ----------------------------------------------------
 
         if game["registration_mode"] == "TEAM":
 
             flash(
-                "This is a team event. Team registration will be handled through the team registration flow.",
+                "This is a team event. Team registration will be added through the team registration flow.",
                 "info"
             )
 
@@ -457,7 +472,9 @@ def register(game_id):
 
         cursor.execute(
             """
-            SELECT id
+            SELECT
+                id,
+                status
             FROM registrations
             WHERE student_id = %s
               AND game_id = %s
@@ -473,6 +490,43 @@ def register(game_id):
 
         if existing:
 
+            # ------------------------------------------------
+            # ALLOW RE-REGISTRATION AFTER CANCELLATION
+            # ------------------------------------------------
+
+            if existing["status"] == "CANCELLED":
+
+                cursor.execute(
+                    """
+                    UPDATE registrations
+                    SET
+                        status = 'REGISTERED',
+                        updated_at = CURRENT_TIMESTAMP
+                    WHERE id = %s
+                      AND student_id = %s
+                      AND game_id = %s
+                    """,
+                    (
+                        existing["id"],
+                        student["id"],
+                        game_id
+                    )
+                )
+
+                connection.commit()
+
+                flash(
+                    f"Registration successful for {game['game_name']}.",
+                    "success"
+                )
+
+                return redirect(
+                    url_for(
+                        "games.game_details",
+                        game_id=game_id
+                    )
+                )
+
             flash(
                 "You are already registered for this event.",
                 "info"
@@ -486,7 +540,7 @@ def register(game_id):
             )
 
         # ----------------------------------------------------
-        # INSERT
+        # INSERT REGISTRATION
         # ----------------------------------------------------
 
         cursor.execute(
@@ -495,7 +549,7 @@ def register(game_id):
             (
                 student_id,
                 game_id,
-                registration_status
+                status
             )
             VALUES
             (
@@ -503,6 +557,7 @@ def register(game_id):
                 %s,
                 'REGISTERED'
             )
+            RETURNING id
             """,
             (
                 student["id"],
@@ -510,12 +565,27 @@ def register(game_id):
             )
         )
 
+        registration_row = cursor.fetchone()
+
         connection.commit()
 
-        flash(
-            f"Registration successful for {game['name']}.",
-            "success"
+        registration_id = (
+            registration_row["id"]
+            if registration_row
+            else None
         )
+
+        if registration_id:
+            flash(
+                f"Registration successful for {game['game_name']}. "
+                f"Registration ID: {registration_id}",
+                "success"
+            )
+        else:
+            flash(
+                f"Registration successful for {game['game_name']}.",
+                "success"
+            )
 
         return redirect(
             url_for(
@@ -524,10 +594,17 @@ def register(game_id):
             )
         )
 
-    except Exception:
+    except Exception as error:
 
         if connection:
             connection.rollback()
+
+        print("\n==============================================")
+        print("REGISTRATION DATABASE ERROR")
+        print("==============================================")
+        print(f"GAME ID: {game_id}")
+        print(repr(error))
+        print("==============================================\n")
 
         flash(
             "Registration could not be completed. Please try again.",
@@ -565,13 +642,17 @@ def cancel_registration(game_id):
     cursor = None
 
     try:
-
         connection = get_db_connection()
         cursor = connection.cursor()
 
+        # ----------------------------------------------------
+        # STUDENT
+        # ----------------------------------------------------
+
         cursor.execute(
             """
-            SELECT id
+            SELECT
+                id
             FROM students
             WHERE id = %s
               AND is_active = TRUE
@@ -590,9 +671,15 @@ def cancel_registration(game_id):
                 url_for("auth.login")
             )
 
+        # ----------------------------------------------------
+        # REGISTRATION
+        # ----------------------------------------------------
+
         cursor.execute(
             """
-            SELECT id
+            SELECT
+                id,
+                status
             FROM registrations
             WHERE student_id = %s
               AND game_id = %s
@@ -620,15 +707,24 @@ def cancel_registration(game_id):
                 )
             )
 
+        # ----------------------------------------------------
+        # CANCEL
+        # ----------------------------------------------------
+
         cursor.execute(
             """
-            DELETE FROM registrations
+            UPDATE registrations
+            SET
+                status = 'CANCELLED',
+                updated_at = CURRENT_TIMESTAMP
             WHERE id = %s
               AND student_id = %s
+              AND game_id = %s
             """,
             (
                 registration["id"],
-                student["id"]
+                student["id"],
+                game_id
             )
         )
 
@@ -646,10 +742,17 @@ def cancel_registration(game_id):
             )
         )
 
-    except Exception:
+    except Exception as error:
 
         if connection:
             connection.rollback()
+
+        print("\n==============================================")
+        print("CANCEL REGISTRATION DATABASE ERROR")
+        print("==============================================")
+        print(f"GAME ID: {game_id}")
+        print(repr(error))
+        print("==============================================\n")
 
         flash(
             "Unable to cancel registration.",
