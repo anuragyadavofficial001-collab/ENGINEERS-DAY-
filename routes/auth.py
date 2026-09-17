@@ -1,13 +1,26 @@
 # ============================================================
-# ENGINEERS DAY - STUDENT AUTHENTICATION
+# ENGINEERS DAY 2026
+# STUDENT AUTHENTICATION
+# ============================================================
 # Direct Login using Admin-Saved Student Information
 # OTP / AWS SES REMOVED
+#
+# Authentication source:
+#     students table
+#
+# Login requires:
+#     Student ID
+#     Name
+#     Phone
+#     Email
 # ============================================================
+
 
 import re
 import hmac
 
 from functools import wraps
+
 from flask import (
     Blueprint,
     flash,
@@ -21,60 +34,80 @@ from flask import (
 from database.db import get_db_connection
 
 
+# ============================================================
+# BLUEPRINT
+# ============================================================
+
 auth_bp = Blueprint("auth", __name__)
 
 
 # ============================================================
-# VALIDATION HELPERS
+# NORMALIZATION HELPERS
 # ============================================================
 
 def normalize_name(name):
     """
-    Normalize name for reliable comparison.
+    Normalize student name.
+
     Example:
-        "Anurag   Yadav" -> "anurag yadav"
+        "Anurag   Yadav"
+        ->
+        "anurag yadav"
     """
+
     if not name:
         return ""
 
-    name = " ".join(name.strip().split())
+    name = " ".join(str(name).strip().split())
+
     return name.casefold()
 
 
 def normalize_email(email):
     """
-    Normalize email for exact comparison.
+    Normalize email for comparison.
     """
+
     if not email:
         return ""
 
-    return email.strip().casefold()
+    return str(email).strip().casefold()
 
 
 def normalize_phone(phone):
     """
-    Normalize Indian phone number.
+    Normalize Indian mobile number.
 
-    Accepted:
+    Accepted examples:
+
         9876543210
         919876543210
         +919876543210
         98765-43210
         98765 43210
+
+    Internal format:
+
+        919876543210
     """
 
-    if not phone:
+    if phone is None:
         return ""
 
-    phone = phone.strip()
+    phone = str(phone).strip()
+
+    # Remove spaces, hyphens and brackets
     phone = re.sub(r"[\s\-()]+", "", phone)
 
+    # +919876543210 -> 919876543210
     if phone.startswith("+91"):
         phone = phone[1:]
 
-    if phone.startswith("91") and len(phone) == 12:
+    # 919876543210
+    if re.fullmatch(r"91[6-9]\d{9}", phone):
         return phone
 
+    # 9876543210 -> 919876543210
     if re.fullmatch(r"[6-9]\d{9}", phone):
         return "91" + phone
 
@@ -83,15 +116,21 @@ def normalize_phone(phone):
 
 def normalize_student_id(student_id):
     """
-    Student ID / Roll Number normalization.
+    Normalize Student ID / Roll Number.
     """
-    if not student_id:
+
+    if student_id is None:
         return ""
 
-    return student_id.strip().upper()
+    return str(student_id).strip().upper()
 
+
+# ============================================================
+# VALIDATION HELPERS
+# ============================================================
 
 def validate_student_id(student_id):
+
     student_id = normalize_student_id(student_id)
 
     if not student_id:
@@ -110,23 +149,31 @@ def validate_student_id(student_id):
 
 
 def validate_name(name):
-    name = " ".join((name or "").strip().split())
+
+    name = " ".join(
+        str(name or "").strip().split()
+    )
 
     if len(name) < 2 or len(name) > 100:
         return None
 
-    # Allows:
+    # Supports:
     # Anurag Yadav
     # Anurag Kumar Yadav
     # O'Connor
     # A. Yadav
-    if not re.fullmatch(r"[A-Za-z .'-]+", name):
+
+    if not re.fullmatch(
+        r"[A-Za-z .'-]+",
+        name
+    ):
         return None
 
     return name
 
 
 def validate_email(email):
+
     email = normalize_email(email)
 
     if not email:
@@ -135,7 +182,6 @@ def validate_email(email):
     if len(email) > 150:
         return None
 
-    # Practical email validation
     if not re.fullmatch(
         r"[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@"
         r"[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+",
@@ -147,12 +193,16 @@ def validate_email(email):
 
 
 def validate_phone(phone):
+
     phone = normalize_phone(phone)
 
     if not phone:
         return None
 
-    if not re.fullmatch(r"91[6-9]\d{9}", phone):
+    if not re.fullmatch(
+        r"91[6-9]\d{9}",
+        phone
+    ):
         return None
 
     return phone
@@ -168,9 +218,14 @@ def login():
     Student login page.
     """
 
-    # Already logged in
-    if session.get("authenticated") and session.get("student_id"):
-        return redirect(url_for("student.home"))
+    # Already authenticated
+    if (
+        session.get("authenticated")
+        and session.get("student_id")
+    ):
+        return redirect(
+            url_for("student.home")
+        )
 
     return render_template("login.html")
 
@@ -184,65 +239,156 @@ def login_post():
     """
     Direct student authentication.
 
-    Student must provide the SAME information
-    that Admin imported/saved in the database:
+    Student must provide:
 
         Student ID
         Name
         Phone
         Email
 
-    All four fields must match the same student record.
+    All four values must belong to the
+    SAME active student record.
     """
 
-    # --------------------------------------------------------
+    # ========================================================
     # GET FORM DATA
-    # --------------------------------------------------------
+    # ========================================================
 
-    student_id_raw = request.form.get("student_id", "")
-    name_raw = request.form.get("name", "")
-    phone_raw = request.form.get("phone", "")
-    email_raw = request.form.get("email", "")
+    student_id_raw = request.form.get(
+        "student_id",
+        ""
+    )
 
-    # --------------------------------------------------------
+    name_raw = request.form.get(
+        "name",
+        ""
+    )
+
+    phone_raw = request.form.get(
+        "phone",
+        ""
+    )
+
+    email_raw = request.form.get(
+        "email",
+        ""
+    )
+
+
+    # ========================================================
     # VALIDATE INPUT
-    # --------------------------------------------------------
+    # ========================================================
 
-    student_id = validate_student_id(student_id_raw)
-    name = validate_name(name_raw)
-    phone = validate_phone(phone_raw)
-    email = validate_email(email_raw)
+    student_id = validate_student_id(
+        student_id_raw
+    )
+
+    name = validate_name(
+        name_raw
+    )
+
+    phone = validate_phone(
+        phone_raw
+    )
+
+    email = validate_email(
+        email_raw
+    )
+
+
+    # --------------------------------------------------------
+    # Student ID validation
+    # --------------------------------------------------------
 
     if not student_id:
-        flash("Please enter a valid Student ID / Roll Number.", "error")
-        return redirect(url_for("auth.login"))
+
+        flash(
+            "Please enter a valid Student ID / Roll Number.",
+            "error"
+        )
+
+        return redirect(
+            url_for("auth.login")
+        )
+
+
+    # --------------------------------------------------------
+    # Name validation
+    # --------------------------------------------------------
 
     if not name:
-        flash("Please enter a valid student name.", "error")
-        return redirect(url_for("auth.login"))
+
+        flash(
+            "Please enter a valid student name.",
+            "error"
+        )
+
+        return redirect(
+            url_for("auth.login")
+        )
+
+
+    # --------------------------------------------------------
+    # Phone validation
+    # --------------------------------------------------------
 
     if not phone:
-        flash("Please enter a valid mobile number.", "error")
-        return redirect(url_for("auth.login"))
+
+        flash(
+            "Please enter a valid 10-digit mobile number.",
+            "error"
+        )
+
+        return redirect(
+            url_for("auth.login")
+        )
+
+
+    # --------------------------------------------------------
+    # Email validation
+    # --------------------------------------------------------
 
     if not email:
-        flash("Please enter a valid email address.", "error")
-        return redirect(url_for("auth.login"))
 
-    # --------------------------------------------------------
+        flash(
+            "Please enter a valid email address.",
+            "error"
+        )
+
+        return redirect(
+            url_for("auth.login")
+        )
+
+
+    # ========================================================
     # DATABASE
-    # --------------------------------------------------------
+    # ========================================================
 
     connection = None
     cursor = None
 
     try:
+
         connection = get_db_connection()
+
         cursor = connection.cursor()
 
-        # ----------------------------------------------------
-        # FIND STUDENT BY STUDENT ID
-        # ----------------------------------------------------
+
+        # ====================================================
+        # FIND STUDENT
+        # ====================================================
+        #
+        # We search ONLY by Student ID first.
+        #
+        # Then we compare:
+        #
+        #   Student ID
+        #   Name
+        #   Email
+        #   Phone
+        #
+        # against the same database record.
+        # ====================================================
 
         cursor.execute(
             """
@@ -265,65 +411,110 @@ def login_post():
 
         student = cursor.fetchone()
 
-        # ----------------------------------------------------
+
+        # ====================================================
         # STUDENT NOT FOUND
-        # ----------------------------------------------------
+        # ====================================================
 
         if not student:
+
             flash(
                 "Student information does not match our records.",
                 "error"
             )
-            return redirect(url_for("auth.login"))
 
-        # ----------------------------------------------------
-        # ACCOUNT DISABLED
-        # ----------------------------------------------------
+            return redirect(
+                url_for("auth.login")
+            )
+
+
+        # ====================================================
+        # ACCOUNT INACTIVE
+        # ====================================================
 
         if not student.get("is_active"):
+
             flash(
                 "Your student account is currently inactive. "
                 "Please contact the administration.",
                 "error"
             )
-            return redirect(url_for("auth.login"))
 
-        # ----------------------------------------------------
+            return redirect(
+                url_for("auth.login")
+            )
+
+
+        # ====================================================
         # NORMALIZE DATABASE VALUES
-        # ----------------------------------------------------
+        # ====================================================
 
-        db_name = normalize_name(student.get("name"))
-        db_email = normalize_email(student.get("email"))
-        db_phone = normalize_phone(student.get("phone"))
-        db_student_id = normalize_student_id(student.get("student_id"))
+        db_student_id = normalize_student_id(
+            student.get("student_id")
+        )
 
-        # ----------------------------------------------------
+        db_name = normalize_name(
+            student.get("name")
+        )
+
+        db_email = normalize_email(
+            student.get("email")
+        )
+
+        db_phone = normalize_phone(
+            student.get("phone")
+        )
+
+
+        # ====================================================
+        # NORMALIZE USER INPUT
+        # ====================================================
+
+        input_student_id = normalize_student_id(
+            student_id
+        )
+
+        input_name = normalize_name(
+            name
+        )
+
+        input_email = normalize_email(
+            email
+        )
+
+        input_phone = normalize_phone(
+            phone
+        )
+
+
+        # ====================================================
         # EXACT IDENTITY MATCH
-        # ----------------------------------------------------
+        # ====================================================
+
+        student_id_match = hmac.compare_digest(
+            input_student_id,
+            db_student_id
+        )
 
         name_match = hmac.compare_digest(
-            name.casefold(),
+            input_name,
             db_name
         )
 
         email_match = hmac.compare_digest(
-            email,
+            input_email,
             db_email
         )
 
         phone_match = hmac.compare_digest(
-            phone,
+            input_phone,
             db_phone
         )
 
-        student_id_match = hmac.compare_digest(
-            student_id,
-            db_student_id
-        )
 
-        # ----------------------------------------------------
+        # ====================================================
         # ALL FOUR MUST MATCH
-        # ----------------------------------------------------
+        # ====================================================
 
         if not (
             student_id_match
@@ -331,88 +522,96 @@ def login_post():
             and email_match
             and phone_match
         ):
+
             flash(
                 "Student information does not match our records.",
                 "error"
             )
-            return redirect(url_for("auth.login"))
 
-        # ----------------------------------------------------
-        # SUCCESS
-        # ----------------------------------------------------
+            return redirect(
+                url_for("auth.login")
+            )
 
-        # Clear any old authentication/session state
+
+        # ====================================================
+        # LOGIN SUCCESS
+        # ====================================================
+
+        # Destroy any old session data first
         session.clear()
 
-        # Store ONLY internal student DB ID
+
+        # Store internal database ID only
         session["student_id"] = student["id"]
+
 
         # Authentication flag
         session["authenticated"] = True
 
-        # Persistent session
+
+        # Permanent login session
         session.permanent = True
 
-        # ----------------------------------------------------
-        # OPTIONAL REGISTRY CHECK
-        # ----------------------------------------------------
-        #
-        # If student_registry exists, make sure the Student ID
-        # is not disabled there.
-        #
-        # We intentionally do not require a registry record here
-        # because students table is the actual account record.
-        #
 
-        try:
-            cursor.execute(
-                """
-                SELECT
-                    id,
-                    student_id,
-                    is_active
-                FROM student_registry
-                WHERE student_id = %s
-                LIMIT 1
-                """,
-                (student_id,)
-            )
-
-            registry_student = cursor.fetchone()
-
-            if registry_student:
-                if not registry_student.get("is_active"):
-                    session.clear()
-
-                    flash(
-                        "Your Student ID is currently disabled "
-                        "by the administration.",
-                        "error"
-                    )
-
-                    return redirect(url_for("auth.login"))
-
-        except Exception:
-            # If registry table/query is unavailable,
-            # don't break login for a valid students record.
-            pass
-
-        # ----------------------------------------------------
+        # ====================================================
         # COMMIT
-        # ----------------------------------------------------
+        # ====================================================
 
         connection.commit()
+
+
+        # ====================================================
+        # SUCCESS MESSAGE
+        # ====================================================
 
         flash(
             f"Welcome, {student['name']}!",
             "success"
         )
 
-        return redirect(url_for("student.home"))
 
-    except Exception:
+        # ====================================================
+        # REDIRECT TO STUDENT DASHBOARD
+        # ====================================================
+
+        return redirect(
+            url_for("student.home")
+        )
+
+
+    # ========================================================
+    # DATABASE / APPLICATION ERROR
+    # ========================================================
+
+    except Exception as error:
+
+        # Rollback failed transaction
         if connection:
-            connection.rollback()
+
+            try:
+                connection.rollback()
+
+            except Exception:
+                pass
+
+
+        # Print actual error in Flask terminal
+        # This is extremely useful during development.
+        print(
+            "\n"
+            "====================================================\n"
+            "STUDENT LOGIN DATABASE ERROR\n"
+            "===================================================="
+        )
+
+        print(
+            repr(error)
+        )
+
+        print(
+            "====================================================\n"
+        )
+
 
         flash(
             "Unable to verify your information right now. "
@@ -420,14 +619,34 @@ def login_post():
             "error"
         )
 
-        return redirect(url_for("auth.login"))
+
+        return redirect(
+            url_for("auth.login")
+        )
+
+
+    # ========================================================
+    # CLEANUP
+    # ========================================================
 
     finally:
+
         if cursor:
-            cursor.close()
+
+            try:
+                cursor.close()
+
+            except Exception:
+                pass
+
 
         if connection:
-            connection.close()
+
+            try:
+                connection.close()
+
+            except Exception:
+                pass
 
 
 # ============================================================
@@ -447,4 +666,6 @@ def logout():
         "success"
     )
 
-    return redirect(url_for("auth.login"))
+    return redirect(
+        url_for("auth.login")
+    )

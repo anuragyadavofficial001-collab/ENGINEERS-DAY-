@@ -1,5 +1,6 @@
 # ============================================================
-# ENGINEERS DAY - STUDENT PANEL
+# ENGINEERS DAY 2026
+# STUDENT ROUTES
 # ============================================================
 
 from functools import wraps
@@ -9,35 +10,32 @@ from flask import (
     redirect,
     render_template,
     session,
-    url_for,
+    url_for
 )
 
 from database.db import get_db_connection
 
 
+# ============================================================
+# BLUEPRINT
+# ============================================================
+
 student_bp = Blueprint("student", __name__)
 
 
 # ============================================================
-# STUDENT AUTHENTICATION GUARD
+# STUDENT LOGIN REQUIRED
 # ============================================================
 
 def student_login_required(view_function):
-
     @wraps(view_function)
     def wrapped_view(*args, **kwargs):
 
-        # ----------------------------------------------------
-        # Check authentication session
-        # ----------------------------------------------------
-
+        # Student must be authenticated
         if not session.get("authenticated"):
             return redirect(url_for("auth.login"))
 
-        # ----------------------------------------------------
-        # Internal database student ID must exist
-        # ----------------------------------------------------
-
+        # Student ID must exist in session
         if not session.get("student_id"):
             session.clear()
             return redirect(url_for("auth.login"))
@@ -59,12 +57,16 @@ def home():
     cursor = None
 
     try:
+        # ----------------------------------------------------
+        # DATABASE CONNECTION
+        # ----------------------------------------------------
 
         connection = get_db_connection()
         cursor = connection.cursor()
 
+
         # ----------------------------------------------------
-        # Load authenticated student
+        # LOAD LOGGED-IN STUDENT
         # ----------------------------------------------------
 
         cursor.execute(
@@ -88,28 +90,180 @@ def home():
 
         student = cursor.fetchone()
 
+
         # ----------------------------------------------------
-        # Session belongs to invalid / deleted / disabled user
+        # STUDENT NOT FOUND
         # ----------------------------------------------------
 
         if not student:
-
             session.clear()
-
             return redirect(url_for("auth.login"))
 
+
         # ----------------------------------------------------
-        # Dashboard
+        # LOAD ALL 27 GAMES
+        # ----------------------------------------------------
+
+        cursor.execute(
+            """
+            SELECT
+                id,
+                game_name,
+                description,
+                prize_pool,
+                requirements,
+                rules,
+                registration_mode,
+                team_min_size,
+                team_max_size,
+                event_date,
+                start_time,
+                end_time,
+                block,
+                floor,
+                room,
+                status,
+                registration_open,
+                winner_certificate,
+                runner_up_certificate
+            FROM games
+            ORDER BY id ASC
+            """
+        )
+
+        games = cursor.fetchall()
+
+
+        # ----------------------------------------------------
+        # LOAD STUDENT REGISTRATIONS
+        # ----------------------------------------------------
+
+        cursor.execute(
+            """
+            SELECT
+                r.id AS registration_id,
+                r.game_id,
+                r.status AS registration_status,
+                r.registered_at,
+                g.game_name
+            FROM registrations r
+            INNER JOIN games g
+                ON g.id = r.game_id
+            WHERE r.student_id = %s
+            ORDER BY r.registered_at DESC
+            """,
+            (student["id"],)
+        )
+
+        my_events = cursor.fetchall()
+
+
+        # ----------------------------------------------------
+        # TOTAL GAMES
+        # ----------------------------------------------------
+
+        total_games = len(games)
+
+
+        # ----------------------------------------------------
+        # JOINED GAMES
+        # ----------------------------------------------------
+
+        joined_games = sum(
+            1
+            for event in my_events
+            if event["registration_status"] in (
+                "REGISTERED",
+                "APPROVED"
+            )
+        )
+
+
+        # ----------------------------------------------------
+        # UPCOMING GAMES
+        # ----------------------------------------------------
+
+        upcoming_games = sum(
+            1
+            for game in games
+            if game["status"] == "UPCOMING"
+            and game["registration_open"]
+        )
+
+
+        # ----------------------------------------------------
+        # PUBLISHED RESULTS COUNT
+        # ----------------------------------------------------
+
+        cursor.execute(
+            """
+            SELECT
+                COUNT(*) AS result_count
+            FROM results
+            WHERE is_published = TRUE
+            """
+        )
+
+        result_row = cursor.fetchone()
+
+        results_available = (
+            result_row["result_count"]
+            if result_row
+            else 0
+        )
+
+
+        # ----------------------------------------------------
+        # LOAD PUBLISHED NOTIFICATIONS
+        # ----------------------------------------------------
+
+        cursor.execute(
+            """
+            SELECT
+                id,
+                game_id,
+                title,
+                message,
+                notification_type,
+                published_at,
+                expires_at
+            FROM notifications
+            WHERE is_published = TRUE
+              AND (
+                    expires_at IS NULL
+                    OR expires_at > CURRENT_TIMESTAMP
+                  )
+            ORDER BY published_at DESC
+            LIMIT 10
+            """
+        )
+
+        notifications = cursor.fetchall()
+
+
+        # ----------------------------------------------------
+        # RENDER STUDENT DASHBOARD
         # ----------------------------------------------------
 
         return render_template(
             "home.html",
-            student=student
+            student=student,
+            games=games,
+            my_events=my_events,
+            notifications=notifications,
+            total_games=total_games,
+            joined_games=joined_games,
+            upcoming_games=upcoming_games,
+            results_available=results_available
         )
+
+
+    # ========================================================
+    # DATABASE / APPLICATION ERROR
+    # ========================================================
 
     except Exception:
 
-        # Do NOT expose database errors to students.
         if connection:
             connection.rollback()
 
@@ -117,6 +271,11 @@ def home():
             "Unable to load your student dashboard. "
             "Please try again later."
         ), 500
+
+
+    # ========================================================
+    # CLOSE DATABASE RESOURCES
+    # ========================================================
 
     finally:
 
