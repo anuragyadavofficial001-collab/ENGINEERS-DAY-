@@ -1,672 +1,2505 @@
+
 {% extends "admin/base.html" %}
 
-{% block title %}Registration Details | Admin{% endblock %}
+{% block title %}
+Registration Details
+{% endblock %}
+
 
 {% block content %}
 
-<div class="admin-page">
+<style>
 
-    <!-- =========================================================
-         PAGE HEADER
-    ========================================================== -->
-    <div class="page-header">
+/* ============================================================
+   REGISTRATION DETAILS — ENGINEERS DAY 2026
+   ============================================================ */
 
-        <div>
+:root {
+    --rd-bg: #07111f;
+    --rd-card: rgba(14, 28, 48, 0.78);
+    --rd-card-soft: rgba(255, 255, 255, 0.045);
 
-            <div class="page-eyebrow">
-                <span class="eyebrow-dot"></span>
-                REGISTRATION INSPECTOR
+    --rd-border: rgba(151, 190, 255, 0.16);
+    --rd-border-strong: rgba(99, 174, 255, 0.30);
+
+    --rd-text: #eef6ff;
+    --rd-muted: #8ea5bf;
+    --rd-soft: #b9c9db;
+
+    --rd-blue: #4aa8ff;
+    --rd-cyan: #36d9ff;
+    --rd-purple: #9b7cff;
+    --rd-green: #39d98a;
+    --rd-orange: #ffae57;
+    --rd-red: #ff637b;
+
+    --rd-radius: 22px;
+}
+
+
+/* ============================================================
+   PAGE
+   ============================================================ */
+
+.registration-details-page {
+
+    width: min(
+        calc(100% - 48px),
+        1480px
+    );
+
+    margin: 28px auto 70px;
+
+    color: var(--rd-text);
+
+    min-width: 0;
+}
+
+
+/* ============================================================
+   UNIVERSAL OVERFLOW PROTECTION
+   ============================================================ */
+
+.registration-details-page *,
+.registration-details-page *::before,
+.registration-details-page *::after {
+
+    box-sizing: border-box;
+    min-width: 0;
+}
+
+
+.registration-details-page h1,
+.registration-details-page h2,
+.registration-details-page h3,
+.registration-details-page h4,
+.registration-details-page p,
+.registration-details-page span,
+.registration-details-page strong,
+.registration-details-page small,
+.registration-details-page div,
+.registration-details-page a {
+
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+
+/* ============================================================
+   BACK NAVIGATION
+   ============================================================ */
+
+.rd-back {
+
+    display: inline-flex;
+
+    align-items: center;
+    gap: 10px;
+
+    margin-bottom: 20px;
+
+    color: var(--rd-soft);
+
+    text-decoration: none;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    letter-spacing: 0.2px;
+
+    transition:
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.rd-back:hover {
+
+    color: #ffffff;
+
+    transform:
+        translateX(-3px);
+}
+
+
+.rd-back-icon {
+
+    width: 34px;
+    height: 34px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 11px;
+
+    border:
+        1px solid
+        var(--rd-border);
+
+    background:
+        rgba(255,255,255,0.045);
+
+    font-size: 16px;
+}
+
+
+/* ============================================================
+   TOP REGISTRATION HEADER
+   ============================================================ */
+
+.registration-header {
+
+    position: relative;
+
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        auto;
+
+    gap: 24px;
+
+    align-items: center;
+
+    padding: 28px;
+
+    margin-bottom: 22px;
+
+    border:
+        1px solid
+        var(--rd-border);
+
+    border-radius:
+        var(--rd-radius);
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(23, 48, 81, 0.88),
+            rgba(8, 19, 34, 0.92)
+        );
+
+    box-shadow:
+        0 28px 70px rgba(0,0,0,0.28),
+        inset 0 1px 0 rgba(255,255,255,0.07);
+
+    overflow: hidden;
+}
+
+
+.registration-header::before {
+
+    content: "";
+
+    position: absolute;
+
+    width: 280px;
+    height: 280px;
+
+    top: -160px;
+    right: -80px;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(54,217,255,0.20),
+            transparent 68%
+        );
+
+    pointer-events: none;
+}
+
+
+.registration-header::after {
+
+    content: "";
+
+    position: absolute;
+
+    width: 240px;
+    height: 240px;
+
+    bottom: -170px;
+    left: -100px;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(155,124,255,0.16),
+            transparent 70%
+        );
+
+    pointer-events: none;
+}
+
+
+.registration-heading {
+
+    position: relative;
+    z-index: 1;
+
+    min-width: 0;
+}
+
+
+.registration-eyebrow {
+
+    display: inline-flex;
+
+    align-items: center;
+    gap: 8px;
+
+    margin-bottom: 10px;
+
+    color: #82c8ff;
+
+    font-size: 10px;
+    font-weight: 900;
+
+    letter-spacing: 2.4px;
+
+    text-transform: uppercase;
+}
+
+
+.registration-eyebrow-dot {
+
+    width: 7px;
+    height: 7px;
+
+    border-radius: 50%;
+
+    background: var(--rd-green);
+
+    box-shadow:
+        0 0 12px
+        rgba(57,217,138,0.75);
+}
+
+
+.registration-heading h1 {
+
+    margin: 0;
+
+    font-size:
+        clamp(25px, 3vw, 42px);
+
+    line-height: 1.08;
+
+    letter-spacing: -1.2px;
+
+    font-weight: 850;
+
+    color: #ffffff;
+}
+
+
+.registration-subtitle {
+
+    margin: 9px 0 0;
+
+    color: var(--rd-muted);
+
+    font-size: 13px;
+
+    line-height: 1.65;
+
+    max-width: 760px;
+}
+
+
+/* ============================================================
+   REGISTRATION META
+   ============================================================ */
+
+.registration-meta {
+
+    position: relative;
+    z-index: 1;
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    justify-content: flex-end;
+
+    gap: 9px;
+
+    max-width: 100%;
+
+}
+
+
+.meta-chip {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 7px;
+
+    min-height: 36px;
+
+    max-width: 100%;
+
+    padding:
+        8px
+        12px;
+
+    border-radius: 12px;
+
+    border:
+        1px solid
+        rgba(255,255,255,0.11);
+
+    background:
+        rgba(255,255,255,0.055);
+
+    color: #c7d8e9;
+
+    font-size: 11px;
+    font-weight: 750;
+
+    white-space: normal;
+
+    text-align: center;
+}
+
+
+.meta-chip strong {
+
+    color: #ffffff;
+
+    font-weight: 850;
+}
+
+
+.meta-chip.status {
+
+    border-color:
+        rgba(57,217,138,0.25);
+
+    background:
+        rgba(57,217,138,0.10);
+
+    color: #76efb1;
+}
+
+
+.meta-chip.status.approved {
+
+    border-color:
+        rgba(57,217,138,0.30);
+
+    background:
+        rgba(57,217,138,0.11);
+
+    color: #6ff0ae;
+}
+
+
+.meta-chip.status.rejected {
+
+    border-color:
+        rgba(255,99,123,0.30);
+
+    background:
+        rgba(255,99,123,0.10);
+
+    color: #ff899b;
+}
+
+
+.meta-chip.status.cancelled {
+
+    border-color:
+        rgba(255,174,87,0.30);
+
+    background:
+        rgba(255,174,87,0.10);
+
+    color: #ffc17e;
+}
+
+
+/* ============================================================
+   MAIN GRID
+   ============================================================ */
+
+.registration-main-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1.35fr)
+        minmax(300px, 0.65fr);
+
+    gap: 22px;
+
+    align-items: start;
+}
+
+
+/* ============================================================
+   CARD
+   ============================================================ */
+
+.rd-card {
+
+    min-width: 0;
+
+    border:
+        1px solid
+        var(--rd-border);
+
+    border-radius:
+        var(--rd-radius);
+
+    background:
+        var(--rd-card);
+
+    box-shadow:
+        0 22px 60px rgba(0,0,0,0.22),
+        inset 0 1px 0 rgba(255,255,255,0.045);
+
+    backdrop-filter:
+        blur(18px);
+
+    -webkit-backdrop-filter:
+        blur(18px);
+
+    overflow: hidden;
+}
+
+
+.rd-card + .rd-card {
+
+    margin-top: 22px;
+}
+
+
+/* ============================================================
+   CARD HEADER
+   ============================================================ */
+
+.rd-card-header {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 18px;
+
+    padding:
+        20px
+        22px;
+
+    border-bottom:
+        1px solid
+        rgba(255,255,255,0.075);
+
+    min-width: 0;
+}
+
+
+.rd-card-title {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    min-width: 0;
+}
+
+
+.rd-card-icon {
+
+    flex:
+        0 0 40px;
+
+    width: 40px;
+    height: 40px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 12px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(74,168,255,0.18),
+            rgba(155,124,255,0.16)
+        );
+
+    border:
+        1px solid
+        rgba(101,181,255,0.22);
+
+    font-size: 17px;
+}
+
+
+.rd-card-title-text {
+
+    min-width: 0;
+}
+
+
+.rd-card-title-text h2 {
+
+    margin: 0;
+
+    color: #f3f8ff;
+
+    font-size: 15px;
+    font-weight: 850;
+
+    letter-spacing: 0.2px;
+}
+
+
+.rd-card-title-text p {
+
+    margin: 3px 0 0;
+
+    color: var(--rd-muted);
+
+    font-size: 11px;
+
+    line-height: 1.5;
+}
+
+
+.rd-card-body {
+
+    padding: 22px;
+
+    min-width: 0;
+}
+
+
+/* ============================================================
+   INFORMATION GRID
+   ============================================================ */
+
+.info-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 12px;
+
+    min-width: 0;
+}
+
+
+.info-item {
+
+    min-width: 0;
+
+    padding: 15px;
+
+    border:
+        1px solid
+        rgba(255,255,255,0.075);
+
+    border-radius: 15px;
+
+    background:
+        rgba(255,255,255,0.035);
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.info-item:hover {
+
+    background:
+        rgba(255,255,255,0.055);
+
+    border-color:
+        rgba(99,174,255,0.22);
+
+    transform:
+        translateY(-1px);
+}
+
+
+.info-label {
+
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: #7189a4;
+
+    font-size: 9px;
+    font-weight: 850;
+
+    letter-spacing: 1.45px;
+
+    text-transform: uppercase;
+}
+
+
+.info-value {
+
+    display: block;
+
+    width: 100%;
+
+    color: #eef6ff;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    line-height: 1.5;
+
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+
+.info-value.muted {
+
+    color: #91a5bc;
+
+    font-weight: 600;
+}
+
+
+.info-value.accent {
+
+    color: #6ec3ff;
+}
+
+
+.info-value.success {
+
+    color: #67e7a4;
+}
+
+
+/* ============================================================
+   FULL WIDTH INFORMATION ITEM
+   ============================================================ */
+
+.info-item.full {
+
+    grid-column:
+        1 / -1;
+}
+
+
+/* ============================================================
+   EMAIL / LONG TEXT
+   ============================================================ */
+
+.long-value {
+
+    display: block;
+
+    max-width: 100%;
+
+    overflow-wrap: anywhere;
+    word-break: break-word;
+
+    white-space: normal;
+}
+
+
+/* ============================================================
+   EVENT HERO STRIP
+   ============================================================ */
+
+.event-highlight {
+
+    position: relative;
+
+    padding: 22px;
+
+    margin-bottom: 16px;
+
+    border-radius: 18px;
+
+    border:
+        1px solid
+        rgba(74,168,255,0.20);
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(44,111,183,0.16),
+            rgba(105,71,184,0.11)
+        );
+
+    overflow: hidden;
+}
+
+
+.event-highlight::before {
+
+    content: "";
+
+    position: absolute;
+
+    width: 170px;
+    height: 170px;
+
+    top: -110px;
+    right: -40px;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(54,217,255,0.18),
+            transparent 70%
+        );
+}
+
+
+.event-highlight-label {
+
+    position: relative;
+    z-index: 1;
+
+    margin-bottom: 6px;
+
+    color: #74c9ff;
+
+    font-size: 9px;
+    font-weight: 900;
+
+    letter-spacing: 1.7px;
+
+    text-transform: uppercase;
+}
+
+
+.event-highlight-title {
+
+    position: relative;
+    z-index: 1;
+
+    margin: 0;
+
+    color: #ffffff;
+
+    font-size:
+        clamp(20px, 2.2vw, 30px);
+
+    line-height: 1.18;
+
+    font-weight: 850;
+
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+
+.event-highlight-id {
+
+    position: relative;
+    z-index: 1;
+
+    margin-top: 8px;
+
+    color: #839bb6;
+
+    font-size: 11px;
+}
+
+
+/* ============================================================
+   TEAM SECTION
+   ============================================================ */
+
+.team-summary {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 10px;
+
+    margin-bottom: 15px;
+}
+
+
+.team-stat {
+
+    min-width: 0;
+
+    padding: 13px;
+
+    border:
+        1px solid
+        rgba(255,255,255,0.075);
+
+    border-radius: 14px;
+
+    background:
+        rgba(255,255,255,0.035);
+}
+
+
+.team-stat small {
+
+    display: block;
+
+    color: #7189a4;
+
+    font-size: 8px;
+    font-weight: 850;
+
+    letter-spacing: 1.25px;
+
+    text-transform: uppercase;
+
+    margin-bottom: 6px;
+}
+
+
+.team-stat strong {
+
+    display: block;
+
+    color: #f1f7ff;
+
+    font-size: 13px;
+
+    line-height: 1.45;
+
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+
+/* ============================================================
+   TEAM MEMBER LIST
+   ============================================================ */
+
+.team-members {
+
+    display: grid;
+
+    gap: 10px;
+
+    min-width: 0;
+}
+
+
+.team-member {
+
+    display: grid;
+
+    grid-template-columns:
+        auto
+        minmax(0, 1fr)
+        auto;
+
+    gap: 13px;
+
+    align-items: center;
+
+    min-width: 0;
+
+    padding: 14px;
+
+    border:
+        1px solid
+        rgba(255,255,255,0.075);
+
+    border-radius: 15px;
+
+    background:
+        rgba(255,255,255,0.032);
+}
+
+
+.team-avatar {
+
+    width: 40px;
+    height: 40px;
+
+    display: grid;
+    place-items: center;
+
+    flex-shrink: 0;
+
+    border-radius: 12px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(74,168,255,0.28),
+            rgba(155,124,255,0.28)
+        );
+
+    border:
+        1px solid
+        rgba(125,187,255,0.22);
+
+    color: #ffffff;
+
+    font-size: 14px;
+    font-weight: 900;
+}
+
+
+.team-member-main {
+
+    min-width: 0;
+}
+
+
+.team-member-name {
+
+    margin: 0;
+
+    color: #f3f8ff;
+
+    font-size: 13px;
+    font-weight: 800;
+
+    line-height: 1.35;
+
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+
+.team-member-contact {
+
+    margin-top: 4px;
+
+    color: #7f96af;
+
+    font-size: 10px;
+
+    line-height: 1.55;
+
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+
+.team-member-role {
+
+    flex-shrink: 0;
+
+    padding:
+        6px
+        9px;
+
+    border-radius: 9px;
+
+    background:
+        rgba(255,255,255,0.055);
+
+    border:
+        1px solid
+        rgba(255,255,255,0.09);
+
+    color: #9eb2c8;
+
+    font-size: 8px;
+    font-weight: 900;
+
+    letter-spacing: 1px;
+
+    white-space: nowrap;
+}
+
+
+.team-member-role.leader {
+
+    background:
+        rgba(255,174,87,0.10);
+
+    border-color:
+        rgba(255,174,87,0.24);
+
+    color: #ffc27e;
+}
+
+
+/* ============================================================
+   EMPTY TEAM
+   ============================================================ */
+
+.empty-state {
+
+    padding: 25px 18px;
+
+    text-align: center;
+
+    border:
+        1px dashed
+        rgba(255,255,255,0.12);
+
+    border-radius: 15px;
+
+    color: #788ea8;
+
+    font-size: 12px;
+
+    line-height: 1.6;
+}
+
+
+/* ============================================================
+   STATUS MANAGEMENT
+   ============================================================ */
+
+.status-panel {
+
+    position: sticky;
+
+    top: 20px;
+
+    min-width: 0;
+}
+
+
+.status-current {
+
+    padding: 18px;
+
+    margin-bottom: 14px;
+
+    border-radius: 17px;
+
+    background:
+        rgba(255,255,255,0.035);
+
+    border:
+        1px solid
+        rgba(255,255,255,0.075);
+}
+
+
+.status-current-label {
+
+    color: #738aa4;
+
+    font-size: 9px;
+    font-weight: 900;
+
+    letter-spacing: 1.5px;
+
+    text-transform: uppercase;
+
+    margin-bottom: 9px;
+}
+
+
+.status-badge {
+
+    display: inline-flex;
+
+    align-items: center;
+    gap: 8px;
+
+    max-width: 100%;
+
+    padding:
+        9px
+        12px;
+
+    border-radius: 11px;
+
+    font-size: 10px;
+    font-weight: 900;
+
+    letter-spacing: 0.8px;
+
+    text-transform: uppercase;
+
+    overflow-wrap: anywhere;
+}
+
+
+.status-badge::before {
+
+    content: "";
+
+    width: 7px;
+    height: 7px;
+
+    flex: 0 0 7px;
+
+    border-radius: 50%;
+
+    background: currentColor;
+
+    box-shadow:
+        0 0 10px currentColor;
+}
+
+
+.status-registered {
+
+    color: #62c3ff;
+
+    background:
+        rgba(74,168,255,0.10);
+
+    border:
+        1px solid
+        rgba(74,168,255,0.24);
+}
+
+
+.status-approved {
+
+    color: #66e7a3;
+
+    background:
+        rgba(57,217,138,0.10);
+
+    border:
+        1px solid
+        rgba(57,217,138,0.24);
+}
+
+
+.status-rejected {
+
+    color: #ff8497;
+
+    background:
+        rgba(255,99,123,0.10);
+
+    border:
+        1px solid
+        rgba(255,99,123,0.24);
+}
+
+
+.status-cancelled {
+
+    color: #ffc077;
+
+    background:
+        rgba(255,174,87,0.10);
+
+    border:
+        1px solid
+        rgba(255,174,87,0.24);
+}
+
+
+/* ============================================================
+   STATUS FORM
+   ============================================================ */
+
+.status-form {
+
+    display: grid;
+
+    gap: 11px;
+}
+
+
+.status-option {
+
+    position: relative;
+
+    min-width: 0;
+}
+
+
+.status-option input {
+
+    position: absolute;
+
+    opacity: 0;
+
+    pointer-events: none;
+}
+
+
+.status-option label {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 12px;
+
+    width: 100%;
+
+    min-width: 0;
+
+    padding:
+        13px
+        14px;
+
+    border:
+        1px solid
+        rgba(255,255,255,0.08);
+
+    border-radius: 13px;
+
+    background:
+        rgba(255,255,255,0.032);
+
+    color: #a8bad0;
+
+    font-size: 11px;
+    font-weight: 750;
+
+    cursor: pointer;
+
+    transition:
+        border-color 0.2s ease,
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.status-option label:hover {
+
+    border-color:
+        rgba(99,174,255,0.26);
+
+    background:
+        rgba(255,255,255,0.055);
+
+    color: #ffffff;
+
+    transform:
+        translateX(2px);
+}
+
+
+.status-option input:checked + label {
+
+    border-color:
+        rgba(74,168,255,0.45);
+
+    background:
+        rgba(74,168,255,0.10);
+
+    color: #ffffff;
+
+    box-shadow:
+        inset 3px 0 0
+        var(--rd-blue);
+}
+
+
+.status-option-dot {
+
+    width: 8px;
+    height: 8px;
+
+    flex: 0 0 8px;
+
+    border-radius: 50%;
+
+    background: currentColor;
+}
+
+
+.status-update-button {
+
+    width: 100%;
+
+    min-height: 46px;
+
+    margin-top: 5px;
+
+    border: 0;
+
+    border-radius: 13px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #398fff,
+            #695dff
+        );
+
+    color: #ffffff;
+
+    font-size: 11px;
+    font-weight: 900;
+
+    letter-spacing: 0.7px;
+
+    text-transform: uppercase;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 12px 28px
+        rgba(64,111,255,0.23);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        filter 0.2s ease;
+}
+
+
+.status-update-button:hover {
+
+    transform:
+        translateY(-2px);
+
+    box-shadow:
+        0 16px 34px
+        rgba(64,111,255,0.32);
+
+    filter:
+        brightness(1.08);
+}
+
+
+.status-update-button:active {
+
+    transform:
+        translateY(0);
+}
+
+
+/* ============================================================
+   QUICK REGISTRATION INFORMATION
+   ============================================================ */
+
+.quick-info {
+
+    display: grid;
+
+    gap: 9px;
+}
+
+
+.quick-row {
+
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 0.85fr)
+        minmax(0, 1.15fr);
+
+    gap: 12px;
+
+    padding:
+        11px
+        12px;
+
+    border-radius: 11px;
+
+    background:
+        rgba(255,255,255,0.028);
+
+    border:
+        1px solid
+        rgba(255,255,255,0.055);
+
+    min-width: 0;
+}
+
+
+.quick-label {
+
+    color: #7189a4;
+
+    font-size: 9px;
+    font-weight: 800;
+
+    text-transform: uppercase;
+
+    letter-spacing: 1px;
+}
+
+
+.quick-value {
+
+    color: #d9e6f3;
+
+    font-size: 10px;
+    font-weight: 700;
+
+    text-align: right;
+
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+
+/* ============================================================
+   FOOTER ACTIONS
+   ============================================================ */
+
+.rd-actions {
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 10px;
+
+    margin-top: 22px;
+}
+
+
+.rd-action {
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    min-height: 42px;
+
+    padding:
+        10px
+        15px;
+
+    border-radius: 11px;
+
+    border:
+        1px solid
+        rgba(255,255,255,0.10);
+
+    background:
+        rgba(255,255,255,0.045);
+
+    color: #b8cbe0;
+
+    text-decoration: none;
+
+    font-size: 10px;
+    font-weight: 800;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.rd-action:hover {
+
+    background:
+        rgba(255,255,255,0.075);
+
+    border-color:
+        rgba(99,174,255,0.25);
+
+    color: #ffffff;
+
+    transform:
+        translateY(-1px);
+}
+
+
+/* ============================================================
+   DATE / TIME
+   ============================================================ */
+
+.datetime {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    max-width: 100%;
+
+    padding: 6px 9px;
+
+    border-radius: 8px;
+
+    background:
+        rgba(255,255,255,0.045);
+
+    color: #b8cbe0;
+
+    font-size: 10px;
+    font-weight: 700;
+
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+
+/* ============================================================
+   MOBILE
+   ============================================================ */
+
+@media (max-width: 1050px) {
+
+    .registration-main-grid {
+
+        grid-template-columns:
+            minmax(0, 1fr);
+    }
+
+
+    .status-panel {
+
+        position: static;
+    }
+}
+
+
+@media (max-width: 760px) {
+
+    .registration-details-page {
+
+        width:
+            calc(100% - 26px);
+
+        margin:
+            18px auto 50px;
+    }
+
+
+    .registration-header {
+
+        grid-template-columns:
+            minmax(0, 1fr);
+
+        padding: 21px;
+
+        gap: 18px;
+    }
+
+
+    .registration-meta {
+
+        justify-content: flex-start;
+    }
+
+
+    .registration-main-grid {
+
+        gap: 16px;
+    }
+
+
+    .rd-card + .rd-card {
+
+        margin-top: 16px;
+    }
+
+
+    .rd-card-header {
+
+        padding:
+            17px;
+    }
+
+
+    .rd-card-body {
+
+        padding:
+            17px;
+    }
+
+
+    .info-grid {
+
+        grid-template-columns:
+            minmax(0, 1fr);
+    }
+
+
+    .info-item.full {
+
+        grid-column:
+            auto;
+    }
+
+
+    .team-summary {
+
+        grid-template-columns:
+            minmax(0, 1fr);
+    }
+
+
+    .team-member {
+
+        grid-template-columns:
+            auto
+            minmax(0, 1fr);
+    }
+
+
+    .team-member-role {
+
+        grid-column:
+            2;
+
+        justify-self:
+            start;
+    }
+
+
+    .quick-row {
+
+        grid-template-columns:
+            minmax(0, 1fr);
+    }
+
+
+    .quick-value {
+
+        text-align:
+            left;
+    }
+}
+
+
+@media (max-width: 480px) {
+
+    .registration-details-page {
+
+        width:
+            calc(100% - 18px);
+    }
+
+
+    .registration-heading h1 {
+
+        font-size: 25px;
+    }
+
+
+    .registration-subtitle {
+
+        font-size: 12px;
+    }
+
+
+    .meta-chip {
+
+        width: 100%;
+    }
+
+
+    .rd-card-title {
+
+        align-items:
+            flex-start;
+    }
+
+
+    .rd-card-icon {
+
+        width: 36px;
+        height: 36px;
+
+        flex-basis: 36px;
+    }
+
+
+    .team-member {
+
+        grid-template-columns:
+            auto
+            minmax(0, 1fr);
+    }
+
+
+    .team-member-role {
+
+        grid-column:
+            1 / -1;
+
+        justify-self:
+            start;
+    }
+
+
+    .rd-actions {
+
+        flex-direction:
+            column;
+    }
+
+
+    .rd-action {
+
+        width:
+            100%;
+    }
+}
+
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .registration-details-page *,
+    .registration-details-page *::before,
+    .registration-details-page *::after {
+
+        scroll-behavior: auto !important;
+
+        transition-duration:
+            0.01ms !important;
+    }
+}
+
+</style>
+
+
+<main class="registration-details-page">
+
+
+    <!-- ======================================================
+         BACK
+    ======================================================= -->
+
+    <a
+        href="{{ url_for('admin.registrations') }}"
+        class="rd-back"
+    >
+
+        <span class="rd-back-icon">
+            ←
+        </span>
+
+        <span>
+            Back to Registrations
+        </span>
+
+    </a>
+
+
+
+    <!-- ======================================================
+         REGISTRATION HEADER
+    ======================================================= -->
+
+    <header class="registration-header">
+
+
+        <div class="registration-heading">
+
+            <div class="registration-eyebrow">
+
+                <span class="registration-eyebrow-dot"></span>
+
+                ENGINEERS DAY 2026 · ADMIN
+
             </div>
 
-            <h1 class="page-title">
+
+            <h1>
                 Registration Details
             </h1>
 
-            <p class="page-subtitle">
-                Review complete registration, student and participation details.
+
+            <p class="registration-subtitle">
+
+                Review the participant, event, registration status
+                and team information associated with this registration.
+
             </p>
 
         </div>
 
 
-        <div class="page-header-actions">
 
-            <a
-                href="{{ url_for('admin.registrations') }}"
-                class="admin-btn admin-btn-secondary"
+        <div class="registration-meta">
+
+
+            <div class="meta-chip">
+
+                REGISTRATION #
+
+                <strong>
+                    {{ registration.id }}
+                </strong>
+
+            </div>
+
+
+            {% set current_status =
+                (registration.status or "REGISTERED")|upper
+            %}
+
+
+            <div
+                class="
+                    meta-chip
+                    status
+                    {% if current_status == 'APPROVED' %}
+                        approved
+                    {% elif current_status == 'REJECTED' %}
+                        rejected
+                    {% elif current_status == 'CANCELLED' %}
+                        cancelled
+                    {% endif %}
+                "
             >
-                <span>←</span>
-                Back to Registrations
-            </a>
 
-        </div>
+                {{ current_status }}
 
-    </div>
+            </div>
 
 
-    <!-- =========================================================
-         STATUS / ID STRIP
-    ========================================================== -->
-    <div class="registration-identity-strip">
+            {% if registration.registered_at %}
 
-        <div class="identity-main">
+            <div class="meta-chip">
 
-            <span class="identity-label">
-                REGISTRATION
-            </span>
+                {{ registration.registered_at }}
 
-            <strong>
-                #{{ registration.id }}
-            </strong>
-
-        </div>
-
-
-        <div class="identity-divider"></div>
-
-
-        <div class="identity-main">
-
-            <span class="identity-label">
-                STATUS
-            </span>
-
-            {% if registration.status == 'APPROVED' %}
-
-                <span class="status-badge status-approved">
-                    <i></i>
-                    Approved
-                </span>
-
-            {% elif registration.status == 'REJECTED' %}
-
-                <span class="status-badge status-rejected">
-                    <i></i>
-                    Rejected
-                </span>
-
-            {% elif registration.status == 'CANCELLED' %}
-
-                <span class="status-badge status-cancelled">
-                    <i></i>
-                    Cancelled
-                </span>
-
-            {% else %}
-
-                <span class="status-badge status-registered">
-                    <i></i>
-                    Registered
-                </span>
+            </div>
 
             {% endif %}
 
         </div>
 
-
-        <div class="identity-divider"></div>
-
-
-        <div class="identity-main">
-
-            <span class="identity-label">
-                REGISTERED
-            </span>
-
-            <strong class="identity-date">
-                {{ registration.registered_at or '—' }}
-            </strong>
-
-        </div>
-
-    </div>
+    </header>
 
 
-    <!-- =========================================================
-         MAIN GRID
-    ========================================================== -->
-    <div class="registration-details-grid">
+
+    <!-- ======================================================
+         MAIN CONTENT
+    ======================================================= -->
+
+    <div class="registration-main-grid">
 
 
-        <!-- =====================================================
-             STUDENT INFORMATION
-        ====================================================== -->
-        <section class="admin-card details-card">
+        <!-- ==================================================
+             LEFT COLUMN
+        =================================================== -->
 
-            <div class="admin-card-header">
+        <div>
 
-                <div>
 
-                    <div class="section-kicker">
-                        STUDENT PROFILE
+            <!-- ==============================================
+                 STUDENT PROFILE
+            =============================================== -->
+
+            <section class="rd-card">
+
+
+                <div class="rd-card-header">
+
+                    <div class="rd-card-title">
+
+                        <div class="rd-card-icon">
+                            👤
+                        </div>
+
+
+                        <div class="rd-card-title-text">
+
+                            <h2>
+                                Student Profile
+                            </h2>
+
+                            <p>
+                                Participant identity and contact information
+                            </p>
+
+                        </div>
+
                     </div>
 
-                    <h2>
-                        Student Information
-                    </h2>
-
-                </div>
-
-                <div class="section-number">
-                    01
-                </div>
-
-            </div>
-
-
-            <div class="profile-hero">
-
-                <div class="profile-avatar-large">
-                    {{ (registration.name or '?')[:1]|upper }}
-                </div>
-
-                <div class="profile-hero-info">
-
-                    <h3>
-                        {{ registration.name or 'Unknown Student' }}
-                    </h3>
-
-                    <span>
-                        {{ registration.email or 'Email not available' }}
-                    </span>
-
-                </div>
-
-            </div>
-
-
-            <div class="detail-list">
-
-                <div class="detail-row">
-
-                    <span class="detail-label">
-                        Student ID
-                    </span>
-
-                    <strong class="detail-value mono-value">
-                        {{ registration.student_id_display
-                           or registration.student_roll
-                           or registration.student_id
-                           or '—' }}
-                    </strong>
-
                 </div>
 
 
-                <div class="detail-row">
 
-                    <span class="detail-label">
-                        Full Name
-                    </span>
+                <div class="rd-card-body">
 
-                    <strong class="detail-value">
-                        {{ registration.name or '—' }}
-                    </strong>
 
-                </div>
+                    <div class="info-grid">
 
 
-                <div class="detail-row">
+                        <!-- NAME -->
 
-                    <span class="detail-label">
-                        Email
-                    </span>
+                        <div class="info-item">
 
-                    <strong class="detail-value">
-                        {{ registration.email or '—' }}
-                    </strong>
-
-                </div>
-
-
-                <div class="detail-row">
-
-                    <span class="detail-label">
-                        Phone
-                    </span>
-
-                    <strong class="detail-value">
-                        {{ registration.phone or '—' }}
-                    </strong>
-
-                </div>
-
-
-                {% if registration.branch is defined %}
-
-                <div class="detail-row">
-
-                    <span class="detail-label">
-                        Branch
-                    </span>
-
-                    <strong class="detail-value">
-                        {{ registration.branch or '—' }}
-                    </strong>
-
-                </div>
-
-                {% endif %}
-
-
-                {% if registration.section is defined %}
-
-                <div class="detail-row">
-
-                    <span class="detail-label">
-                        Section
-                    </span>
-
-                    <strong class="detail-value">
-                        {{ registration.section or '—' }}
-                    </strong>
-
-                </div>
-
-                {% endif %}
-
-
-                {% if registration.year is defined %}
-
-                <div class="detail-row">
-
-                    <span class="detail-label">
-                        Year
-                    </span>
-
-                    <strong class="detail-value">
-                        {{ registration.year or '—' }}
-                    </strong>
-
-                </div>
-
-                {% endif %}
-
-            </div>
-
-        </section>
-
-
-
-        <!-- =====================================================
-             EVENT INFORMATION
-        ====================================================== -->
-        <section class="admin-card details-card">
-
-            <div class="admin-card-header">
-
-                <div>
-
-                    <div class="section-kicker">
-                        EVENT CONTEXT
-                    </div>
-
-                    <h2>
-                        Event Information
-                    </h2>
-
-                </div>
-
-                <div class="section-number">
-                    02
-                </div>
-
-            </div>
-
-
-            <div class="event-highlight">
-
-                <div class="event-symbol">
-                    EV
-                </div>
-
-                <div>
-
-                    <h3>
-                        {{ registration.game_name or 'Unknown Event' }}
-                    </h3>
-
-                    <span>
-                        Game ID: {{ registration.game_id }}
-                    </span>
-
-                </div>
-
-            </div>
-
-
-            <div class="detail-list">
-
-                <div class="detail-row">
-
-                    <span class="detail-label">
-                        Event
-                    </span>
-
-                    <strong class="detail-value">
-                        {{ registration.game_name or '—' }}
-                    </strong>
-
-                </div>
-
-
-                <div class="detail-row">
-
-                    <span class="detail-label">
-                        Participation
-                    </span>
-
-                    <strong class="detail-value">
-
-                        {% if registration.registration_mode == 'TEAM' %}
-
-                            <span class="mode-badge mode-team">
-                                TEAM
+                            <span class="info-label">
+                                Full Name
                             </span>
 
-                        {% else %}
+                            <span class="info-value">
 
-                            <span class="mode-badge mode-individual">
-                                INDIVIDUAL
+                                {{ registration.name
+                                   or registration.student_name
+                                   or "—" }}
+
                             </span>
 
-                        {% endif %}
-
-                    </strong>
-
-                </div>
+                        </div>
 
 
-                {% if registration.schedule_date is defined %}
+                        <!-- STUDENT ID -->
 
-                <div class="detail-row">
+                        <div class="info-item">
 
-                    <span class="detail-label">
-                        Schedule
-                    </span>
-
-                    <strong class="detail-value">
-                        {{ registration.schedule_date or '—' }}
-                        {% if registration.schedule_time %}
-                            · {{ registration.schedule_time }}
-                        {% endif %}
-                    </strong>
-
-                </div>
-
-                {% endif %}
-
-
-                {% if registration.venue is defined %}
-
-                <div class="detail-row">
-
-                    <span class="detail-label">
-                        Venue
-                    </span>
-
-                    <strong class="detail-value">
-                        {{ registration.venue or '—' }}
-                    </strong>
-
-                </div>
-
-                {% endif %}
-
-
-                <div class="detail-row">
-
-                    <span class="detail-label">
-                        Registration Status
-                    </span>
-
-                    <strong class="detail-value">
-                        {{ registration.status }}
-                    </strong>
-
-                </div>
-
-
-                <div class="detail-row">
-
-                    <span class="detail-label">
-                        Registered At
-                    </span>
-
-                    <strong class="detail-value">
-                        {{ registration.registered_at or '—' }}
-                    </strong>
-
-                </div>
-
-
-                <div class="detail-row">
-
-                    <span class="detail-label">
-                        Last Updated
-                    </span>
-
-                    <strong class="detail-value">
-                        {{ registration.updated_at or '—' }}
-                    </strong>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-
-        <!-- =====================================================
-             TEAM INFORMATION
-        ====================================================== -->
-        <section class="admin-card details-card team-details-card">
-
-            <div class="admin-card-header">
-
-                <div>
-
-                    <div class="section-kicker">
-                        PARTICIPATION UNIT
-                    </div>
-
-                    <h2>
-                        Team Information
-                    </h2>
-
-                </div>
-
-                <div class="section-number">
-                    03
-                </div>
-
-            </div>
-
-
-            {% if registration.team_id %}
-
-                <div class="team-banner">
-
-                    <div class="team-mark">
-                        T
-                    </div>
-
-                    <div class="team-banner-info">
-
-                        <span>
-                            TEAM
-                        </span>
-
-                        <h3>
-                            {{ registration.team_name or 'Unnamed Team' }}
-                        </h3>
-
-                    </div>
-
-                    <div class="team-status">
-
-                        {% if registration.team_status == 'APPROVED' %}
-
-                            <span class="status-badge status-approved">
-                                <i></i>
-                                Approved
+                            <span class="info-label">
+                                Student ID
                             </span>
 
-                        {% elif registration.team_status == 'REJECTED' %}
+                            <span class="info-value accent">
 
-                            <span class="status-badge status-rejected">
-                                <i></i>
-                                Rejected
+                                {{ registration.student_id_display
+                                   or registration.student_roll
+                                   or registration.student_id
+                                   or "—" }}
+
                             </span>
 
-                        {% elif registration.team_status == 'CANCELLED' %}
+                        </div>
 
-                            <span class="status-badge status-cancelled">
-                                <i></i>
-                                Cancelled
+
+                        <!-- EMAIL -->
+
+                        <div class="info-item">
+
+                            <span class="info-label">
+                                Email
                             </span>
 
-                        {% else %}
+                            <span
+                                class="
+                                    info-value
+                                    long-value
+                                "
+                            >
 
-                            <span class="status-badge status-registered">
-                                <i></i>
-                                Registered
+                                {{ registration.email
+                                   or registration.student_email
+                                   or "—" }}
+
                             </span>
 
-                        {% endif %}
+                        </div>
+
+
+                        <!-- PHONE -->
+
+                        <div class="info-item">
+
+                            <span class="info-label">
+                                Phone
+                            </span>
+
+                            <span class="info-value">
+
+                                {{ registration.phone
+                                   or registration.student_phone
+                                   or "—" }}
+
+                            </span>
+
+                        </div>
+
+
+                        <!-- BRANCH -->
+
+                        <div class="info-item">
+
+                            <span class="info-label">
+                                Branch
+                            </span>
+
+                            <span class="info-value">
+
+                                {{ registration.branch or "—" }}
+
+                            </span>
+
+                        </div>
+
+
+                        <!-- SECTION -->
+
+                        <div class="info-item">
+
+                            <span class="info-label">
+                                Section
+                            </span>
+
+                            <span class="info-value">
+
+                                {{ registration.section or "—" }}
+
+                            </span>
+
+                        </div>
+
+
+                        <!-- YEAR -->
+
+                        <div class="info-item">
+
+                            <span class="info-label">
+                                Academic Year
+                            </span>
+
+                            <span class="info-value">
+
+                                {{ registration.year or "—" }}
+
+                            </span>
+
+                        </div>
+
+
+                        <!-- REGISTRATION DATE -->
+
+                        <div class="info-item">
+
+                            <span class="info-label">
+                                Registered At
+                            </span>
+
+                            <span class="info-value muted">
+
+                                {{ registration.registered_at or "—" }}
+
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- ==============================================
+                 EVENT DETAILS
+            =============================================== -->
+
+            <section class="rd-card">
+
+
+                <div class="rd-card-header">
+
+                    <div class="rd-card-title">
+
+                        <div class="rd-card-icon">
+                            ◈
+                        </div>
+
+
+                        <div class="rd-card-title-text">
+
+                            <h2>
+                                Event Details
+                            </h2>
+
+                            <p>
+                                Competition and schedule information
+                            </p>
+
+                        </div>
 
                     </div>
 
                 </div>
 
 
-                <div class="detail-list">
 
-                    <div class="detail-row">
-
-                        <span class="detail-label">
-                            Team ID
-                        </span>
-
-                        <strong class="detail-value mono-value">
-                            #{{ registration.team_id }}
-                        </strong>
-
-                    </div>
+                <div class="rd-card-body">
 
 
-                    <div class="detail-row">
+                    <div class="event-highlight">
 
-                        <span class="detail-label">
-                            Team Name
-                        </span>
-
-                        <strong class="detail-value">
-                            {{ registration.team_name or '—' }}
-                        </strong>
-
-                    </div>
+                        <div class="event-highlight-label">
+                            Registered Event
+                        </div>
 
 
-                    <div class="detail-row">
+                        <h2 class="event-highlight-title">
 
-                        <span class="detail-label">
-                            Team Leader
-                        </span>
+                            {{ registration.game_name or "—" }}
 
-                        <strong class="detail-value">
-                            {{ registration.team_leader_name or '—' }}
-                        </strong>
-
-                    </div>
+                        </h2>
 
 
-                    <div class="detail-row">
+                        <div class="event-highlight-id">
 
-                        <span class="detail-label">
-                            Team Size
-                        </span>
+                            Game ID:
+                            {{ registration.game_id or "—" }}
 
-                        <strong class="detail-value">
-                            {{ team_members|length if team_members is defined else '—' }}
-                        </strong>
-
-                    </div>
-
-                </div>
-
-
-                <!-- TEAM MEMBERS -->
-
-                <div class="team-members-section">
-
-                    <div class="subsection-heading">
-
-                        <div>
-                            <span>TEAM ROSTER</span>
-                            <strong>
-                                {{ team_members|length if team_members is defined else 0 }}
-                                Member{{ '' if team_members is defined and team_members|length == 1 else 's' }}
-                            </strong>
                         </div>
 
                     </div>
 
 
-                    {% if team_members %}
 
-                        <div class="team-member-list">
+                    <div class="info-grid">
+
+
+                        <!-- MODE -->
+
+                        <div class="info-item">
+
+                            <span class="info-label">
+                                Registration Mode
+                            </span>
+
+                            <span class="info-value accent">
+
+                                {{ registration.registration_mode
+                                   or "INDIVIDUAL" }}
+
+                            </span>
+
+                        </div>
+
+
+                        <!-- GAME STATUS -->
+
+                        <div class="info-item">
+
+                            <span class="info-label">
+                                Event Status
+                            </span>
+
+                            <span class="info-value">
+
+                                {{ registration.game_status
+                                   or "—" }}
+
+                            </span>
+
+                        </div>
+
+
+                        <!-- EVENT DATE -->
+
+                        <div class="info-item">
+
+                            <span class="info-label">
+                                Event Date
+                            </span>
+
+                            <span class="info-value">
+
+                                {{ registration.schedule_date
+                                   or registration.event_date
+                                   or "—" }}
+
+                            </span>
+
+                        </div>
+
+
+                        <!-- TIME -->
+
+                        <div class="info-item">
+
+                            <span class="info-label">
+                                Schedule Time
+                            </span>
+
+                            <span class="info-value">
+
+                                {{ registration.schedule_time
+                                   or registration.start_time
+                                   or "—" }}
+
+                            </span>
+
+                        </div>
+
+
+                        <!-- VENUE -->
+
+                        <div class="info-item full">
+
+                            <span class="info-label">
+                                Venue
+                            </span>
+
+                            <span class="info-value">
+
+                                {{ registration.venue or "Venue not assigned" }}
+
+                            </span>
+
+                        </div>
+
+
+                        <!-- PRIZE -->
+
+                        <div class="info-item">
+
+                            <span class="info-label">
+                                Prize Pool
+                            </span>
+
+                            <span class="info-value success">
+
+                                {{ registration.prize_pool or "—" }}
+
+                            </span>
+
+                        </div>
+
+
+                        <!-- REGISTRATION OPEN -->
+
+                        <div class="info-item">
+
+                            <span class="info-label">
+                                Registration Availability
+                            </span>
+
+                            <span class="info-value">
+
+                                {% if registration.registration_open %}
+
+                                    Open
+
+                                {% else %}
+
+                                    Closed
+
+                                {% endif %}
+
+                            </span>
+
+                        </div>
+
+
+                        <!-- TEAM SIZE -->
+
+                        <div class="info-item full">
+
+                            <span class="info-label">
+                                Team Size
+                            </span>
+
+                            <span class="info-value">
+
+                                {% if registration.registration_mode == "TEAM" %}
+
+                                    {{ registration.team_min_size or 1 }}
+                                    –
+                                    {{ registration.team_max_size
+                                       or registration.team_min_size
+                                       or 1 }}
+                                    participants
+
+                                {% else %}
+
+                                    1 participant
+
+                                {% endif %}
+
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- ==============================================
+                 TEAM INFORMATION
+            =============================================== -->
+
+            {% if registration.team_id or team_members %}
+
+            <section class="rd-card">
+
+
+                <div class="rd-card-header">
+
+                    <div class="rd-card-title">
+
+                        <div class="rd-card-icon">
+                            👥
+                        </div>
+
+
+                        <div class="rd-card-title-text">
+
+                            <h2>
+                                Team Information
+                            </h2>
+
+                            <p>
+                                Team identity and registered members
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="rd-card-body">
+
+
+                    <div class="team-summary">
+
+
+                        <div class="team-stat">
+
+                            <small>
+                                Team Name
+                            </small>
+
+                            <strong>
+
+                                {{ registration.team_name or "—" }}
+
+                            </strong>
+
+                        </div>
+
+
+                        <div class="team-stat">
+
+                            <small>
+                                Team Status
+                            </small>
+
+                            <strong>
+
+                                {{ registration.team_status or "—" }}
+
+                            </strong>
+
+                        </div>
+
+
+                        <div class="team-stat">
+
+                            <small>
+                                Team Leader
+                            </small>
+
+                            <strong>
+
+                                {{ registration.team_leader_name or "—" }}
+
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="team-members">
+
+                        {% if team_members %}
+
 
                             {% for member in team_members %}
 
-                            <div class="team-member-row">
-
-                                <div class="member-avatar">
-                                    {{ (member.name or '?')[:1]|upper }}
-                                </div>
+                            <div class="team-member">
 
 
-                                <div class="member-info">
+                                <div class="team-avatar">
 
-                                    <strong>
-                                        {{ member.name or 'Unknown Student' }}
-                                    </strong>
-
-                                    <span>
-                                        {{ member.email or member.phone or 'Contact unavailable' }}
-                                    </span>
+                                    {{ (
+                                        member.name
+                                        or "S"
+                                    )[:1]|upper }}
 
                                 </div>
 
 
-                                <div class="member-id">
 
-                                    <span class="mono-value">
-                                        {{ member.student_id_display
-                                           or member.student_roll
-                                           or member.student_id
-                                           or '—' }}
-                                    </span>
+                                <div class="team-member-main">
+
+                                    <p class="team-member-name">
+
+                                        {{ member.name or "Unknown Student" }}
+
+                                    </p>
+
+
+                                    <div class="team-member-contact">
+
+                                        {% if member.student_id_display
+                                              or member.student_roll
+                                              or member.student_id %}
+
+                                            ID:
+                                            {{ member.student_id_display
+                                               or member.student_roll
+                                               or member.student_id }}
+
+                                        {% endif %}
+
+
+                                        {% if member.email %}
+
+                                            ·
+                                            {{ member.email }}
+
+                                        {% endif %}
+
+
+                                        {% if member.phone %}
+
+                                            ·
+                                            {{ member.phone }}
+
+                                        {% endif %}
+
+                                    </div>
 
                                 </div>
 
 
-                                <div class="member-role">
 
-                                    {% if member.member_role == 'LEADER' %}
+                                <div
+                                    class="
+                                        team-member-role
+                                        {% if member.member_role == 'LEADER' %}
+                                            leader
+                                        {% endif %}
+                                    "
+                                >
 
-                                        <span class="role-badge role-leader">
-                                            LEADER
-                                        </span>
-
-                                    {% else %}
-
-                                        <span class="role-badge">
-                                            MEMBER
-                                        </span>
-
-                                    {% endif %}
+                                    {{ member.member_role or "MEMBER" }}
 
                                 </div>
 
@@ -674,716 +2507,601 @@
 
                             {% endfor %}
 
-                        </div>
 
-                    {% else %}
+                        {% else %}
 
-                        <div class="mini-empty">
-                            No team members found.
-                        </div>
+                            <div class="empty-state">
 
-                    {% endif %}
+                                Team information is available, but no
+                                member records were returned.
 
-                </div>
+                            </div>
 
-
-            {% else %}
-
-                <div class="individual-participation">
-
-                    <div class="individual-icon">
-                        I
-                    </div>
-
-                    <div>
-
-                        <h3>
-                            Individual Participation
-                        </h3>
-
-                        <p>
-                            This registration does not belong to a team.
-                            The student is participating individually.
-                        </p>
+                        {% endif %}
 
                     </div>
 
                 </div>
+
+            </section>
 
             {% endif %}
 
-        </section>
 
 
+            <!-- ==============================================
+                 REGISTRATION TIMELINE
+            =============================================== -->
 
-        <!-- =====================================================
-             ADMIN ACTIONS
-        ====================================================== -->
-        <section class="admin-card details-card action-card">
+            <section class="rd-card">
 
-            <div class="admin-card-header">
 
-                <div>
+                <div class="rd-card-header">
 
-                    <div class="section-kicker">
-                        ADMIN CONTROL
+                    <div class="rd-card-title">
+
+                        <div class="rd-card-icon">
+                            ◷
+                        </div>
+
+
+                        <div class="rd-card-title-text">
+
+                            <h2>
+                                Registration Timeline
+                            </h2>
+
+                            <p>
+                                Important timestamps for this record
+                            </p>
+
+                        </div>
+
                     </div>
 
-                    <h2>
-                        Registration Actions
-                    </h2>
+                </div>
+
+
+
+                <div class="rd-card-body">
+
+
+                    <div class="info-grid">
+
+
+                        <div class="info-item">
+
+                            <span class="info-label">
+                                Registration Created
+                            </span>
+
+                            <span class="datetime">
+
+                                {{ registration.registered_at or "—" }}
+
+                            </span>
+
+                        </div>
+
+
+                        <div class="info-item">
+
+                            <span class="info-label">
+                                Last Updated
+                            </span>
+
+                            <span class="datetime">
+
+                                {{ registration.updated_at or "—" }}
+
+                            </span>
+
+                        </div>
+
+
+                        <div class="info-item full">
+
+                            <span class="info-label">
+                                Current Registration Status
+                            </span>
+
+                            <span
+                                class="
+                                    status-badge
+                                    {% if current_status == 'APPROVED' %}
+                                        status-approved
+                                    {% elif current_status == 'REJECTED' %}
+                                        status-rejected
+                                    {% elif current_status == 'CANCELLED' %}
+                                        status-cancelled
+                                    {% else %}
+                                        status-registered
+                                    {% endif %}
+                                "
+                            >
+
+                                {{ current_status }}
+
+                            </span>
+
+                        </div>
+
+                    </div>
 
                 </div>
 
-                <div class="section-number">
-                    04
+            </section>
+
+
+        </div>
+
+
+
+        <!-- ==================================================
+             RIGHT COLUMN
+        =================================================== -->
+
+        <aside class="status-panel">
+
+
+            <!-- ==============================================
+                 STATUS MANAGEMENT
+            =============================================== -->
+
+            <section class="rd-card">
+
+
+                <div class="rd-card-header">
+
+                    <div class="rd-card-title">
+
+                        <div class="rd-card-icon">
+                            ⚡
+                        </div>
+
+
+                        <div class="rd-card-title-text">
+
+                            <h2>
+                                Manage Registration
+                            </h2>
+
+                            <p>
+                                Update participant status
+                            </p>
+
+                        </div>
+
+                    </div>
+
                 </div>
 
-            </div>
 
 
-            <div class="action-warning">
-
-                <span class="warning-symbol">
-                    !
-                </span>
-
-                <p>
-                    Registration status changes affect the official event
-                    registration record. Review the details before taking action.
-                </p>
-
-            </div>
+                <div class="rd-card-body">
 
 
-            <div class="registration-actions">
+                    <div class="status-current">
 
-                {% if registration.status != 'APPROVED' %}
+                        <div class="status-current-label">
+                            Current Status
+                        </div>
 
-                <form
-                    method="POST"
-                    action="{{ url_for(
-                        'admin.update_registration_status',
-                        registration_id=registration.id
-                    ) }}"
+
+                        <div
+                            class="
+                                status-badge
+                                {% if current_status == 'APPROVED' %}
+                                    status-approved
+                                {% elif current_status == 'REJECTED' %}
+                                    status-rejected
+                                {% elif current_status == 'CANCELLED' %}
+                                    status-cancelled
+                                {% else %}
+                                    status-registered
+                                {% endif %}
+                            "
+                        >
+
+                            {{ current_status }}
+
+                        </div>
+
+                    </div>
+
+
+
+                    <form
+                        method="POST"
+                        action="{{
+                            url_for(
+                                'admin.update_registration_status',
+                                registration_id=registration.id
+                            )
+                        }}"
+                        class="status-form"
+                    >
+
+
+                        <!-- REGISTERED -->
+
+                        <div class="status-option">
+
+                            <input
+                                type="radio"
+                                id="status-registered"
+                                name="status"
+                                value="REGISTERED"
+                                {% if current_status == "REGISTERED" %}
+                                    checked
+                                {% endif %}
+                            >
+
+
+                            <label for="status-registered">
+
+                                <span>
+                                    Registered
+                                </span>
+
+                                <span class="status-option-dot">
+                                </span>
+
+                            </label>
+
+                        </div>
+
+
+
+                        <!-- APPROVED -->
+
+                        <div class="status-option">
+
+                            <input
+                                type="radio"
+                                id="status-approved"
+                                name="status"
+                                value="APPROVED"
+                                {% if current_status == "APPROVED" %}
+                                    checked
+                                {% endif %}
+                            >
+
+
+                            <label for="status-approved">
+
+                                <span>
+                                    Approved
+                                </span>
+
+                                <span class="status-option-dot">
+                                </span>
+
+                            </label>
+
+                        </div>
+
+
+
+                        <!-- REJECTED -->
+
+                        <div class="status-option">
+
+                            <input
+                                type="radio"
+                                id="status-rejected"
+                                name="status"
+                                value="REJECTED"
+                                {% if current_status == "REJECTED" %}
+                                    checked
+                                {% endif %}
+                            >
+
+
+                            <label for="status-rejected">
+
+                                <span>
+                                    Rejected
+                                </span>
+
+                                <span class="status-option-dot">
+                                </span>
+
+                            </label>
+
+                        </div>
+
+
+
+                        <!-- CANCELLED -->
+
+                        <div class="status-option">
+
+                            <input
+                                type="radio"
+                                id="status-cancelled"
+                                name="status"
+                                value="CANCELLED"
+                                {% if current_status == "CANCELLED" %}
+                                    checked
+                                {% endif %}
+                            >
+
+
+                            <label for="status-cancelled">
+
+                                <span>
+                                    Cancelled
+                                </span>
+
+                                <span class="status-option-dot">
+                                </span>
+
+                            </label>
+
+                        </div>
+
+
+
+                        <button
+                            type="submit"
+                            class="status-update-button"
+                        >
+
+                            Update Registration Status
+
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- ==============================================
+                 QUICK INFO
+            =============================================== -->
+
+            <section class="rd-card">
+
+
+                <div class="rd-card-header">
+
+                    <div class="rd-card-title">
+
+                        <div class="rd-card-icon">
+                            #
+                        </div>
+
+
+                        <div class="rd-card-title-text">
+
+                            <h2>
+                                Quick Information
+                            </h2>
+
+                            <p>
+                                Registration reference
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="rd-card-body">
+
+
+                    <div class="quick-info">
+
+
+                        <div class="quick-row">
+
+                            <span class="quick-label">
+                                Registration ID
+                            </span>
+
+                            <span class="quick-value">
+                                #{{ registration.id }}
+                            </span>
+
+                        </div>
+
+
+                        <div class="quick-row">
+
+                            <span class="quick-label">
+                                Student ID
+                            </span>
+
+                            <span class="quick-value">
+
+                                {{ registration.student_id_display
+                                   or registration.student_roll
+                                   or registration.student_id
+                                   or "—" }}
+
+                            </span>
+
+                        </div>
+
+
+                        <div class="quick-row">
+
+                            <span class="quick-label">
+                                Game ID
+                            </span>
+
+                            <span class="quick-value">
+
+                                {{ registration.game_id or "—" }}
+
+                            </span>
+
+                        </div>
+
+
+                        <div class="quick-row">
+
+                            <span class="quick-label">
+                                Mode
+                            </span>
+
+                            <span class="quick-value">
+
+                                {{ registration.registration_mode
+                                   or "INDIVIDUAL" }}
+
+                            </span>
+
+                        </div>
+
+
+                        <div class="quick-row">
+
+                            <span class="quick-label">
+                                Team
+                            </span>
+
+                            <span class="quick-value">
+
+                                {% if registration.team_id %}
+
+                                    {{ registration.team_name or
+                                       "Team #" ~ registration.team_id }}
+
+                                {% else %}
+
+                                    Individual
+
+                                {% endif %}
+
+                            </span>
+
+                        </div>
+
+
+                        <div class="quick-row">
+
+                            <span class="quick-label">
+                                Event
+                            </span>
+
+                            <span class="quick-value">
+
+                                {{ registration.game_name or "—" }}
+
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- ==============================================
+                 ACTIONS
+            =============================================== -->
+
+            <div class="rd-actions">
+
+
+                <a
+                    href="{{ url_for('admin.registrations') }}"
+                    class="rd-action"
                 >
 
-                    <input type="hidden" name="status" value="APPROVED">
+                    ←
+                    All Registrations
 
-                    <button
-                        type="submit"
-                        class="admin-btn admin-btn-success action-button"
-                    >
-                        <span>✓</span>
-                        Approve Registration
-                    </button>
+                </a>
 
-                </form>
+
+                {% if registration.game_id %}
+
+                <a
+                    href="{{
+                        url_for(
+                            'admin.export_game_registrations',
+                            game_id=registration.game_id
+                        )
+                    }}"
+                    class="rd-action"
+                >
+
+                    ↓
+                    Export Game Excel
+
+                </a>
 
                 {% endif %}
 
-
-                {% if registration.status != 'REJECTED' %}
-
-                <form
-                    method="POST"
-                    action="{{ url_for(
-                        'admin.update_registration_status',
-                        registration_id=registration.id
-                    ) }}"
-                >
-
-                    <input type="hidden" name="status" value="REJECTED">
-
-                    <button
-                        type="submit"
-                        class="admin-btn admin-btn-danger action-button"
-                    >
-                        <span>×</span>
-                        Reject Registration
-                    </button>
-
-                </form>
-
-                {% endif %}
-
-
-                {% if registration.status != 'CANCELLED' %}
-
-                <form
-                    method="POST"
-                    action="{{ url_for(
-                        'admin.update_registration_status',
-                        registration_id=registration.id
-                    ) }}"
-                >
-
-                    <input type="hidden" name="status" value="CANCELLED">
-
-                    <button
-                        type="submit"
-                        class="admin-btn admin-btn-secondary action-button"
-                    >
-                        <span>⊘</span>
-                        Cancel Registration
-                    </button>
-
-                </form>
-
-                {% endif %}
-
             </div>
 
-        </section>
+
+        </aside>
+
 
     </div>
 
-</div>
+
+</main>
 
 
-<!-- =============================================================
-     PAGE-SPECIFIC STYLING
-============================================================= -->
+<script>
 
-<style>
+/* ============================================================
+   REGISTRATION DETAILS — SMALL UI ENHANCEMENTS
+   ============================================================ */
 
-    .registration-identity-strip {
-        display: flex;
-        align-items: center;
-        gap: 22px;
-        padding: 17px 20px;
-        margin-bottom: 24px;
-        border: 1px solid rgba(255,255,255,.08);
-        border-radius: 14px;
-        background: rgba(255,255,255,.025);
-    }
+(function () {
 
-    .identity-main {
-        display: flex;
-        flex-direction: column;
-        gap: 5px;
-    }
+    const form =
+        document.querySelector(".status-form");
 
-    .identity-label {
-        font-size: 9px;
-        font-weight: 800;
-        letter-spacing: .1em;
-        opacity: .42;
-    }
+    const button =
+        document.querySelector(".status-update-button");
 
-    .identity-main strong {
-        font-size: 14px;
-    }
 
-    .identity-date {
-        font-size: 12px !important;
-        font-weight: 600 !important;
-        opacity: .72;
-    }
-
-    .identity-divider {
-        width: 1px;
-        height: 34px;
-        background: rgba(255,255,255,.08);
+    if (!form || !button) {
+        return;
     }
 
 
-    /* MAIN GRID */
+    form.addEventListener(
+        "submit",
+        function () {
 
-    .registration-details-grid {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 20px;
-    }
+            const selected =
+                form.querySelector(
+                    'input[name="status"]:checked'
+                );
 
-    .details-card {
-        min-width: 0;
-    }
 
-    .team-details-card,
-    .action-card {
-        grid-column: 1 / -1;
-    }
+            if (!selected) {
+                return;
+            }
 
 
-    /* CARD HEADER */
+            button.textContent =
+                "Updating Status…";
 
-    .section-kicker {
-        margin-bottom: 5px;
-        font-size: 9px;
-        font-weight: 800;
-        letter-spacing: .12em;
-        opacity: .4;
-    }
+            button.disabled = true;
 
-    .section-number {
-        font-family: ui-monospace, monospace;
-        font-size: 11px;
-        opacity: .28;
-    }
-
-
-    /* PROFILE */
-
-    .profile-hero {
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        padding: 15px;
-        margin-bottom: 18px;
-        border-radius: 13px;
-        background: rgba(255,255,255,.025);
-        border: 1px solid rgba(255,255,255,.055);
-    }
-
-    .profile-avatar-large {
-        width: 54px;
-        height: 54px;
-        display: grid;
-        place-items: center;
-        flex: 0 0 54px;
-        border-radius: 15px;
-        background: linear-gradient(
-            135deg,
-            rgba(255,255,255,.13),
-            rgba(255,255,255,.035)
-        );
-        border: 1px solid rgba(255,255,255,.09);
-        font-size: 18px;
-        font-weight: 800;
-    }
-
-    .profile-hero-info {
-        min-width: 0;
-        display: flex;
-        flex-direction: column;
-        gap: 5px;
-    }
-
-    .profile-hero-info h3 {
-        margin: 0;
-        font-size: 17px;
-    }
-
-    .profile-hero-info span {
-        font-size: 11px;
-        opacity: .5;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-
-    /* EVENT */
-
-    .event-highlight {
-        display: flex;
-        align-items: center;
-        gap: 13px;
-        margin-bottom: 18px;
-        padding: 15px;
-        border-radius: 13px;
-        background: rgba(255,255,255,.025);
-        border: 1px solid rgba(255,255,255,.055);
-    }
-
-    .event-symbol {
-        width: 48px;
-        height: 48px;
-        display: grid;
-        place-items: center;
-        border-radius: 13px;
-        background: rgba(255,255,255,.07);
-        border: 1px solid rgba(255,255,255,.09);
-        font-family: ui-monospace, monospace;
-        font-size: 12px;
-        font-weight: 900;
-    }
-
-    .event-highlight h3 {
-        margin: 0 0 4px;
-        font-size: 15px;
-    }
-
-    .event-highlight span {
-        font-size: 10px;
-        opacity: .45;
-        font-family: ui-monospace, monospace;
-    }
-
-
-    /* DETAILS */
-
-    .detail-list {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .detail-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 20px;
-        min-height: 44px;
-        padding: 9px 0;
-        border-bottom: 1px solid rgba(255,255,255,.055);
-    }
-
-    .detail-row:last-child {
-        border-bottom: 0;
-    }
-
-    .detail-label {
-        font-size: 10px;
-        text-transform: uppercase;
-        letter-spacing: .07em;
-        opacity: .42;
-        flex: 0 0 auto;
-    }
-
-    .detail-value {
-        text-align: right;
-        font-size: 12px;
-        max-width: 65%;
-        overflow-wrap: anywhere;
-    }
-
-    .mono-value {
-        font-family:
-            ui-monospace,
-            SFMono-Regular,
-            Menlo,
-            Monaco,
-            Consolas,
-            monospace;
-        font-size: 11px;
-    }
-
-
-    /* TEAM */
-
-    .team-banner {
-        display: flex;
-        align-items: center;
-        gap: 13px;
-        padding: 16px;
-        margin-bottom: 18px;
-        border-radius: 13px;
-        background: rgba(255,255,255,.025);
-        border: 1px solid rgba(255,255,255,.055);
-    }
-
-    .team-mark {
-        width: 48px;
-        height: 48px;
-        display: grid;
-        place-items: center;
-        flex: 0 0 48px;
-        border-radius: 13px;
-        background: rgba(255,255,255,.07);
-        border: 1px solid rgba(255,255,255,.09);
-        font-size: 16px;
-        font-weight: 900;
-    }
-
-    .team-banner-info {
-        min-width: 0;
-        flex: 1;
-    }
-
-    .team-banner-info span {
-        display: block;
-        margin-bottom: 4px;
-        font-size: 9px;
-        letter-spacing: .1em;
-        opacity: .4;
-    }
-
-    .team-banner-info h3 {
-        margin: 0;
-        font-size: 16px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-
-    /* MEMBERS */
-
-    .team-members-section {
-        margin-top: 22px;
-    }
-
-    .subsection-heading {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 10px;
-    }
-
-    .subsection-heading > div {
-        display: flex;
-        flex-direction: column;
-        gap: 3px;
-    }
-
-    .subsection-heading span {
-        font-size: 9px;
-        font-weight: 800;
-        letter-spacing: .1em;
-        opacity: .4;
-    }
-
-    .subsection-heading strong {
-        font-size: 13px;
-    }
-
-    .team-member-list {
-        display: flex;
-        flex-direction: column;
-        gap: 7px;
-    }
-
-    .team-member-row {
-        display: grid;
-        grid-template-columns: 38px minmax(160px, 1fr) minmax(130px, auto) auto;
-        align-items: center;
-        gap: 11px;
-        padding: 10px;
-        border-radius: 10px;
-        background: rgba(255,255,255,.022);
-        border: 1px solid rgba(255,255,255,.045);
-    }
-
-    .member-avatar {
-        width: 34px;
-        height: 34px;
-        display: grid;
-        place-items: center;
-        border-radius: 9px;
-        background: rgba(255,255,255,.07);
-        font-size: 11px;
-        font-weight: 800;
-    }
-
-    .member-info {
-        min-width: 0;
-        display: flex;
-        flex-direction: column;
-        gap: 3px;
-    }
-
-    .member-info strong {
-        font-size: 12px;
-    }
-
-    .member-info span {
-        font-size: 10px;
-        opacity: .43;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .member-id {
-        min-width: 0;
-    }
-
-    .member-role {
-        justify-self: end;
-    }
-
-    .role-badge {
-        display: inline-flex;
-        padding: 5px 8px;
-        border-radius: 7px;
-        font-size: 8px;
-        font-weight: 800;
-        letter-spacing: .08em;
-        background: rgba(255,255,255,.05);
-        border: 1px solid rgba(255,255,255,.06);
-    }
-
-    .role-leader {
-        background: rgba(255,190,60,.09);
-    }
-
-
-    /* INDIVIDUAL */
-
-    .individual-participation {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        padding: 25px 20px;
-        border-radius: 13px;
-        background: rgba(255,255,255,.025);
-        border: 1px solid rgba(255,255,255,.055);
-    }
-
-    .individual-icon {
-        width: 52px;
-        height: 52px;
-        display: grid;
-        place-items: center;
-        flex: 0 0 52px;
-        border-radius: 14px;
-        background: rgba(255,255,255,.07);
-        font-weight: 900;
-        font-size: 16px;
-    }
-
-    .individual-participation h3 {
-        margin: 0 0 5px;
-        font-size: 15px;
-    }
-
-    .individual-participation p {
-        margin: 0;
-        font-size: 11px;
-        line-height: 1.6;
-        opacity: .48;
-    }
-
-
-    /* ACTION */
-
-    .action-warning {
-        display: flex;
-        align-items: flex-start;
-        gap: 11px;
-        padding: 13px 15px;
-        margin-bottom: 18px;
-        border-radius: 10px;
-        background: rgba(255,190,60,.055);
-        border: 1px solid rgba(255,190,60,.10);
-    }
-
-    .warning-symbol {
-        width: 22px;
-        height: 22px;
-        display: grid;
-        place-items: center;
-        flex: 0 0 22px;
-        border-radius: 6px;
-        background: rgba(255,190,60,.1);
-        font-weight: 900;
-        font-size: 11px;
-    }
-
-    .action-warning p {
-        margin: 0;
-        font-size: 11px;
-        line-height: 1.55;
-        opacity: .55;
-    }
-
-    .registration-actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-    }
-
-    .registration-actions form {
-        margin: 0;
-    }
-
-    .action-button {
-        min-width: 190px;
-        justify-content: center;
-    }
-
-    .admin-btn-success {
-        background: rgba(55,205,125,.11);
-        border: 1px solid rgba(55,205,125,.18);
-    }
-
-    .admin-btn-danger {
-        background: rgba(240,80,100,.10);
-        border: 1px solid rgba(240,80,100,.17);
-    }
-
-
-    /* EMPTY */
-
-    .mini-empty {
-        padding: 25px;
-        text-align: center;
-        border-radius: 10px;
-        background: rgba(255,255,255,.02);
-        border: 1px dashed rgba(255,255,255,.08);
-        font-size: 11px;
-        opacity: .45;
-    }
-
-
-    /* RESPONSIVE */
-
-    @media (max-width: 900px) {
-
-        .registration-details-grid {
-            grid-template-columns: 1fr;
         }
+    );
 
-        .team-details-card,
-        .action-card {
-            grid-column: auto;
-        }
+})();
 
-        .team-member-row {
-            grid-template-columns: 38px 1fr auto;
-        }
-
-        .member-id {
-            display: none;
-        }
-
-    }
-
-
-    @media (max-width: 650px) {
-
-        .registration-identity-strip {
-            align-items: flex-start;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .identity-divider {
-            width: 100%;
-            height: 1px;
-        }
-
-        .detail-row {
-            align-items: flex-start;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .detail-value {
-            max-width: 100%;
-            text-align: left;
-        }
-
-        .team-banner {
-            flex-wrap: wrap;
-        }
-
-        .team-status {
-            width: 100%;
-        }
-
-        .registration-actions {
-            flex-direction: column;
-        }
-
-        .registration-actions form,
-        .action-button {
-            width: 100%;
-        }
-
-        .action-button {
-            min-width: 0;
-        }
-
-    }
-
-</style>
+</script>
 
 {% endblock %}

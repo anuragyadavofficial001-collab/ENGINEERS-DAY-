@@ -11,857 +11,663 @@
     >
 
     <title>
-        {{ game.name }} | Engineers Day 2026
+        {{ game.game_name }} | Engineers Day 2026
     </title>
 
     <link
-        rel="preconnect"
-        href="https://fonts.googleapis.com"
-    >
-
-    <link
-        rel="preconnect"
-        href="https://fonts.gstatic.com"
-        crossorigin
-    >
-
-    <link
-        href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap"
         rel="stylesheet"
+        href="{{ url_for('static', filename='css/game-details.css') }}"
     >
-
-    <style>
-
-        :root {
-            --bg: #160f0a;
-            --bg2: #24160e;
-
-            --orange: #f3a369;
-            --orange-light: #ffd1aa;
-
-            --cream: #fff4e9;
-            --muted: #bda99a;
-
-            --line: rgba(255, 196, 150, 0.15);
-
-            --panel: rgba(255,255,255,0.045);
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-
-            min-height: 100vh;
-
-            font-family: "Manrope", sans-serif;
-
-            color: var(--cream);
-
-            background:
-
-                radial-gradient(
-                    circle at 20% 15%,
-                    rgba(243,163,105,0.15),
-                    transparent 28%
-                ),
-
-                radial-gradient(
-                    circle at 85% 80%,
-                    rgba(255,205,160,0.08),
-                    transparent 30%
-                ),
-
-                linear-gradient(
-                    135deg,
-                    var(--bg),
-                    var(--bg2)
-                );
-
-            overflow-x: hidden;
-
-            caret-color: transparent;
-        }
-
-
-        body::before {
-
-            content: "";
-
-            position: fixed;
-
-            inset: 0;
-
-            pointer-events: none;
-
-            opacity: 0.16;
-
-            background-image:
-
-                linear-gradient(
-                    rgba(255,255,255,0.035) 1px,
-                    transparent 1px
-                ),
-
-                linear-gradient(
-                    90deg,
-                    rgba(255,255,255,0.035) 1px,
-                    transparent 1px
-                );
-
-            background-size: 42px 42px;
-        }
-
-
-        .page {
-
-            position: relative;
-
-            z-index: 1;
-
-            width: min(1200px, 92%);
-
-            margin: auto;
-
-            padding: 35px 0 80px;
-        }
-
-
-        /* =====================================================
-           NAV
-        ====================================================== */
-
-        .nav {
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: space-between;
-
-            padding-bottom: 22px;
-
-            border-bottom: 1px solid var(--line);
-        }
-
-
-        .back {
-
-            display: inline-flex;
-
-            align-items: center;
-
-            gap: 9px;
-
-            color: var(--muted);
-
-            text-decoration: none;
-
-            font-family: "DM Mono", monospace;
-
-            font-size: 10px;
-
-            letter-spacing: 0.08em;
-
-            transition:
-                color 0.25s ease,
-                transform 0.25s ease;
-        }
-
-
-        .back:hover {
-
-            color: var(--orange-light);
-
-            transform: translateX(-3px);
-        }
-
-
-        .nav-label {
-
-            font-family: "DM Mono", monospace;
-
-            font-size: 9px;
-
-            letter-spacing: 0.14em;
-
-            color: var(--orange);
-        }
-
-
-        /* =====================================================
-           HERO
-        ====================================================== */
-
-        .hero {
-
-            min-height: 460px;
-
-            padding: 90px 0 65px;
-
-            display: grid;
-
-            grid-template-columns:
-                minmax(0, 1.4fr)
-                minmax(280px, 0.6fr);
-
-            gap: 70px;
-
-            align-items: center;
-        }
-
-
-        .eyebrow {
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 10px;
-
-            margin-bottom: 25px;
-
-            font-family: "DM Mono", monospace;
-
-            font-size: 10px;
-
-            letter-spacing: 0.18em;
-
-            color: var(--orange);
-        }
-
-
-        .eyebrow::before {
-
-            content: "";
-
-            width: 35px;
-
-            height: 1px;
-
-            background: var(--orange);
-        }
-
-
-        .event-number {
-
-            font-family: "DM Mono", monospace;
-
-            font-size: 11px;
-
-            color: var(--muted);
-
-            margin-bottom: 12px;
-        }
-
-
-        h1 {
-
-            font-size: clamp(
-                48px,
-                7vw,
-                94px
-            );
-
-            line-height: 0.92;
-
-            letter-spacing: -0.065em;
-
-            font-weight: 800;
-        }
-
-
-        h1::first-letter {
-
-            color: var(--orange);
-        }
-
-
-        .description {
-
-            max-width: 650px;
-
-            margin-top: 30px;
-
-            color: var(--muted);
-
-            font-size: 14px;
-
-            line-height: 1.8;
-        }
-
-
-        /* =====================================================
-           INFO PANEL
-        ====================================================== */
-
-        .info-panel {
-
-            position: relative;
-
-            padding: 25px;
-
-            border: 1px solid var(--line);
-
-            border-radius: 22px;
-
-            background:
-                linear-gradient(
-                    145deg,
-                    rgba(255,255,255,0.075),
-                    rgba(255,255,255,0.018)
-                );
-
-            backdrop-filter: blur(16px);
-
-            box-shadow:
-                0 30px 80px rgba(0,0,0,0.22);
-
-            transform-style: preserve-3d;
-
-            transition:
-                transform 0.35s ease,
-                border-color 0.3s ease;
-        }
-
-
-        .info-panel:hover {
-
-            transform:
-                perspective(900px)
-                rotateY(-3deg)
-                translateY(-4px);
-
-            border-color:
-                rgba(243,163,105,0.35);
-        }
-
-
-        .info-label {
-
-            font-family: "DM Mono", monospace;
-
-            font-size: 9px;
-
-            letter-spacing: 0.15em;
-
-            color: var(--orange);
-
-            margin-bottom: 20px;
-        }
-
-
-        .info-row {
-
-            padding: 15px 0;
-
-            border-top: 1px solid var(--line);
-        }
-
-
-        .info-row:first-of-type {
-
-            border-top: 0;
-        }
-
-
-        .info-row span {
-
-            display: block;
-
-            margin-bottom: 6px;
-
-            font-family: "DM Mono", monospace;
-
-            font-size: 8px;
-
-            letter-spacing: 0.08em;
-
-            color: var(--muted);
-        }
-
-
-        .info-row strong {
-
-            font-size: 13px;
-
-            font-weight: 600;
-
-            color: var(--cream);
-        }
-
-
-        /* =====================================================
-           CONTENT SECTIONS
-        ====================================================== */
-
-        .content-grid {
-
-            display: grid;
-
-            grid-template-columns:
-                repeat(2, minmax(0, 1fr));
-
-            gap: 16px;
-
-            margin-top: 15px;
-        }
-
-
-        .content-card {
-
-            padding: 28px;
-
-            min-height: 210px;
-
-            border: 1px solid var(--line);
-
-            border-radius: 20px;
-
-            background: var(--panel);
-
-            transition:
-                transform 0.3s ease,
-                border-color 0.3s ease;
-        }
-
-
-        .content-card:hover {
-
-            transform: translateY(-4px);
-
-            border-color:
-                rgba(243,163,105,0.3);
-        }
-
-
-        .content-card.full {
-
-            grid-column: 1 / -1;
-        }
-
-
-        .content-title {
-
-            margin-bottom: 18px;
-
-            font-family: "DM Mono", monospace;
-
-            font-size: 10px;
-
-            letter-spacing: 0.16em;
-
-            color: var(--orange);
-        }
-
-
-        .content-body {
-
-            color: var(--muted);
-
-            font-size: 13px;
-
-            line-height: 1.9;
-
-            white-space: pre-line;
-        }
-
-
-        .rules {
-
-            white-space: pre-line;
-        }
-
-
-        /* =====================================================
-           REGISTRATION
-        ====================================================== */
-
-        .register-zone {
-
-            margin-top: 18px;
-
-            padding: 35px;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: space-between;
-
-            gap: 30px;
-
-            border: 1px solid
-                rgba(243,163,105,0.20);
-
-            border-radius: 22px;
-
-            background:
-                linear-gradient(
-                    110deg,
-                    rgba(243,163,105,0.12),
-                    rgba(255,255,255,0.025)
-                );
-        }
-
-
-        .register-title {
-
-            font-size: 22px;
-
-            font-weight: 700;
-
-            letter-spacing: -0.03em;
-        }
-
-
-        .register-subtitle {
-
-            margin-top: 7px;
-
-            color: var(--muted);
-
-            font-size: 11px;
-        }
-
-
-        .register-button {
-
-            min-width: 220px;
-
-            min-height: 58px;
-
-            display: inline-flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            padding: 0 25px;
-
-            border-radius: 14px;
-
-            text-decoration: none;
-
-            font-size: 11px;
-
-            font-weight: 800;
-
-            letter-spacing: 0.08em;
-
-            text-transform: uppercase;
-
-            color: #28150c;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #ffd0a7,
-                    #ee9a5e
-                );
-
-            border: 1px solid
-                rgba(255,235,215,0.7);
-
-            box-shadow:
-                0 15px 35px
-                rgba(170,82,32,0.18);
-
-            transition:
-                transform 0.3s ease,
-                box-shadow 0.3s ease;
-        }
-
-
-        .register-button:hover {
-
-            transform: translateY(-4px);
-
-            box-shadow:
-                0 22px 45px
-                rgba(170,82,32,0.25);
-        }
-
-
-        .register-button.disabled {
-
-            cursor: not-allowed;
-
-            opacity: 0.45;
-
-            filter: grayscale(0.25);
-
-            pointer-events: none;
-        }
-
-
-        /* =====================================================
-           FOOTER
-        ====================================================== */
-
-        footer {
-
-            margin-top: 70px;
-
-            padding-top: 22px;
-
-            border-top: 1px solid var(--line);
-
-            display: flex;
-
-            justify-content: space-between;
-
-            font-family: "DM Mono", monospace;
-
-            font-size: 9px;
-
-            color: var(--muted);
-
-            letter-spacing: 0.08em;
-        }
-
-
-        footer strong {
-
-            color: var(--orange-light);
-
-            font-weight: 500;
-        }
-
-
-        /* =====================================================
-           RESPONSIVE
-        ====================================================== */
-
-        @media (max-width: 800px) {
-
-            .hero {
-
-                grid-template-columns: 1fr;
-
-                gap: 35px;
-
-                padding-top: 60px;
-            }
-
-            .content-grid {
-
-                grid-template-columns: 1fr;
-            }
-
-            .content-card.full {
-
-                grid-column: auto;
-            }
-
-            .register-zone {
-
-                flex-direction: column;
-
-                align-items: flex-start;
-            }
-
-            .register-button {
-
-                width: 100%;
-            }
-        }
-
-
-        @media (max-width: 500px) {
-
-            .page {
-
-                width: 92%;
-            }
-
-            .nav-label {
-
-                display: none;
-            }
-
-            .hero {
-
-                padding-top: 50px;
-            }
-
-            footer {
-
-                flex-direction: column;
-
-                gap: 10px;
-            }
-        }
-
-    </style>
 
 </head>
 
 
 <body>
 
-<div class="page">
+
+<!-- =========================================================
+     PAGE BACKGROUND
+========================================================= -->
+
+<div
+    class="page-bg"
+    data-image-url="{{ url_for('static', filename='image/games/' ~ game.id ~ '-background.jpg') }}"
+></div>
 
 
-    <!-- =====================================================
-         NAVIGATION
-    ====================================================== -->
+<div class="ambient ambient-1"></div>
 
-    <nav class="nav">
+<div class="ambient ambient-2"></div>
+
+<div class="ambient ambient-3"></div>
+
+
+
+<!-- =========================================================
+     TOP NAVIGATION
+========================================================= -->
+
+<header class="top-navigation">
+
+
+    <div class="nav-left">
 
         <a
-            href="{{ url_for('games.games') }}"
-            class="back"
+            href="{{ url_for('student.home') }}"
+            class="back-button"
         >
-            ← BACK TO EVENTS
+
+            <span class="back-arrow">
+                ‹
+            </span>
+
+            <span>
+                Back to Events
+            </span>
+
         </a>
 
-        <span class="nav-label">
-            SR GROUP OF INSTITUTION / ENGINEERS DAY 2026
-        </span>
-
-    </nav>
+    </div>
 
 
-    <!-- =====================================================
-         EVENT HERO
-    ====================================================== -->
 
-    <section class="hero">
+    <div class="nav-brand">
 
-        <div>
+        <div class="brand-mark">
+            ⚙
+        </div>
 
-            <div class="eyebrow">
-                EVENT EXPERIENCE
-            </div>
+        <div class="brand-text">
 
-            <div class="event-number">
-                EVENT // {{ "%02d"|format(game.id) }}
-            </div>
+            <strong>
+                ENGINEERS DAY
+            </strong>
 
-            <h1>
-                {{ game.name }}
-            </h1>
-
-            <p class="description">
-                {{ game.description or
-                   "Event information will be announced soon." }}
-            </p>
+            <span>
+                SRGI 2026
+            </span>
 
         </div>
 
+    </div>
 
-        <!-- EVENT INFO -->
 
-        <aside class="info-panel">
 
-            <div class="info-label">
-                EVENT CONFIGURATION
+    <div class="nav-right">
+
+        <span>
+            SR Group of Institution / Engineers Day 2026
+        </span>
+
+
+        <div class="profile">
+
+            <div class="profile-avatar">
+
+                {{ session.get("student_name", "A")[0] }}
+
             </div>
 
+            <span>
+                {{ session.get("student_name", "Student") }}
+            </span>
 
-            <div class="info-row">
+            <span class="profile-arrow">
+                ⌄
+            </span>
 
-                <span>PARTICIPATION</span>
+        </div>
 
-                <strong>
-                    {% if game.registration_mode == "TEAM" %}
-                        TEAM
+    </div>
+
+</header>
+
+
+
+
+<!-- =========================================================
+     MAIN CONTENT
+========================================================= -->
+
+<main class="game-page">
+
+
+    <!-- =====================================================
+         HERO + CONFIGURATION
+    ====================================================== -->
+
+    <section class="top-layout">
+
+
+        <!-- =================================================
+             HERO CARD
+        ================================================== -->
+
+        <article class="hero-card">
+
+
+            <!-- Dynamic game artwork -->
+
+            <div
+                class="hero-art"
+                data-image-url="{{ url_for('static', filename='image/games/' ~ game.id ~ '-hero.jpg') }}"
+            ></div>
+
+
+            <div class="hero-overlay"></div>
+
+            <div class="hero-light"></div>
+
+
+
+            <!-- HERO CONTENT -->
+
+            <div class="hero-content">
+
+
+                <div class="game-category">
+                    ENGINEERS DAY EVENT
+                </div>
+
+
+
+                <h1>
+                    {{ game.game_name }}
+                </h1>
+
+
+
+                <div class="game-meta">
+
+
+                    <!-- PARTICIPATION -->
+
+                    <div class="meta-item">
+
+                        <div class="meta-icon team-icon">
+                            👥
+                        </div>
+
+                        <div>
+
+                            <small>
+                                PARTICIPATION
+                            </small>
+
+                            <strong>
+
+                                {% if game.registration_mode == "TEAM" %}
+
+                                    TEAM
+
+                                {% else %}
+
+                                    INDIVIDUAL
+
+                                {% endif %}
+
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="meta-divider"></div>
+
+
+
+                    <!-- DATE -->
+
+                    <div class="meta-item">
+
+                        <div class="meta-icon">
+                            ◫
+                        </div>
+
+                        <div>
+
+                            <small>
+                                DATE
+                            </small>
+
+                            <strong>
+                                {{ game.event_date or "TBA" }}
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="meta-divider"></div>
+
+
+
+                    <!-- TIME -->
+
+                    <div class="meta-item">
+
+                        <div class="meta-icon">
+                            ◷
+                        </div>
+
+                        <div>
+
+                            <small>
+                                TIME
+                            </small>
+
+                            <strong>
+                                {{ game.start_time or "TBA" }}
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="meta-divider"></div>
+
+
+
+                    <!-- VENUE -->
+
+                    <div class="meta-item">
+
+                        <div class="meta-icon">
+                            ◉
+                        </div>
+
+                        <div>
+
+                            <small>
+                                VENUE
+                            </small>
+
+                            <strong>
+
+                                {% if game.room %}
+
+                                    {{ game.room }}
+
+                                {% elif game.block %}
+
+                                    {{ game.block }}
+
+                                {% else %}
+
+                                    TBA
+
+                                {% endif %}
+
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- EVENT EXPERIENCE -->
+
+                <div class="experience-label">
+
+                    <span class="experience-line"></span>
+
+                    <span>
+                        EVENT EXPERIENCE
+                    </span>
+
+                </div>
+
+
+
+                <div class="event-number">
+                    EVENT // {{ game.id }}
+                </div>
+
+
+
+                <!-- DESCRIPTION -->
+
+                <p class="hero-description">
+
+                    {% if game.description %}
+
+                        {{ game.description }}
+
                     {% else %}
-                        INDIVIDUAL
-                    {% endif %}
-                </strong>
 
-            </div>
-
-
-            {% if game.registration_mode == "TEAM"
-                  and game.team_min_size
-                  and game.team_max_size %}
-
-            <div class="info-row">
-
-                <span>TEAM SIZE</span>
-
-                <strong>
-                    {{ game.team_min_size }}
-                    –
-                    {{ game.team_max_size }}
-                    PARTICIPANTS
-                </strong>
-
-            </div>
-
-            {% endif %}
-
-
-            <div class="info-row">
-
-                <span>DATE</span>
-
-                <strong>
-                    {{ game.event_date or "TBA" }}
-                </strong>
-
-            </div>
-
-
-            <div class="info-row">
-
-                <span>TIME</span>
-
-                <strong>
-
-                    {% if game.start_time %}
-
-                        {{ game.start_time }}
-
-                        {% if game.end_time %}
-                            — {{ game.end_time }}
-                        {% endif %}
-
-                    {% else %}
-
-                        TBA
+                        Get ready to participate, compete and
+                        showcase your skills at Engineers Day 2026.
 
                     {% endif %}
 
-                </strong>
+                </p>
+
+
+
+                <!-- =================================================
+                     REGISTER
+                ================================================== -->
+
+                {% if game.registration_open %}
+
+                    <form
+                        method="POST"
+                        action="{{ url_for('games.register', game_id=game.id) }}"
+                        class="register-form"
+                    >
+
+                        <button
+                            type="submit"
+                            class="register-button"
+                            aria-label="Register for {{ game.game_name }}"
+                        >
+
+                            <span>
+                                Register Now
+                            </span>
+
+                            <span class="register-arrow">
+                                →
+                            </span>
+
+                        </button>
+
+                    </form>
+
+                {% else %}
+
+                    <button
+                        class="register-button disabled"
+                        disabled
+                    >
+
+                        <span>
+                            Registration Closed
+                        </span>
+
+                        <span>
+                            ×
+                        </span>
+
+                    </button>
+
+                {% endif %}
+
+
+            </div>
+
+        </article>
+
+
+
+
+        <!-- =================================================
+             EVENT CONFIGURATION
+        ================================================== -->
+
+        <aside class="configuration-card">
+
+
+            <div class="configuration-glow"></div>
+
+
+
+            <div class="configuration-header">
+
+                <div class="configuration-icon">
+                    ⚙
+                </div>
+
+                <h2>
+                    EVENT CONFIGURATION
+                </h2>
 
             </div>
 
 
-            <div class="info-row">
 
-                <span>VENUE</span>
-
-                <strong>
-                    {{ game.venue or "TBA" }}
-                </strong>
-
-            </div>
+            <div class="config-list">
 
 
-            <div class="info-row">
+                <!-- PARTICIPATION -->
 
-                <span>REGISTRATION</span>
+                <div class="config-item purple">
 
-                <strong>
+                    <div class="config-icon">
+                        👥
+                    </div>
 
-                    {% if game.registration_open %}
+                    <div class="config-text">
 
-                        OPEN
+                        <small>
+                            PARTICIPATION
+                        </small>
 
-                    {% else %}
+                        <strong>
 
-                        CLOSED
+                            {% if game.registration_mode == "TEAM" %}
 
-                    {% endif %}
+                                TEAM
 
-                </strong>
+                            {% else %}
+
+                                INDIVIDUAL
+
+                            {% endif %}
+
+                        </strong>
+
+                    </div>
+
+                    <span class="config-arrow">
+                        ⌄
+                    </span>
+
+                </div>
+
+
+
+                <!-- TEAM SIZE -->
+
+                <div class="config-item cyan">
+
+                    <div class="config-icon">
+                        👤
+                    </div>
+
+                    <div class="config-text">
+
+                        <small>
+                            TEAM SIZE
+                        </small>
+
+                        <strong>
+
+                            {% if game.registration_mode == "TEAM" %}
+
+                                {{ game.team_min_size or 1 }}
+                                -
+                                {{ game.team_max_size or game.team_min_size or 1 }}
+                                PARTICIPANTS
+
+                            {% else %}
+
+                                1 PARTICIPANT
+
+                            {% endif %}
+
+                        </strong>
+
+                    </div>
+
+                    <span class="config-arrow">
+                        ⌄
+                    </span>
+
+                </div>
+
+
+
+                <!-- REGISTRATION MODE -->
+
+                <div class="config-item green">
+
+                    <div class="config-icon">
+                        ◉
+                    </div>
+
+                    <div class="config-text">
+
+                        <small>
+                            REGISTRATION MODE
+                        </small>
+
+                        <strong>
+                            ONLINE
+                        </strong>
+
+                    </div>
+
+                    <span class="config-arrow">
+                        ⌄
+                    </span>
+
+                </div>
+
+
+
+                <!-- DATE -->
+
+                <div class="config-item orange">
+
+                    <div class="config-icon">
+                        ▣
+                    </div>
+
+                    <div class="config-text">
+
+                        <small>
+                            DATE
+                        </small>
+
+                        <strong>
+                            {{ game.event_date or "TBA" }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- TIME -->
+
+                <div class="config-item violet">
+
+                    <div class="config-icon">
+                        ◷
+                    </div>
+
+                    <div class="config-text">
+
+                        <small>
+                            TIME
+                        </small>
+
+                        <strong>
+                            {{ game.start_time or "TBA" }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- VENUE -->
+
+                <div class="config-item pink">
+
+                    <div class="config-icon">
+                        ⌖
+                    </div>
+
+                    <div class="config-text">
+
+                        <small>
+                            VENUE
+                        </small>
+
+                        <strong>
+
+                            {% if game.room %}
+
+                                {{ game.room }}
+
+                            {% elif game.block %}
+
+                                {{ game.block }}
+
+                            {% else %}
+
+                                TBA
+
+                            {% endif %}
+
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- REGISTRATION STATUS -->
+
+                <div class="config-item status-item">
+
+                    <div class="config-icon status-icon">
+                        ✓
+                    </div>
+
+                    <div class="config-text">
+
+                        <small>
+                            REGISTRATION STATUS
+                        </small>
+
+                        <strong
+                            class="{% if game.registration_open %}status-open{% else %}status-closed{% endif %}"
+                        >
+
+                            <span class="status-dot"></span>
+
+                            {% if game.registration_open %}
+
+                                OPEN
+
+                            {% else %}
+
+                                CLOSED
+
+                            {% endif %}
+
+                        </strong>
+
+                    </div>
+
+                </div>
+
 
             </div>
 
@@ -870,237 +676,356 @@
     </section>
 
 
+
+
     <!-- =====================================================
-         EVENT INFORMATION
+         RULES SECTION
     ====================================================== -->
 
-    <section class="content-grid">
+    <section class="rules-card">
 
 
-        <!-- RULES -->
-
-        <article class="content-card full">
-
-            <div class="content-title">
-                RULES & REGULATIONS
-            </div>
-
-            <div class="content-body rules">
-
-                {{ game.rules or
-                   "Official rules will be published by the event administration team." }}
-
-            </div>
-
-        </article>
+        <div class="rules-content">
 
 
-        <!-- REQUIREMENTS -->
+            <div class="section-heading">
 
-        <article class="content-card">
+                <div class="heading-icon">
+                    ◈
+                </div>
 
-            <div class="content-title">
-                REQUIREMENTS
-            </div>
+                <div>
 
-            <div class="content-body">
+                    <span>
+                        EVENT GUIDELINES
+                    </span>
 
-                {{ game.requirements or
-                   "Participation requirements will be announced soon." }}
+                    <h2>
+                        RULES & REGULATIONS
+                    </h2>
+
+                </div>
 
             </div>
 
-        </article>
 
 
-        <!-- PRIZES -->
-
-        <article class="content-card">
-
-            <div class="content-title">
-                PRIZES
-            </div>
-
-            <div class="content-body">
-
-                {{ game.prizes or
-                   "Prize information will be announced soon." }}
-
-            </div>
-
-        </article>
+            <div class="rules-list">
 
 
-        <!-- CERTIFICATE -->
+                {% if game.rules %}
 
-        <article class="content-card">
+                    {% set rules = game.rules.split('\n') %}
 
-            <div class="content-title">
-                CERTIFICATION
-            </div>
+                    {% for rule in rules %}
 
-            <div class="content-body">
+                        {% if rule.strip() %}
 
-                {% if game.certificate_enabled %}
+                            <div class="rule-item">
 
-                    Certificate:
-                    {{ game.certificate_type or
-                       "Participation / Achievement Certificate" }}
+                                <div class="rule-number">
+                                    {{ loop.index }}
+                                </div>
+
+                                <p>
+                                    {{ rule.strip() }}
+                                </p>
+
+                            </div>
+
+                        {% endif %}
+
+                    {% endfor %}
 
                 {% else %}
 
-                    Certificate information is not available
-                    for this event.
+
+                    <div class="rule-item">
+
+                        <div class="rule-number">
+                            1
+                        </div>
+
+                        <p>
+                            Participants must follow all event
+                            instructions issued by the organizers.
+                        </p>
+
+                    </div>
+
+
+
+                    <div class="rule-item">
+
+                        <div class="rule-number">
+                            2
+                        </div>
+
+                        <p>
+                            Only eligible SRGI students can participate
+                            in the Engineers Day event.
+                        </p>
+
+                    </div>
+
+
+
+                    <div class="rule-item">
+
+                        <div class="rule-number">
+                            3
+                        </div>
+
+                        <p>
+                            Participants must report at the assigned
+                            venue before the event begins.
+                        </p>
+
+                    </div>
+
+
+
+                    <div class="rule-item">
+
+                        <div class="rule-number">
+                            4
+                        </div>
+
+                        <p>
+                            Any form of unfair practice may result in
+                            disqualification.
+                        </p>
+
+                    </div>
+
+
+
+                    <div class="rule-item">
+
+                        <div class="rule-number">
+                            5
+                        </div>
+
+                        <p>
+                            Decisions of the event coordinators will
+                            be treated as final.
+                        </p>
+
+                    </div>
+
 
                 {% endif %}
 
-            </div>
-
-        </article>
-
-
-        <!-- STATUS -->
-
-        <article class="content-card">
-
-            <div class="content-title">
-                EVENT STATUS
-            </div>
-
-            <div class="content-body">
-
-                {{ game.status or "ACTIVE" }}
-
-            </div>
-
-        </article>
-
-    </section>
-
-
-    <!-- =====================================================
-         REGISTRATION CTA
-    ====================================================== -->
-
-    <section class="register-zone">
-
-        <div>
-
-            <div class="register-title">
-                Ready to enter the arena?
-            </div>
-
-            <div class="register-subtitle">
-
-                Your student profile is already connected.
-                Registration will only ask for
-                event-specific information.
 
             </div>
 
         </div>
 
 
-        {% if game.registration_open %}
 
-            <a
-                href="#"
-                class="register-button"
-                id="registerButton"
-            >
-                REGISTER FOR EVENT →
-            </a>
 
-        {% else %}
+        <!-- =================================================
+             RULES ART
+        ================================================== -->
 
-            <div
-                class="register-button disabled"
-            >
-                REGISTRATION CLOSED
-            </div>
+        <div
+            class="rules-art"
+            data-image-url="{{ url_for('static', filename='image/games/' ~ game.id ~ '-rules.jpg') }}"
+        >
 
-        {% endif %}
+            <div class="rules-art-glow"></div>
+
+            <div class="floating-object object-1"></div>
+
+            <div class="floating-object object-2"></div>
+
+            <div class="floating-object object-3"></div>
+
+        </div>
 
     </section>
 
 
+
+
     <!-- =====================================================
-         FOOTER
+         PRIZE / REQUIREMENTS STRIP
     ====================================================== -->
 
-    <footer>
+    <section class="bottom-info-grid">
 
-        <span>
-            ENGINEERS DAY / 16 SEPTEMBER 2026
-        </span>
 
-        <span>
-            POWERED BY
-            <strong>ANURAG YADAV</strong>
-        </span>
+        <!-- PRIZE -->
 
-    </footer>
+        <div class="info-card prize-card">
 
-</div>
+            <div class="info-icon">
+                🏆
+            </div>
 
+            <div>
+
+                <small>
+                    PRIZE POOL
+                </small>
+
+                <strong>
+                    {{ game.prize_pool or "TBA" }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- REQUIREMENTS -->
+
+        <div class="info-card requirement-card">
+
+            <div class="info-icon">
+                ✦
+            </div>
+
+            <div>
+
+                <small>
+                    REQUIREMENTS
+                </small>
+
+                <strong>
+                    {{ game.requirements or "Will be announced soon" }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- STATUS -->
+
+        <div class="info-card status-card">
+
+            <div class="info-icon">
+                ✓
+            </div>
+
+            <div>
+
+                <small>
+                    EVENT STATUS
+                </small>
+
+                <strong>
+                    {{ game.status or "UPCOMING" }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+    </section>
+
+
+</main>
+
+
+
+
+<!-- =========================================================
+     IMAGE LOADER
+========================================================= -->
 
 <script>
 
-    /*
-     * Gentle 3D interaction for the event information panel.
-     */
+document.addEventListener("DOMContentLoaded", function () {
 
-    const panel =
-        document.querySelector(".info-panel");
+    const imageElements =
+        document.querySelectorAll("[data-image-url]");
 
 
-    if (panel) {
+    imageElements.forEach(function (element) {
 
-        panel.addEventListener(
-            "mousemove",
-            (event) => {
-
-                const rect =
-                    panel.getBoundingClientRect();
-
-                const x =
-                    event.clientX - rect.left;
-
-                const y =
-                    event.clientY - rect.top;
-
-                const centerX =
-                    rect.width / 2;
-
-                const centerY =
-                    rect.height / 2;
-
-                const rotateY =
-                    ((x - centerX) / centerX) * 4;
-
-                const rotateX =
-                    ((centerY - y) / centerY) * 4;
-
-                panel.style.transform =
-                    `perspective(900px)
-                     rotateX(${rotateX}deg)
-                     rotateY(${rotateY}deg)
-                     translateY(-4px)`;
-            }
-        );
+        const imageUrl =
+            element.getAttribute("data-image-url");
 
 
-        panel.addEventListener(
-            "mouseleave",
-            () => {
+        if (!imageUrl) {
+            return;
+        }
 
-                panel.style.transform = "";
-            }
-        );
 
-    }
+        element.style.backgroundImage =
+            'url("' + imageUrl + '")';
+
+
+        element.style.backgroundSize =
+            "cover";
+
+
+        element.style.backgroundPosition =
+            "center";
+
+
+        element.style.backgroundRepeat =
+            "no-repeat";
+
+    });
+
+
+});
 
 </script>
+
+
+
+
+<!-- =========================================================
+     PAGE ANIMATION
+========================================================= -->
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+
+        const cards =
+            document.querySelectorAll(
+                ".hero-card, .configuration-card, .rules-card"
+            );
+
+
+        cards.forEach(
+            function (card, index) {
+
+                card.style.animationDelay =
+                    (index * 0.12) + "s";
+
+            }
+        );
+
+
+        document
+            .querySelectorAll(".config-item")
+            .forEach(
+                function (item, index) {
+
+                    item.style.animationDelay =
+                        (0.35 + index * 0.08) + "s";
+
+                }
+            );
+
+
+    }
+);
+
+</script>
+
 
 </body>
 

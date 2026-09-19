@@ -139,7 +139,7 @@ def game_details(game_id):
         cursor = connection.cursor()
 
         # ----------------------------------------------------
-        # GAME
+        # GAME DETAILS
         # ----------------------------------------------------
 
         cursor.execute(
@@ -173,11 +173,23 @@ def game_details(game_id):
 
         game = cursor.fetchone()
 
-        if not game:
-            flash("Event not found.", "error")
+        # ----------------------------------------------------
+        # IMPORTANT:
+        # NEVER REDIRECT TO /games/ IF ID IS INVALID.
+        # ----------------------------------------------------
 
-            return redirect(
-                url_for("games.games")
+        if not game:
+            return (
+                f"""
+                <h2>Game not found</h2>
+                <p>Game ID <strong>{game_id}</strong> does not exist.</p>
+                <p>
+                    <a href="{url_for('games.games')}">
+                        Back to Events
+                    </a>
+                </p>
+                """,
+                404
             )
 
         # ----------------------------------------------------
@@ -206,6 +218,7 @@ def game_details(game_id):
         student = cursor.fetchone()
 
         if not student:
+
             session.clear()
 
             return redirect(
@@ -296,7 +309,9 @@ def game_details(game_id):
             FROM results
             WHERE game_id = %s
               AND is_published = TRUE
-            ORDER BY published_at DESC NULLS LAST, id DESC
+            ORDER BY
+                published_at DESC NULLS LAST,
+                id DESC
             LIMIT 1
             """,
             (game_id,)
@@ -305,7 +320,7 @@ def game_details(game_id):
         result = cursor.fetchone()
 
         # ----------------------------------------------------
-        # RENDER GAME DETAILS
+        # RENDER SAME CREATIVE PAGE FOR EVERY GAME
         # ----------------------------------------------------
 
         return render_template(
@@ -326,16 +341,32 @@ def game_details(game_id):
         print("GAME DETAILS DATABASE ERROR")
         print("==============================================")
         print(f"GAME ID: {game_id}")
-        print(repr(error))
+        print(f"ERROR TYPE: {type(error).__name__}")
+        print(f"ERROR: {repr(error)}")
         print("==============================================\n")
 
-        flash(
-            "Unable to load event details right now.",
-            "error"
-        )
+        # IMPORTANT:
+        # Do NOT redirect to /games/
+        # Otherwise every database/template error looks like
+        # the user simply opened the events listing page.
 
-        return redirect(
-            url_for("games.games")
+        return (
+            f"""
+            <h2>Unable to load game details</h2>
+            <p>
+                Game ID:
+                <strong>{game_id}</strong>
+            </p>
+            <p>
+                Please check the Flask terminal for the exact error.
+            </p>
+            <p>
+                <a href="{url_for('games.games')}">
+                    Back to Events
+                </a>
+            </p>
+            """,
+            500
         )
 
     finally:
@@ -576,12 +607,15 @@ def register(game_id):
         )
 
         if registration_id:
+
             flash(
                 f"Registration successful for {game['game_name']}. "
                 f"Registration ID: {registration_id}",
                 "success"
             )
+
         else:
+
             flash(
                 f"Registration successful for {game['game_name']}.",
                 "success"
@@ -603,7 +637,8 @@ def register(game_id):
         print("REGISTRATION DATABASE ERROR")
         print("==============================================")
         print(f"GAME ID: {game_id}")
-        print(repr(error))
+        print(f"ERROR TYPE: {type(error).__name__}")
+        print(f"ERROR: {repr(error)}")
         print("==============================================\n")
 
         flash(
@@ -751,7 +786,8 @@ def cancel_registration(game_id):
         print("CANCEL REGISTRATION DATABASE ERROR")
         print("==============================================")
         print(f"GAME ID: {game_id}")
-        print(repr(error))
+        print(f"ERROR TYPE: {type(error).__name__}")
+        print(f"ERROR: {repr(error)}")
         print("==============================================\n")
 
         flash(

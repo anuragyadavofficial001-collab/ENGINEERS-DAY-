@@ -78,6 +78,123 @@
     </div>
 
 
+  
+    <!-- =========================================================
+     GAME-WISE EXCEL EXPORT
+========================================================= -->
+<section class="admin-card registration-export-card">
+
+    <div class="registration-export-top">
+
+        <div class="registration-export-heading">
+
+            <div class="registration-export-eyebrow">
+                <span class="registration-export-dot"></span>
+                DATA EXPORT
+            </div>
+
+            <h2>
+                Game-wise Excel Export
+            </h2>
+
+            <p>
+                Download complete registration data separately for every Engineers Day game.
+            </p>
+
+        </div>
+
+        <div class="registration-export-badge">
+            <span>×</span>
+            XLSX
+        </div>
+
+    </div>
+
+
+    {% if games %}
+
+    <div class="registration-export-list">
+
+        {% for game in games %}
+
+        <div class="registration-export-row">
+
+            <div class="registration-export-game">
+
+                <div class="registration-export-index">
+                    {{ "%02d"|format(loop.index) }}
+                </div>
+
+                <div class="registration-export-game-info">
+
+                    <strong>
+                        {{ game.game_name }}
+                    </strong>
+
+                    <span>
+                        {% if game.registration_mode == 'TEAM' %}
+                            TEAM EVENT
+                        {% else %}
+                            INDIVIDUAL EVENT
+                        {% endif %}
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <a
+                href="{{ url_for(
+                    'admin.export_game_registrations',
+                    game_id=game.id
+                ) }}"
+                class="registration-export-button"
+            >
+
+                <span class="registration-export-button-icon">
+                    ↓
+                </span>
+
+                <span>
+                    EXPORT
+                </span>
+
+                <span class="registration-export-button-arrow">
+                    →
+                </span>
+
+            </a>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    {% else %}
+
+    <div class="registration-export-empty">
+
+        <div class="registration-export-empty-icon">
+            XLSX
+        </div>
+
+        <strong>
+            No games available
+        </strong>
+
+        <span>
+            Games must be available before registration data can be exported.
+        </span>
+
+    </div>
+
+    {% endif %}
+
+</section>
+
+
     <!-- =========================================================
          FILTER PANEL
     ========================================================== -->
@@ -476,9 +593,206 @@
 
 
 <!-- =============================================================
-     PAGE-SPECIFIC POLISH
+     EXPORT UI STYLES
 ============================================================= -->
 
+<style>
 
+.registration-export-card {
+    overflow: hidden;
+}
+
+.registration-export-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+.export-eyebrow {
+    margin-bottom: 8px;
+}
+
+.registration-export-header h2 {
+    margin: 0;
+}
+
+.registration-export-header p {
+    margin-top: 7px;
+}
+
+.export-header-icon {
+    width: 58px;
+    height: 58px;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    background: rgba(255,255,255,0.04);
+    flex-shrink: 0;
+}
+
+.game-export-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.game-export-item {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 15px;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 15px;
+    background: rgba(255,255,255,0.025);
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        background 0.2s ease;
+}
+
+.game-export-item:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255,255,255,0.18);
+    background: rgba(255,255,255,0.045);
+}
+
+.game-export-info {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.game-export-number {
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.06);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+}
+
+.game-export-name {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.game-export-name strong {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.game-export-name span {
+    font-size: 11px;
+    opacity: 0.55;
+}
+
+.game-export-btn {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 36px;
+    padding: 0 12px;
+    border-radius: 10px;
+    text-decoration: none;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.06);
+    color: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.game-export-btn:hover {
+    background: rgba(255,255,255,0.12);
+    border-color: rgba(255,255,255,0.22);
+    transform: translateY(-1px);
+}
+
+.export-btn-icon {
+    font-size: 16px;
+    line-height: 1;
+}
+
+.export-empty {
+    margin-top: 20px;
+    padding: 30px;
+    border: 1px dashed rgba(255,255,255,0.12);
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    text-align: center;
+}
+
+.export-empty-icon {
+    font-size: 26px;
+    opacity: 0.5;
+}
+
+.export-empty span {
+    font-size: 12px;
+    opacity: 0.55;
+}
+
+@media (max-width: 900px) {
+
+    .game-export-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+@media (max-width: 600px) {
+
+    .registration-export-header {
+        align-items: flex-start;
+    }
+
+    .export-header-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 13px;
+    }
+
+    .game-export-item {
+        align-items: flex-start;
+    }
+
+    .game-export-info {
+        align-items: flex-start;
+    }
+
+    .game-export-btn {
+        min-height: 34px;
+        padding: 0 10px;
+    }
+
+}
+
+</style>
 
 {% endblock %}
