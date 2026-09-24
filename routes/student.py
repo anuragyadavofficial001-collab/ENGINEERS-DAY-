@@ -284,3 +284,56 @@ def home():
 
         if connection:
             connection.close()
+
+
+# ============================================================
+# STUDENT RESULTS
+# ============================================================
+
+@student_bp.route("/results", methods=["GET"])
+@student_login_required
+def results():
+    connection = None
+    cursor = None
+
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor()
+
+        cursor.execute(
+            """
+            SELECT
+                r.id,
+                r.game_id,
+                g.game_name,
+                r.winner_name,
+                r.winner_roll_number,
+                r.winner_department,
+                r.runner_up_name,
+                r.runner_up_roll_number,
+                r.runner_up_department,
+                r.remarks,
+                r.published_at
+            FROM results r
+            INNER JOIN games g ON g.id = r.game_id
+            WHERE r.is_published = TRUE
+            ORDER BY r.published_at DESC, g.game_name ASC
+            """
+        )
+        published_results = cursor.fetchall()
+
+        return render_template(
+            "results.html",
+            results=published_results
+        )
+
+    except Exception:
+        if connection:
+            connection.rollback()
+        return render_template("results.html", results=[])
+
+    finally:
+        if cursor:
+            cursor.close()
+        if connection:
+            connection.close()

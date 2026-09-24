@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Events &amp; Games • Engineers Day 2026</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #090d16;
+            --surface: #101626;
+            --surface-hover: #162035;
+            --border: rgba(255, 255, 255, 0.08);
+            --border-glow: rgba(0, 200, 230, 0.35);
+            --text: #f0f4fc;
+            --text-muted: #8899b5;
+            --cyan: #00d4ef;
+            --violet: #8c6cf5;
+            --pink: #ff4d8d;
+            --green: #10b981;
+            --gold: #f59e0b;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-image: 
+                radial-gradient(circle at 15% 10%, rgba(0, 212, 239, 0.12), transparent 35%),
+                radial-gradient(circle at 85% 20%, rgba(140, 108, 245, 0.12), transparent 35%),
+                radial-gradient(circle at 50% 80%, rgba(255, 77, 141, 0.06), transparent 45%);
+            background-attachment: fixed;
+        }
+
+        header.navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 40px;
+            background: rgba(16, 22, 38, 0.85);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .brand-badge {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--cyan), var(--violet));
+            color: #fff;
+            display: grid;
+            place-items: center;
+            font-weight: 800;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+        }
+
+        .brand-text strong {
+            display: block;
+            font-size: 14px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .brand-text span {
+            font-size: 11px;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 18px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            color: var(--text);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .btn-back:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateX(-2px);
+        }
+
+        main.container {
+            max-width: 1380px;
+            margin: 0 auto;
+            padding: 40px 24px 80px;
+            width: 100%;
+            flex: 1;
+        }
+
+        .hero-banner {
+            text-align: center;
+            margin-bottom: 45px;
+        }
+
+        .pill-badge {
+            display: inline-block;
+            padding: 5px 14px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--cyan);
+            background: rgba(0, 212, 239, 0.1);
+            border: 1px solid rgba(0, 212, 239, 0.25);
+            margin-bottom: 14px;
+        }
+
+        .hero-banner h1 {
+            font-size: 38px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #ffffff 40%, var(--cyan) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-banner p {
+            font-size: 15px;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto 28px;
+            line-height: 1.6;
+        }
+
+        .search-bar-wrap {
+            max-width: 520px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .search-bar-wrap input {
+            width: 100%;
+            padding: 14px 20px 14px 44px;
+            border-radius: 12px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .search-bar-wrap input:focus {
+            border-color: var(--cyan);
+            box-shadow: 0 0 0 3px rgba(0, 212, 239, 0.18);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+
+        .events-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 24px;
+            margin-top: 36px;
+        }
+
+        .event-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .event-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--border-glow);
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 212, 239, 0.1);
+        }
+
+        .card-img-wrap {
+            height: 170px;
+            position: relative;
+            background-color: #1a2236;
+            background-size: cover;
+            background-position: center;
+            overflow: hidden;
+        }
+
+        .card-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(9, 13, 22, 0.1) 0%, rgba(16, 22, 38, 0.95) 100%);
+        }
+
+        .card-badge {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            backdrop-filter: blur(8px);
+        }
+
+        .badge-open {
+            background: rgba(16, 185, 129, 0.2);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.4);
+        }
+
+        .badge-closed {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.4);
+        }
+
+        .badge-mode {
+            position: absolute;
+            top: 14px;
+            left: 14px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            background: rgba(0, 0, 0, 0.6);
+            color: var(--cyan);
+            border: 1px solid rgba(0, 212, 239, 0.3);
+        }
+
+        .card-body {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #ffffff;
+            line-height: 1.3;
+        }
+
+        .card-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin-bottom: 18px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            flex: 1;
+        }
+
+        .card-meta {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            padding: 12px 0;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            font-size: 12px;
+            margin-bottom: 18px;
+        }
+
+        .meta-item small {
+            display: block;
+            color: var(--text-muted);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 3px;
+        }
+
+        .meta-item strong {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .btn-view {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            padding: 11px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, rgba(0, 212, 239, 0.15), rgba(140, 108, 245, 0.15));
+            border: 1px solid rgba(0, 212, 239, 0.3);
+            color: var(--cyan);
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .event-card:hover .btn-view {
+            background: linear-gradient(135deg, var(--cyan), var(--violet));
+            color: #fff;
+            border-color: transparent;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-muted);
+            font-size: 12px;
+            border-top: 1px solid var(--border);
+            background: var(--surface);
+        }
+
+        @media (max-width: 768px) {
+            header.navbar {
+                padding: 14px 20px;
+            }
+            .hero-banner h1 {
+                font-size: 28px;
+            }
+            .events-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="navbar">
+        <a href="{{ url_for('student.home') }}" class="brand">
+            <div class="brand-badge">SR</div>
+            <div class="brand-text">
+                <strong>SRGI Engineers Day</strong>
+                <span>Event Catalog 2026</span>
+            </div>
+        </a>
+
+        <div class="nav-actions">
+            <a href="{{ url_for('student.home') }}" class="btn-back">
+                &larr; Dashboard
+            </a>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="hero-banner">
+            <div class="pill-badge">Official Events</div>
+            <h1>Engineers Day 2026 Events</h1>
+            <p>Explore all 27 technical, creative, and gaming events. Select any event to review complete rules, guidelines, and confirm your participation.</p>
+
+            <div class="search-bar-wrap">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="eventSearch" placeholder="Search by event name, rules, or venue..." onkeyup="filterEvents()">
+            </div>
+        </div>
+
+        <div class="events-grid" id="eventsGrid">
+            {% for game in games %}
+            <a href="{{ url_for('games.game_details', game_id=game.id) }}" class="event-card">
+                <div class="card-img-wrap" data-image-url="{{ url_for('static', filename='image/games/' ~ game.id ~ '-hero.jpg') }}">
+                    <div class="card-overlay"></div>
+                    <span class="badge-mode">{{ game.registration_mode }}</span>
+                    {% if game.registration_open %}
+                        <span class="card-badge badge-open">Registration Open</span>
+                    {% else %}
+                        <span class="card-badge badge-closed">Closed</span>
+                    {% endif %}
+                </div>
+
+                <div class="card-body">
+                    <h2 class="card-title">{{ game.game_name }}</h2>
+                    <p class="card-desc">{{ game.description if game.description else 'Participate and demonstrate your engineering mastery in this competition.' }}</p>
+
+                    <div class="card-meta">
+                        <div class="meta-item">
+                            <small>Prize Pool</small>
+                            <strong>{{ game.prize_pool if game.prize_pool else 'Certificates &amp; Trophy' }}</strong>
+                        </div>
+                        <div class="meta-item">
+                            <small>Location</small>
+                            <strong>{{ (game.block ~ ' - ' ~ game.room) if game.block and game.room else 'Main Campus' }}</strong>
+                        </div>
+                    </div>
+
+                    <div class="btn-view">
+                        <span>View Details &amp; Register</span>
+                        <span>&rarr;</span>
+                    </div>
+                </div>
+            </a>
+            {% else %}
+            <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--text-muted);">
+                <h3>No events found</h3>
+                <p style="margin-top: 10px;">Please check back shortly or return to the main dashboard.</p>
+                <a href="{{ url_for('student.home') }}" class="btn-back" style="margin-top: 20px; display: inline-flex;">Return to Dashboard</a>
+            </div>
+            {% endfor %}
+        </div>
+    </main>
+
+    <footer>
+        <p>Engineers Day 2026 • SR Group of Institution • Designed &amp; Developed by Anurag Yadav</p>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll("[data-image-url]").forEach(function (el) {
+                var url = el.getAttribute("data-image-url");
+                if (url) {
+                    el.style.backgroundImage = 'url("' + url + '")';
+                }
+            });
+        });
+
+        function filterEvents() {
+            var query = document.getElementById('eventSearch').value.toLowerCase().trim();
+            var cards = document.querySelectorAll('.event-card');
+            cards.forEach(function (card) {
+                var titleEl = card.querySelector('.card-title');
+                var descEl = card.querySelector('.card-desc');
+                var title = titleEl ? titleEl.textContent.toLowerCase() : '';
+                var desc = descEl ? descEl.textContent.toLowerCase() : '';
+                if (title.indexOf(query) !== -1 || desc.indexOf(query) !== -1) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

@@ -8,6 +8,7 @@ import io
 import os
 import re
 from functools import wraps
+from io import BytesIO
 
 from flask import (
     Blueprint,
@@ -20,14 +21,9 @@ from flask import (
     send_file,
     url_for
 )
-from io import BytesIO
-import re
-
-from flask import send_file
-from openpyxl import Workbook
+from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Font, PatternFill, Alignment
 from openpyxl.utils import get_column_letter
-from openpyxl import Workbook, load_workbook
 from pypdf import PdfReader
 from werkzeug.security import check_password_hash
 

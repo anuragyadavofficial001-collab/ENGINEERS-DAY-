@@ -227,6 +227,52 @@ def login():
             url_for("student.home")
         )
 
+    # --------------------------------------------------------
+    # PORTAL SETTINGS CHECK
+    # If admin has disabled student login, show maintenance.
+    # --------------------------------------------------------
+
+    login_blocked = False
+    maintenance_message = (
+        "The student portal is currently offline for maintenance. "
+        "Please try again later."
+    )
+
+    try:
+        from database.db import get_db_connection as _get_conn
+        _conn = _get_conn()
+        _cur = _conn.cursor()
+        _cur.execute(
+            """
+            SELECT
+                student_login_enabled,
+                portal_status
+            FROM portal_settings
+            WHERE id = 1
+            LIMIT 1
+            """
+        )
+        _settings = _cur.fetchone()
+        _cur.close()
+        _conn.close()
+
+        if _settings:
+            if not bool(_settings.get("student_login_enabled")):
+                login_blocked = True
+            elif _settings.get("portal_status") == "MAINTENANCE":
+                login_blocked = True
+
+    except Exception:
+        # If portal_settings table doesn't exist yet, allow login.
+        pass
+
+    if login_blocked:
+        return render_template(
+            "login.html",
+            login_blocked=True,
+            maintenance_message=maintenance_message
+        )
+
     return render_template("login.html")
 
 

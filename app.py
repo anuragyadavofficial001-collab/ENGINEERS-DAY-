@@ -3,9 +3,11 @@
 # Supabase PostgreSQL + Vercel Ready
 # ============================================================
 
+import os
 from datetime import timedelta
 
 from flask import Flask, render_template
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 from config import Config
 from database.db import get_db_connection
@@ -19,6 +21,16 @@ app = Flask(__name__)
 
 app.config.from_object(Config)
 
+# Enable ProxyFix to correctly handle reverse proxies on Vercel
+# (X-Forwarded-For, X-Forwarded-Proto, X-Forwarded-Host)
+app.wsgi_app = ProxyFix(
+    app.wsgi_app,
+    x_for=1,
+    x_proto=1,
+    x_host=1,
+    x_prefix=1
+)
+
 
 # ============================================================
 # SESSION SECURITY
@@ -27,8 +39,9 @@ app.config.from_object(Config)
 app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 
-# Production is HTTPS on Vercel
-app.config["SESSION_COOKIE_SECURE"] = True
+# Secure cookie in production (Vercel uses HTTPS)
+is_production = os.getenv("VERCEL") == "1" or os.getenv("FLASK_ENV") == "production"
+app.config["SESSION_COOKIE_SECURE"] = bool(is_production)
 
 app.permanent_session_lifetime = timedelta(
     hours=4

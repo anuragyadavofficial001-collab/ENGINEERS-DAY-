@@ -844,3 +844,45 @@ body {
 
     -webkit-text-fill-color: transparent;
 }
+
+
+/* ============================================================
+   FLASH MESSAGES — LOGIN PAGE
+   ============================================================ */
+
+.login-messages {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.login-message {
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    line-height: 1.5;
+}
+
+/* Error — Red */
+.login-message--error {
+    background: rgba(180, 30, 50, 0.18);
+    border: 1px solid rgba(180, 30, 50, 0.45);
+    color: #f4a0a8;
+}
+
+/* Info — Blue */
+.login-message--info {
+    background: rgba(30, 80, 180, 0.18);
+    border: 1px solid rgba(30, 80, 180, 0.45);
+    color: #90b8f8;
+}
+
+/* Warning — Amber */
+.login-message--warning {
+    background: rgba(180, 120, 20, 0.18);
+    border: 1px solid rgba(180, 120, 20, 0.45);
+    color: #f8d090;
+}

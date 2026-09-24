@@ -944,18 +944,100 @@ VALUES
 
 
 -- ============================================================
--- 14. VERIFICATION
+-- 14. STUDENT REGISTRY
+-- ============================================================
+-- Admin uploads student IDs here.
+-- This is the "authorized list" of who can log in.
+-- students table = actual login profile (after first login).
 -- ============================================================
 
-SELECT COUNT(*) AS total_events
-FROM games;
+CREATE TABLE IF NOT EXISTS student_registry (
+    id                  BIGSERIAL    PRIMARY KEY,
 
-SELECT COUNT(*) AS total_tables
-FROM information_schema.tables
-WHERE table_schema = 'engineers_day'
-AND table_type = 'BASE TABLE';
+    student_id          VARCHAR(50)  NOT NULL UNIQUE,
+
+    is_active           BOOLEAN      NOT NULL DEFAULT TRUE,
+
+    claimed             BOOLEAN      NOT NULL DEFAULT FALSE,
+
+    claimed_student_id  INT          NULL,
+
+    imported_at         TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    claimed_at          TIMESTAMP    NULL,
+
+    CONSTRAINT fk_registry_student
+        FOREIGN KEY (claimed_student_id)
+        REFERENCES students(id)
+        ON DELETE SET NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_registry_student_id
+    ON student_registry (student_id);
+
+CREATE INDEX IF NOT EXISTS idx_registry_claimed
+    ON student_registry (claimed);
+
+CREATE INDEX IF NOT EXISTS idx_registry_active
+    ON student_registry (is_active);
+
+
+-- ============================================================
+-- 15. PORTAL SETTINGS
+-- ============================================================
+-- Single-row settings table controlled by the admin panel.
+-- id = 1 always (one row only).
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS portal_settings (
+    id                      INT          PRIMARY KEY DEFAULT 1,
+
+    portal_name             VARCHAR(200) NOT NULL DEFAULT 'Engineers Day 2026',
+
+    event_date              DATE         NULL,
+
+    portal_status           VARCHAR(20)  NOT NULL DEFAULT 'ACTIVE'
+                                CHECK (portal_status IN ('ACTIVE', 'MAINTENANCE')),
+
+    registration_enabled    BOOLEAN      NOT NULL DEFAULT TRUE,
+
+    student_login_enabled   BOOLEAN      NOT NULL DEFAULT TRUE,
+
+    created_at              TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    updated_at              TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Insert the default single settings row
+INSERT INTO portal_settings
+(
+    id,
+    portal_name,
+    event_date,
+    portal_status,
+    registration_enabled,
+    student_login_enabled
+)
+VALUES
+(
+    1,
+    'Engineers Day 2026',
+    '2026-09-15',
+    'ACTIVE',
+    TRUE,
+    TRUE
+)
+ON CONFLICT (id) DO NOTHING;
+
+
+-- ============================================================
+-- 16. VERIFICATION
+-- ============================================================
+
+SELECT COUNT(*) AS total_events   FROM games;
+SELECT COUNT(*) AS total_students FROM student_registry;
 
 
 -- ============================================================
 -- END
--- ============================================================
+-- ============================================================
