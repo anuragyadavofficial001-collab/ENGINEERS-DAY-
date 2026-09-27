@@ -8,7 +8,6 @@ import io
 import os
 import re
 from functools import wraps
-from io import BytesIO
 
 from flask import (
     Blueprint,
@@ -21,9 +20,8 @@ from flask import (
     send_file,
     url_for
 )
+
 from openpyxl import Workbook, load_workbook
-from openpyxl.styles import Font, PatternFill, Alignment
-from openpyxl.utils import get_column_letter
 from pypdf import PdfReader
 from werkzeug.security import check_password_hash
 
@@ -178,9 +176,124 @@ def admin_required(view_function):
                 url_for("admin.login")
             )
 
-        return view_function(*args, **kwargs)
+        admin_id = session.get("admin_id")
+
+        if not admin_id:
+            session.clear()
+            return redirect(
+                url_for("admin.login")
+            )
+
+        connection = None
+        cursor = None
+
+        try:
+
+            connection = get_db_connection()
+            cursor = connection.cursor()
+
+            cursor.execute(
+                """
+                SELECT
+                    id,
+                    username,
+                    full_name,
+                    role,
+                    game_id,
+                    is_active
+                FROM admins
+                WHERE id = %s
+                LIMIT 1
+                """,
+                (admin_id,)
+            )
+
+            admin = cursor.fetchone()
+
+            if not admin:
+                session.clear()
+                return redirect(
+                    url_for("admin.login")
+                )
+
+            if not bool(admin["is_active"]):
+                session.clear()
+                flash(
+                    "Your admin account has been disabled.",
+                    "error"
+                )
+                return redirect(
+                    url_for("admin.login")
+                )
+
+            if admin["role"] not in {
+                "SUPER_ADMIN",
+                "GAME_ADMIN"
+            }:
+                session.clear()
+                flash(
+                    "Invalid admin role.",
+                    "error"
+                )
+                return redirect(
+                    url_for("admin.login")
+                )
+
+            session["admin_authenticated"] = True
+            session["admin_id"] = admin["id"]
+            session["admin_username"] = admin["username"]
+            session["admin_full_name"] = admin["full_name"]
+            session["admin_role"] = admin["role"]
+            session["admin_game_id"] = admin["game_id"]
+
+            return view_function(*args, **kwargs)
+
+        except Exception:
+
+            rollback_db(connection)
+
+            current_app.logger.exception(
+                "Admin authorization check failed"
+            )
+
+            session.clear()
+
+            return redirect(
+                url_for("admin.login")
+            )
+
+        finally:
+
+            close_db(
+                connection,
+                cursor
+            )
 
     return wrapped_view
+
+
+def game_admin_required(game_id):
+    """
+    Allow:
+    - SUPER_ADMIN -> any game
+    - GAME_ADMIN -> only assigned game
+
+    Returns True when access is allowed.
+    """
+
+    admin_role = session.get("admin_role")
+    admin_game_id = session.get("admin_game_id")
+
+    if admin_role == "SUPER_ADMIN":
+        return True
+
+    if admin_role == "GAME_ADMIN":
+        try:
+            return int(admin_game_id) == int(game_id)
+        except (TypeError, ValueError):
+            return False
+
+    return False
 
 
 # ============================================================
@@ -235,6 +348,9 @@ def login():
                     id,
                     username,
                     password_hash,
+                    full_name,
+                    role,
+                    game_id,
                     is_active
                 FROM admins
                 WHERE username = %s
@@ -300,6 +416,9 @@ def login():
             session["admin_authenticated"] = True
             session["admin_id"] = admin["id"]
             session["admin_username"] = admin["username"]
+            session["admin_full_name"] = admin["full_name"]
+            session["admin_role"] = admin["role"]
+            session["admin_game_id"] = admin["game_id"]
             session.permanent = True
 
             return redirect(
@@ -424,7 +543,10 @@ def dashboard():
             total_students=total_students,
             active_accounts=active_accounts,
             total_events=total_events,
-            total_registrations=total_registrations
+            total_registrations=total_registrations,
+            is_super_admin=(
+                session.get("admin_role") == "SUPER_ADMIN"
+            )
         )
 
     except Exception:
@@ -482,8 +604,8 @@ def students():
         cursor = connection.cursor()
 
         search = request.args.get(
-            "search",
-            request.args.get("q", "")
+            "q",
+            ""
         ).strip()
 
         status = request.args.get(
@@ -2006,8 +2128,17 @@ def events():
 
             FROM games
 
+            WHERE (
+                %s = 'SUPER_ADMIN'
+                OR id = %s
+            )
+
             ORDER BY id ASC
-            """
+            """,
+            (
+                session.get("admin_role"),
+                session.get("admin_game_id")
+            )
         )
 
         games = cursor.fetchall()
@@ -2057,6 +2188,21 @@ def edit_event(game_id):
     cursor = None
 
     try:
+
+        # ----------------------------------------------------
+        # GAME ACCESS CONTROL
+        # ----------------------------------------------------
+
+        if not game_admin_required(game_id):
+
+            flash(
+                "You are not authorized to access this event.",
+                "error"
+            )
+
+            return redirect(
+                url_for("admin.events")
+            )
 
         connection = get_db_connection()
         cursor = connection.cursor()
@@ -2400,6 +2546,31 @@ def registrations():
             ""
         ).strip()
 
+        # ----------------------------------------------------
+        # GAME ADMIN ACCESS CONTROL
+        # ----------------------------------------------------
+
+        if session.get("admin_role") == "GAME_ADMIN":
+
+            assigned_game_id = session.get(
+                "admin_game_id"
+            )
+
+            if not assigned_game_id:
+
+                flash(
+                    "No game is assigned to your admin account.",
+                    "error"
+                )
+
+                return redirect(
+                    url_for("admin.dashboard")
+                )
+
+            game_id = str(
+                assigned_game_id
+            )
+
         query = """
             SELECT
                 r.id,
@@ -2410,13 +2581,9 @@ def registrations():
                 r.updated_at,
 
                 s.name AS student_name,
-                s.name AS name,
                 s.student_id AS student_roll,
-                s.student_id AS student_id_display,
                 s.email AS student_email,
-                s.email AS email,
                 s.phone AS student_phone,
-                s.phone AS phone,
                 s.branch,
                 s.section,
                 s.year,
@@ -2424,13 +2591,7 @@ def registrations():
                 g.game_name,
                 g.registration_mode,
                 g.event_date,
-                g.event_date AS schedule_date,
                 g.start_time,
-
-                t.id AS team_id,
-                t.team_name,
-                t.status AS team_status,
-                tm.member_role AS team_role,
 
                 CONCAT_WS(
                     ', ',
@@ -2446,13 +2607,6 @@ def registrations():
 
             INNER JOIN games g
                 ON g.id = r.game_id
-
-            LEFT JOIN team_members tm
-                ON tm.student_id = r.student_id
-
-            LEFT JOIN teams t
-                ON t.id = tm.team_id
-               AND t.game_id = r.game_id
         """
 
         conditions = []
@@ -2588,29 +2742,11 @@ def registrations():
             """
             SELECT COUNT(*) AS total
             FROM registrations
-            WHERE status = 'REJECTED'
-            """
-        )
-
-        rejected = cursor.fetchone()["total"]
-
-        cursor.execute(
-            """
-            SELECT COUNT(*) AS total
-            FROM registrations
             WHERE status = 'CANCELLED'
             """
         )
 
         cancelled = cursor.fetchone()["total"]
-
-        stats = {
-            "total": total,
-            "registered": registered,
-            "approved": approved,
-            "rejected": rejected,
-            "cancelled": cancelled
-        }
 
         return render_template(
             "admin/registrations.html",
@@ -2619,9 +2755,7 @@ def registrations():
             total=total,
             registered=registered,
             approved=approved,
-            rejected=rejected,
             cancelled=cancelled,
-            stats=stats,
             search=search,
             status=status,
             selected_game_id=game_id
@@ -2664,50 +2798,26 @@ def export_game_registrations(game_id):
     cursor = None
 
     try:
-        connection = get_db_connection()
-        cursor = connection.cursor()
 
         # ----------------------------------------------------
-        # GET GAME
+        # GAME ACCESS CONTROL
         # ----------------------------------------------------
 
-        cursor.execute(
-            """
-            SELECT
-                id,
-                game_name,
-                registration_mode,
-                team_min_size,
-                team_max_size,
-                event_date,
-                start_time,
-                end_time,
-                block,
-                floor,
-                room,
-                prize_pool,
-                status
-            FROM games
-            WHERE id = %s
-            LIMIT 1
-            """,
-            (game_id,)
-        )
+        if not game_admin_required(game_id):
 
-        game = cursor.fetchone()
-
-        if not game:
             flash(
-                "Game not found.",
+                "You are not authorized to export this game's registrations.",
                 "error"
             )
 
             return redirect(
                 url_for("admin.registrations")
             )
+        connection = get_db_connection()
+        cursor = connection.cursor()
 
         # ----------------------------------------------------
-        # GET REGISTRATIONS
+        # GAME + REGISTRATION + STUDENT DATA
         # ----------------------------------------------------
 
         cursor.execute(
@@ -2724,14 +2834,31 @@ def export_game_registrations(game_id):
                 s.phone,
                 s.branch,
                 s.section,
-                s.year
+                s.year,
+
+                g.id AS game_id,
+                g.game_name,
+                g.registration_mode,
+                g.team_min_size,
+                g.team_max_size,
+                g.event_date,
+                g.start_time,
+                g.end_time,
+                g.block,
+                g.floor,
+                g.room,
+                g.prize_pool,
+                g.status AS game_status
 
             FROM registrations r
 
             INNER JOIN students s
                 ON s.id = r.student_id
 
-            WHERE r.game_id = %s
+            INNER JOIN games g
+                ON g.id = r.game_id
+
+            WHERE g.id = %s
 
             ORDER BY
                 r.registered_at ASC,
@@ -2743,28 +2870,52 @@ def export_game_registrations(game_id):
         registrations = cursor.fetchall()
 
         # ----------------------------------------------------
+        # CHECK GAME EXISTS
+        # ----------------------------------------------------
+
+        cursor.execute(
+            """
+            SELECT
+                id,
+                game_name,
+                registration_mode
+            FROM games
+            WHERE id = %s
+            LIMIT 1
+            """,
+            (game_id,)
+        )
+
+        game = cursor.fetchone()
+
+        if not game:
+            flash(
+                "Game not found.",
+                "error"
+            )
+
+            return redirect(
+                url_for("admin.events")
+            )
+
+        # ----------------------------------------------------
         # CREATE EXCEL WORKBOOK
         # ----------------------------------------------------
 
         workbook = Workbook()
-
         worksheet = workbook.active
+
         worksheet.title = "Registrations"
 
         # ----------------------------------------------------
-        # GAME SUMMARY
+        # GAME TITLE
         # ----------------------------------------------------
 
         worksheet["A1"] = "ENGINEERS DAY 2026"
-
         worksheet["A2"] = "GAME"
         worksheet["B2"] = game["game_name"]
-
         worksheet["A3"] = "TOTAL REGISTRATIONS"
         worksheet["B3"] = len(registrations)
-
-        worksheet["A4"] = "REGISTRATION MODE"
-        worksheet["B4"] = game["registration_mode"]
 
         # ----------------------------------------------------
         # HEADERS
@@ -2802,25 +2953,16 @@ def export_game_registrations(game_id):
             "Game Status"
         ]
 
-        header_row = 6
+        header_row = 5
 
         for column_number, header in enumerate(
             headers,
             start=1
         ):
-            cell = worksheet.cell(
+            worksheet.cell(
                 row=header_row,
                 column=column_number,
                 value=header
-            )
-
-            cell.font = Font(
-                bold=True
-            )
-
-            cell.alignment = Alignment(
-                horizontal="center",
-                vertical="center"
             )
 
         # ----------------------------------------------------
@@ -2832,192 +2974,50 @@ def export_game_registrations(game_id):
             start=header_row + 1
         ):
 
-            # ------------------------------------------------
-            # IMPORTANT:
-            # Convert timezone-aware datetime values into
-            # Excel-compatible timezone-naive values.
-            # ------------------------------------------------
-
-            registered_at = registration.get(
-                "registered_at"
-            )
-
-            updated_at = registration.get(
-                "updated_at"
-            )
-
-            if registered_at is not None:
-
-                try:
-                    registered_at = registered_at.replace(
-                        tzinfo=None
-                    )
-                except Exception:
-                    pass
-
-            if updated_at is not None:
-
-                try:
-                    updated_at = updated_at.replace(
-                        tzinfo=None
-                    )
-                except Exception:
-                    pass
-
-            event_date = game.get(
-                "event_date"
-            )
-
-            start_time = game.get(
-                "start_time"
-            )
-
-            end_time = game.get(
-                "end_time"
-            )
-
-            # ------------------------------------------------
-            # DATA ROW
-            # ------------------------------------------------
-
             values = [
+                registration["registration_id"],
+                registration["registration_status"],
+                registration["registered_at"],
+                registration["updated_at"],
 
-                registration.get(
-                    "registration_id"
-                ),
+                registration["student_id"],
+                registration["student_name"],
+                registration["email"],
+                registration["phone"],
+                registration["branch"],
+                registration["section"],
+                registration["year"],
 
-                registration.get(
-                    "registration_status"
-                ),
+                registration["game_id"],
+                registration["game_name"],
+                registration["registration_mode"],
+                registration["team_min_size"],
+                registration["team_max_size"],
 
-                registered_at,
+                registration["event_date"],
+                registration["start_time"],
+                registration["end_time"],
 
-                updated_at,
+                registration["block"],
+                registration["floor"],
+                registration["room"],
 
-                registration.get(
-                    "student_id"
-                ),
-
-                registration.get(
-                    "student_name"
-                ),
-
-                registration.get(
-                    "email"
-                ),
-
-                registration.get(
-                    "phone"
-                ),
-
-                registration.get(
-                    "branch"
-                ),
-
-                registration.get(
-                    "section"
-                ),
-
-                registration.get(
-                    "year"
-                ),
-
-                game.get(
-                    "id"
-                ),
-
-                game.get(
-                    "game_name"
-                ),
-
-                game.get(
-                    "registration_mode"
-                ),
-
-                game.get(
-                    "team_min_size"
-                ),
-
-                game.get(
-                    "team_max_size"
-                ),
-
-                event_date,
-
-                start_time,
-
-                end_time,
-
-                game.get(
-                    "block"
-                ),
-
-                game.get(
-                    "floor"
-                ),
-
-                game.get(
-                    "room"
-                ),
-
-                game.get(
-                    "prize_pool"
-                ),
-
-                game.get(
-                    "status"
-                )
+                registration["prize_pool"],
+                registration["game_status"]
             ]
 
             for column_number, value in enumerate(
                 values,
                 start=1
             ):
+                if hasattr(value, "tzinfo") and value.tzinfo is not None:
+                    value = value.replace(tzinfo=None)
 
-                cell = worksheet.cell(
+                worksheet.cell(
                     row=row_number,
                     column=column_number,
                     value=value
                 )
-
-                cell.alignment = Alignment(
-                    vertical="top",
-                    wrap_text=True
-                )
-
-            # ------------------------------------------------
-            # Excel date/time formatting
-            # ------------------------------------------------
-
-            if registered_at is not None:
-                worksheet.cell(
-                    row=row_number,
-                    column=3
-                ).number_format = "yyyy-mm-dd hh:mm:ss"
-
-            if updated_at is not None:
-                worksheet.cell(
-                    row=row_number,
-                    column=4
-                ).number_format = "yyyy-mm-dd hh:mm:ss"
-
-            if event_date is not None:
-                worksheet.cell(
-                    row=row_number,
-                    column=17
-                ).number_format = "yyyy-mm-dd"
-
-            if start_time is not None:
-                worksheet.cell(
-                    row=row_number,
-                    column=18
-                ).number_format = "hh:mm:ss"
-
-            if end_time is not None:
-                worksheet.cell(
-                    row=row_number,
-                    column=19
-                ).number_format = "hh:mm:ss"
 
         # ----------------------------------------------------
         # COLUMN WIDTHS
@@ -3025,317 +3025,42 @@ def export_game_registrations(game_id):
 
         widths = {
             "A": 18,
-            "B": 22,
+            "B": 20,
             "C": 24,
             "D": 24,
-
             "E": 18,
-            "F": 26,
+            "F": 24,
             "G": 32,
             "H": 18,
             "I": 18,
             "J": 12,
             "K": 10,
-
             "L": 12,
             "M": 30,
             "N": 20,
             "O": 16,
             "P": 16,
-
             "Q": 15,
             "R": 15,
             "S": 15,
-
             "T": 15,
             "U": 12,
             "V": 12,
-
             "W": 18,
             "X": 18
         }
 
         for column, width in widths.items():
-
-            worksheet.column_dimensions[
-                column
-            ].width = width
+            worksheet.column_dimensions[column].width = width
 
         # ----------------------------------------------------
         # FREEZE HEADER
         # ----------------------------------------------------
 
-        worksheet.freeze_panes = "A7"
+        worksheet.freeze_panes = "A6"
 
         # ----------------------------------------------------
-        # AUTO FILTER
-        # ----------------------------------------------------
-
-        if registrations:
-
-            last_row = header_row + len(
-                registrations
-            )
-
-            worksheet.auto_filter.ref = (
-                f"A{header_row}:X{last_row}"
-            )
-
-        # ----------------------------------------------------
-        # GAME DETAILS SHEET
-        # ----------------------------------------------------
-
-        details_sheet = workbook.create_sheet(
-            "Game Details"
-        )
-
-        details = [
-            ("Game ID", game.get("id")),
-            ("Game Name", game.get("game_name")),
-            ("Registration Mode", game.get("registration_mode")),
-            ("Minimum Team Size", game.get("team_min_size")),
-            ("Maximum Team Size", game.get("team_max_size")),
-            ("Event Date", game.get("event_date")),
-            ("Start Time", game.get("start_time")),
-            ("End Time", game.get("end_time")),
-            ("Block", game.get("block")),
-            ("Floor", game.get("floor")),
-            ("Room", game.get("room")),
-            ("Prize Pool", game.get("prize_pool")),
-            ("Game Status", game.get("status")),
-            ("Total Registrations", len(registrations))
-        ]
-
-        for row_number, (label, value) in enumerate(
-            details,
-            start=1
-        ):
-
-            details_sheet.cell(
-                row=row_number,
-                column=1,
-                value=label
-            )
-
-            details_sheet.cell(
-                row=row_number,
-                column=2,
-                value=value
-            )
-
-            details_sheet.cell(
-                row=row_number,
-                column=1
-            ).font = Font(
-                bold=True
-            )
-
-        details_sheet.column_dimensions[
-            "A"
-        ].width = 28
-
-        details_sheet.column_dimensions[
-            "B"
-        ].width = 40
-
-        # ----------------------------------------------------
-        # TEAM INFORMATION
-        # ----------------------------------------------------
-
-        if str(
-            game.get("registration_mode") or ""
-        ).upper() == "TEAM":
-
-            team_sheet = workbook.create_sheet(
-                "Team Members"
-            )
-
-            cursor.execute(
-                """
-                SELECT
-                    t.id AS team_id,
-                    t.team_name,
-                    t.status AS team_status,
-
-                    leader.student_id
-                        AS leader_student_id,
-
-                    leader.name
-                        AS leader_name,
-
-                    tm.member_role,
-
-                    member.student_id
-                        AS member_student_id,
-
-                    member.name
-                        AS member_name,
-
-                    member.email
-                        AS member_email,
-
-                    member.phone
-                        AS member_phone,
-
-                    member.branch
-                        AS member_branch,
-
-                    member.section
-                        AS member_section,
-
-                    member.year
-                        AS member_year
-
-                FROM teams t
-
-                INNER JOIN students leader
-                    ON leader.id = t.team_leader_id
-
-                INNER JOIN team_members tm
-                    ON tm.team_id = t.id
-
-                INNER JOIN students member
-                    ON member.id = tm.student_id
-
-                WHERE t.game_id = %s
-
-                ORDER BY
-                    t.id ASC,
-                    tm.id ASC
-                """,
-                (game_id,)
-            )
-
-            team_members = cursor.fetchall()
-
-            team_headers = [
-                "Team ID",
-                "Team Name",
-                "Team Status",
-                "Leader Student ID",
-                "Leader Name",
-                "Member Role",
-                "Member Student ID",
-                "Member Name",
-                "Member Email",
-                "Member Phone",
-                "Branch",
-                "Section",
-                "Year"
-            ]
-
-            for column_number, header in enumerate(
-                team_headers,
-                start=1
-            ):
-
-                cell = team_sheet.cell(
-                    row=1,
-                    column=column_number,
-                    value=header
-                )
-
-                cell.font = Font(
-                    bold=True
-                )
-
-            for row_number, member in enumerate(
-                team_members,
-                start=2
-            ):
-
-                team_values = [
-
-                    member.get(
-                        "team_id"
-                    ),
-
-                    member.get(
-                        "team_name"
-                    ),
-
-                    member.get(
-                        "team_status"
-                    ),
-
-                    member.get(
-                        "leader_student_id"
-                    ),
-
-                    member.get(
-                        "leader_name"
-                    ),
-
-                    member.get(
-                        "member_role"
-                    ),
-
-                    member.get(
-                        "member_student_id"
-                    ),
-
-                    member.get(
-                        "member_name"
-                    ),
-
-                    member.get(
-                        "member_email"
-                    ),
-
-                    member.get(
-                        "member_phone"
-                    ),
-
-                    member.get(
-                        "member_branch"
-                    ),
-
-                    member.get(
-                        "member_section"
-                    ),
-
-                    member.get(
-                        "member_year"
-                    )
-                ]
-
-                for column_number, value in enumerate(
-                    team_values,
-                    start=1
-                ):
-
-                    team_sheet.cell(
-                        row=row_number,
-                        column=column_number,
-                        value=value
-                    )
-
-            team_widths = {
-                "A": 12,
-                "B": 24,
-                "C": 18,
-                "D": 20,
-                "E": 25,
-                "F": 16,
-                "G": 20,
-                "H": 25,
-                "I": 32,
-                "J": 18,
-                "K": 18,
-                "L": 12,
-                "M": 10
-            }
-
-            for column, width in team_widths.items():
-
-                team_sheet.column_dimensions[
-                    column
-                ].width = width
-
-            team_sheet.freeze_panes = "A2"
-
-        # ----------------------------------------------------
-        # SAVE WORKBOOK TO MEMORY
+        # SAVE TO MEMORY
         # ----------------------------------------------------
 
         output = io.BytesIO()
@@ -3351,22 +3076,12 @@ def export_game_registrations(game_id):
         safe_game_name = re.sub(
             r"[^A-Za-z0-9_-]+",
             "_",
-            str(
-                game.get("game_name") or
-                "Game"
-            )
+            game["game_name"]
         ).strip("_")
-
-        if not safe_game_name:
-            safe_game_name = "Game"
 
         filename = (
             f"{safe_game_name}_Registrations.xlsx"
         )
-
-        # ----------------------------------------------------
-        # SEND FILE
-        # ----------------------------------------------------
 
         return send_file(
             output,
@@ -3402,36 +3117,73 @@ def export_game_registrations(game_id):
     finally:
 
         if cursor:
-            try:
-                cursor.close()
-            except Exception:
-                pass
+            cursor.close()
 
         if connection:
-            try:
-                connection.close()
-            except Exception:
-                pass
+            connection.close()
+
 # ============================================================
 # REGISTRATION DETAILS
 # ============================================================
 
-@admin_bp.route("/registrations/<int:registration_id>")
+@admin_bp.route(
+    "/registrations/<int:registration_id>"
+)
 @admin_required
-def registration_details(registration_id):
+def registration_details(
+    registration_id
+):
 
     connection = None
     cursor = None
 
     try:
+
         connection = get_db_connection()
         cursor = connection.cursor()
 
         # ----------------------------------------------------
-        # 1. REGISTRATION + STUDENT + GAME
+        # GAME ADMIN ACCESS CONTROL
         # ----------------------------------------------------
 
-        cursor.execute("""
+        cursor.execute(
+            """
+            SELECT game_id
+            FROM registrations
+            WHERE id = %s
+            LIMIT 1
+            """,
+            (registration_id,)
+        )
+
+        registration_access = cursor.fetchone()
+
+        if not registration_access:
+
+            flash(
+                "Registration not found.",
+                "error"
+            )
+
+            return redirect(
+                url_for("admin.registrations")
+            )
+
+        if not game_admin_required(
+            registration_access["game_id"]
+        ):
+
+            flash(
+                "You are not authorized to view this registration.",
+                "error"
+            )
+
+            return redirect(
+                url_for("admin.registrations")
+            )
+
+        cursor.execute(
+            """
             SELECT
                 r.id,
                 r.student_id,
@@ -3440,24 +3192,29 @@ def registration_details(registration_id):
                 r.registered_at,
                 r.updated_at,
 
-                -- Student
-                s.name AS name,
-                s.email AS email,
-                s.phone AS phone,
+                s.name AS student_name,
                 s.student_id AS student_roll,
+                s.email AS student_email,
+                s.phone AS student_phone,
                 s.branch,
                 s.section,
                 s.year,
 
-                -- Game
                 g.game_name,
                 g.description,
                 g.registration_mode,
                 g.team_min_size,
                 g.team_max_size,
-                g.event_date AS schedule_date,
-                g.start_time AS schedule_time,
-                CONCAT_WS(', ', g.block, g.floor, g.room) AS venue,
+                g.event_date,
+                g.start_time,
+
+                CONCAT_WS(
+                    ', ',
+                    NULLIF(g.block, ''),
+                    NULLIF(g.floor, ''),
+                    NULLIF(g.room, '')
+                ) AS venue,
+
                 g.prize_pool,
                 g.rules,
                 g.requirements,
@@ -3475,7 +3232,9 @@ def registration_details(registration_id):
             WHERE r.id = %s
 
             LIMIT 1
-        """, (registration_id,))
+            """,
+            (registration_id,)
+        )
 
         registration = cursor.fetchone()
 
@@ -3490,119 +3249,14 @@ def registration_details(registration_id):
                 url_for("admin.registrations")
             )
 
-        # ----------------------------------------------------
-        # 2. DEFAULT TEAM VALUES
-        # ----------------------------------------------------
-
-        team_members = []
-
-        registration["team_id"] = None
-        registration["team_name"] = None
-        registration["team_status"] = None
-        registration["team_leader_name"] = None
-
-        # ----------------------------------------------------
-        # 3. FIND TEAM FOR THIS REGISTRATION
-        #
-        # A student can be connected to a team through
-        # team_members.
-        # ----------------------------------------------------
-
-        cursor.execute("""
-            SELECT
-                t.id AS team_id,
-                t.team_name,
-                t.status AS team_status,
-                t.team_leader_id,
-
-                leader.name AS team_leader_name
-
-            FROM team_members tm
-
-            INNER JOIN teams t
-                ON t.id = tm.team_id
-
-            INNER JOIN students leader
-                ON leader.id = t.team_leader_id
-
-            WHERE
-                tm.student_id = %s
-                AND t.game_id = %s
-
-            ORDER BY t.id DESC
-
-            LIMIT 1
-        """, (
-            registration["student_id"],
-            registration["game_id"]
-        ))
-
-        team = cursor.fetchone()
-
-        # ----------------------------------------------------
-        # 4. TEAM DATA
-        # ----------------------------------------------------
-
-        if team:
-
-            registration["team_id"] = team["team_id"]
-            registration["team_name"] = team["team_name"]
-            registration["team_status"] = team["team_status"]
-            registration["team_leader_name"] = team["team_leader_name"]
-
-            # ------------------------------------------------
-            # 5. LOAD ALL TEAM MEMBERS
-            # ------------------------------------------------
-
-            cursor.execute("""
-                SELECT
-
-                    tm.id AS team_member_id,
-
-                    tm.member_role,
-                    tm.joined_at,
-
-                    s.id AS student_id,
-                    s.student_id AS student_roll,
-                    s.name,
-                    s.email,
-                    s.phone,
-                    s.branch,
-                    s.section,
-                    s.year
-
-                FROM team_members tm
-
-                INNER JOIN students s
-                    ON s.id = tm.student_id
-
-                WHERE tm.team_id = %s
-
-                ORDER BY
-                    CASE
-                        WHEN tm.member_role = 'LEADER'
-                        THEN 0
-                        ELSE 1
-                    END,
-                    tm.id ASC
-            """, (team["team_id"],))
-
-            team_members = cursor.fetchall()
-
-        # ----------------------------------------------------
-        # 6. RENDER DETAILS PAGE
-        # ----------------------------------------------------
-
         return render_template(
             "admin/registration_details.html",
-            registration=registration,
-            team_members=team_members
+            registration=registration
         )
 
     except Exception:
 
-        if connection:
-            connection.rollback()
+        rollback_db(connection)
 
         current_app.logger.exception(
             "Registration details error"
@@ -3619,11 +3273,10 @@ def registration_details(registration_id):
 
     finally:
 
-        if cursor:
-            cursor.close()
-
-        if connection:
-            connection.close()
+        close_db(
+            connection,
+            cursor
+        )
 
 
 # ============================================================
@@ -3665,6 +3318,46 @@ def update_registration_status(
 
         connection = get_db_connection()
         cursor = connection.cursor()
+
+        # ----------------------------------------------------
+        # GAME ADMIN ACCESS CONTROL
+        # ----------------------------------------------------
+
+        cursor.execute(
+            """
+            SELECT game_id
+            FROM registrations
+            WHERE id = %s
+            LIMIT 1
+            """,
+            (registration_id,)
+        )
+
+        registration_access = cursor.fetchone()
+
+        if not registration_access:
+
+            flash(
+                "Registration not found.",
+                "error"
+            )
+
+            return redirect(
+                url_for("admin.registrations")
+            )
+
+        if not game_admin_required(
+            registration_access["game_id"]
+        ):
+
+            flash(
+                "You are not authorized to update this registration.",
+                "error"
+            )
+
+            return redirect(
+                url_for("admin.registrations")
+            )
 
         cursor.execute(
             """
@@ -3798,6 +3491,35 @@ def results():
         params = []
 
         # ----------------------------------------------------
+        # GAME ADMIN ACCESS CONTROL
+        # ----------------------------------------------------
+
+        if session.get("admin_role") == "GAME_ADMIN":
+
+            assigned_game_id = session.get(
+                "admin_game_id"
+            )
+
+            if not assigned_game_id:
+
+                flash(
+                    "No game is assigned to your admin account.",
+                    "error"
+                )
+
+                return redirect(
+                    url_for("admin.dashboard")
+                )
+
+            conditions.append(
+                "g.id = %s"
+            )
+
+            params.append(
+                assigned_game_id
+            )
+
+        # ----------------------------------------------------
         # EVENT FILTER
         # ----------------------------------------------------
 
@@ -3895,8 +3617,16 @@ def results():
                 id,
                 game_name
             FROM games
+            WHERE (
+                %s = 'SUPER_ADMIN'
+                OR id = %s
+            )
             ORDER BY game_name ASC
-            """
+            """,
+            (
+                session.get("admin_role"),
+                session.get("admin_game_id")
+            )
         )
 
         games = cursor.fetchall()
@@ -4029,6 +3759,32 @@ def result_create():
             game_id = clean_int(
                 raw_game_id
             )
+
+            if game_id is None:
+
+                flash(
+                    "Please select a valid event.",
+                    "error"
+                )
+
+                return redirect(
+                    url_for("admin.result_create")
+                )
+
+            # ------------------------------------------------
+            # GAME ADMIN ACCESS CONTROL
+            # ------------------------------------------------
+
+            if not game_admin_required(game_id):
+
+                flash(
+                    "You are not authorized to manage this event result.",
+                    "error"
+                )
+
+                return redirect(
+                    url_for("admin.results")
+                )
 
             if game_id is None:
 
@@ -4342,6 +4098,10 @@ def result_create():
                 ON r.game_id = g.id
 
             WHERE r.id IS NULL
+                AND (
+                    %s = 'SUPER_ADMIN'
+                    OR g.id = %s
+                )
 
             ORDER BY
                 CASE
@@ -4350,7 +4110,11 @@ def result_create():
                 END,
                 g.event_date ASC,
                 g.game_name ASC
-            """
+            """,
+            (
+                session.get("admin_role"),
+                session.get("admin_game_id")
+            )
         )
 
         games = cursor.fetchall()
@@ -4403,6 +4167,21 @@ def result_edit(game_id):
     cursor = None
 
     try:
+
+        # ----------------------------------------------------
+        # GAME ACCESS CONTROL
+        # ----------------------------------------------------
+
+        if not game_admin_required(game_id):
+
+            flash(
+                "You are not authorized to manage this event result.",
+                "error"
+            )
+
+            return redirect(
+                url_for("admin.results")
+            )
 
         connection = get_db_connection()
         cursor = connection.cursor()

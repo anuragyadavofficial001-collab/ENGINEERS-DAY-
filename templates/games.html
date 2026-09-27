@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,7 +8,9 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@600;700;800&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@600;700;800&display=swap"
+        rel="stylesheet">
 
     <style>
         * {
@@ -38,7 +41,7 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            background-image: 
+            background-image:
                 radial-gradient(circle at 15% 10%, rgba(0, 212, 239, 0.12), transparent 35%),
                 radial-gradient(circle at 85% 20%, rgba(140, 108, 245, 0.12), transparent 35%),
                 radial-gradient(circle at 50% 80%, rgba(255, 77, 141, 0.06), transparent 45%);
@@ -300,6 +303,7 @@
             margin-bottom: 18px;
             display: -webkit-box;
             -webkit-line-clamp: 2;
+            line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
             flex: 1;
@@ -365,15 +369,18 @@
             header.navbar {
                 padding: 14px 20px;
             }
+
             .hero-banner h1 {
                 font-size: 28px;
             }
+
             .events-grid {
                 grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
+
 <body>
 
     <header class="navbar">
@@ -396,30 +403,34 @@
         <div class="hero-banner">
             <div class="pill-badge">Official Events</div>
             <h1>Engineers Day 2026 Events</h1>
-            <p>Explore all 27 technical, creative, and gaming events. Select any event to review complete rules, guidelines, and confirm your participation.</p>
+            <p>Explore all 27 technical, creative, and gaming events. Select any event to review complete rules,
+                guidelines, and confirm your participation.</p>
 
             <div class="search-bar-wrap">
                 <span class="search-icon">🔍</span>
-                <input type="text" id="eventSearch" placeholder="Search by event name, rules, or venue..." onkeyup="filterEvents()">
+                <input type="text" id="eventSearch" placeholder="Search by event name, rules, or venue..."
+                    onkeyup="filterEvents()">
             </div>
         </div>
 
         <div class="events-grid" id="eventsGrid">
             {% for game in games %}
             <a href="{{ url_for('games.game_details', game_id=game.id) }}" class="event-card">
-                <div class="card-img-wrap" data-image-url="{{ url_for('static', filename='image/games/' ~ game.id ~ '-hero.jpg') }}">
+                <div class="card-img-wrap"
+                    data-image-url="{{ url_for('static', filename='image/games/' ~ game.id ~ '-hero.jpg') }}">
                     <div class="card-overlay"></div>
                     <span class="badge-mode">{{ game.registration_mode }}</span>
                     {% if game.registration_open %}
-                        <span class="card-badge badge-open">Registration Open</span>
+                    <span class="card-badge badge-open">Registration Open</span>
                     {% else %}
-                        <span class="card-badge badge-closed">Closed</span>
+                    <span class="card-badge badge-closed">Closed</span>
                     {% endif %}
                 </div>
 
                 <div class="card-body">
                     <h2 class="card-title">{{ game.game_name }}</h2>
-                    <p class="card-desc">{{ game.description if game.description else 'Participate and demonstrate your engineering mastery in this competition.' }}</p>
+                    <p class="card-desc">{{ game.description if game.description else 'Participate and demonstrate your
+                        engineering mastery in this competition.' }}</p>
 
                     <div class="card-meta">
                         <div class="meta-item">
@@ -428,7 +439,8 @@
                         </div>
                         <div class="meta-item">
                             <small>Location</small>
-                            <strong>{{ (game.block ~ ' - ' ~ game.room) if game.block and game.room else 'Main Campus' }}</strong>
+                            <strong>{{ (game.block ~ ' - ' ~ game.room) if game.block and game.room else 'Main Campus'
+                                }}</strong>
                         </div>
                     </div>
 
@@ -442,7 +454,8 @@
             <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--text-muted);">
                 <h3>No events found</h3>
                 <p style="margin-top: 10px;">Please check back shortly or return to the main dashboard.</p>
-                <a href="{{ url_for('student.home') }}" class="btn-back" style="margin-top: 20px; display: inline-flex;">Return to Dashboard</a>
+                <a href="{{ url_for('student.home') }}" class="btn-back"
+                    style="margin-top: 20px; display: inline-flex;">Return to Dashboard</a>
             </div>
             {% endfor %}
         </div>
@@ -479,4 +492,5 @@
         }
     </script>
 </body>
+
 </html>

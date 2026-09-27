@@ -40,7 +40,11 @@ app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 
 # Secure cookie in production (Vercel uses HTTPS)
-is_production = os.getenv("VERCEL") == "1" or os.getenv("FLASK_ENV") == "production"
+is_production = (
+    os.getenv("VERCEL") == "1"
+    or os.getenv("FLASK_ENV") == "production"
+)
+
 app.config["SESSION_COOKIE_SECURE"] = bool(is_production)
 
 app.permanent_session_lifetime = timedelta(
@@ -56,12 +60,14 @@ from routes.auth import auth_bp
 from routes.student import student_bp
 from routes.admin import admin_bp
 from routes.games import games_bp
+from routes.admin_management import admin_management_bp
 
 
 app.register_blueprint(auth_bp)
 app.register_blueprint(student_bp)
 app.register_blueprint(admin_bp)
 app.register_blueprint(games_bp)
+app.register_blueprint(admin_management_bp)
 
 
 # ============================================================

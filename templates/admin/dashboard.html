@@ -32,15 +32,35 @@
 
             <div class="hero-actions">
 
-                <a href="{{ url_for('admin.events') }}" class="hero-primary">
+                <a
+                    href="{{ url_for('admin.events') }}"
+                    class="hero-primary"
+                >
                     <span>Manage Events</span>
                     <span class="hero-action-arrow">→</span>
                 </a>
 
-                <a href="{{ url_for('admin.registrations') }}" class="hero-secondary">
+
+                <a
+                    href="{{ url_for('admin.registrations') }}"
+                    class="hero-secondary"
+                >
                     View Registrations
                     <span>↗</span>
                 </a>
+
+
+                {% if is_super_admin %}
+
+                <a
+                    href="{{ url_for('admin_management.create_admin') }}"
+                    class="hero-secondary admin-create-action"
+                >
+                    <span>+ Create Admin</span>
+                    <span>↗</span>
+                </a>
+
+                {% endif %}
 
             </div>
 
